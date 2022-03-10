@@ -33,8 +33,9 @@ namespace TeleportEverything
         public static ConfigEntry<float> TransportVerticalTolerance;
         public static bool IncludeTamed;
         public static bool IncludeNamed;
-        public static bool  IncludeWild;
+        public static bool IncludeWild;
         public static bool IncludeFollow;
+        public static bool ExcludeNamed;
         public static ConfigEntry<string> IncludeMode;
 
         //Teleport Self
@@ -50,12 +51,7 @@ namespace TeleportEverything
             enemies = new List<Character>();
             transportTargets = new List<Character>();
 
-            TransportAllies = false;
-            IncludeTamed = false;
-            IncludeNamed = false;
-            IncludeWild = false;
-            IncludeFollow = false;
-
+            ClearIncludeVars();
         }
 
         private void OnDestroy()
@@ -96,49 +92,47 @@ namespace TeleportEverything
                         "Take Them With You")));
         }
 
+        private static void ClearIncludeVars()
+        {
+            TransportAllies = false;
+            IncludeTamed = false;
+            IncludeNamed = false;
+            IncludeWild = false;
+            IncludeFollow = false;
+            ExcludeNamed = false;
+        }
+
         public static void SetIncludeMode()
         {
-            if (IncludeMode.Value.Contains("No Allies"))
-            {
-                TransportAllies = false;
-                IncludeTamed = false;
-                IncludeNamed = false;
-                IncludeFollow = false;
-                IncludeWild = false;
-            }
-            else
+            ClearIncludeVars();
+
+            if (!IncludeMode.Value.Contains("No Allies"))
             {
                 TransportAllies = true;
             }
 
-            if (IncludeMode.Value.Contains("All tamed"))
+            if (IncludeMode.Value.Equals("All tamed"))
             {
                 IncludeTamed = true;
                 IncludeNamed = true;
                 IncludeFollow = true;
-                IncludeWild = false;
             }
             
             if(IncludeMode.Value.Contains("Only Follow"))
             {
-                IncludeTamed = false;
-                IncludeNamed = false;
                 IncludeFollow = true;
-                IncludeWild = false;
             }
+
             if(IncludeMode.Value.Contains("All tamed except Named"))
             {
                 IncludeTamed = true;
-                IncludeNamed = false;
+                ExcludeNamed = true;
                 IncludeFollow = true;
-                IncludeWild = false;
             }
+
             if(IncludeMode.Value.Contains("Only Named"))
             {
-                IncludeTamed = false;
                 IncludeNamed = true;
-                IncludeFollow = false;
-                IncludeWild = false;
             }
         }
         public static List<Character> GetEnemies()
@@ -177,7 +171,7 @@ namespace TeleportEverything
             return Mathf.Abs(VectorToEntity(e).y);
         }
 
-        public static bool IsAlly(Character c)
+        public static bool IsElegibleAlly(Character c)
         {
             if (c.m_name.ToLower().Contains("wolf") && TransportWolves.Value)
                 return true;
@@ -194,23 +188,17 @@ namespace TeleportEverything
 
         public static bool IsAllyTransportable(Character ally)
         {
-            if (IsFollow(ally) && IncludeFollow)
-            {
-                return true;
-            }
-            if (IsNamed(ally) && IncludeNamed)
-            {
-                return true;
-            }
-            else if (IsNamed(ally) && !IncludeNamed)
-            {
+            if (IsNamed(ally) && ExcludeNamed)
                 return false;
-            }
+
+            if (IsFollow(ally) && IncludeFollow)
+                return true;
+
+            if (IsNamed(ally) && IncludeNamed)
+                return true;
 
             if (ally.IsTamed() && IncludeTamed)
-            {
                 return true;
-            }
 
             return false;
         }
@@ -240,12 +228,13 @@ namespace TeleportEverything
             transportTargets.Clear();
             enemies.Clear();
 
-            Character[] entityArray = FindObjectsOfType<Character>();
+            List<Character> characters = new List<Character>();
+            Character.GetCharactersInRange(Player.m_localPlayer.transform.position, SearchRadius.Value, characters);
 
 
-            foreach (Character c in entityArray)
+            foreach (Character c in characters)
             {
-                if (IsAlly(c) && IsAllyTransportable(c) && TransportAllies)
+                if (IsElegibleAlly(c) && IsAllyTransportable(c) && TransportAllies)
                 {
                     if (HorizontalDistance(c) <= TransportRadius.Value &&
                         VerticalDistance(c) <= TransportVerticalTolerance.Value)
@@ -257,10 +246,7 @@ namespace TeleportEverything
                 if (c.GetComponent<BaseAI>() != null &&
                     c.GetComponent<BaseAI>().IsEnemey(Player.m_localPlayer) && !c.IsTamed())
                 {
-                    if (CalcDistToEntity(c) <= SearchRadius.Value)
-                    {
-                        enemies.Add(c);
-                    }
+                    enemies.Add(c);
                 }
             }
         }
