@@ -181,7 +181,7 @@ namespace TeleportEverything
 
         public static float VerticalDistance(Character e)
         {
-            return VectorToEntity(e).y;
+            return Mathf.Abs(VectorToEntity(e).y);
         }
 
         public static bool IsAlly(Character c)
@@ -232,13 +232,27 @@ namespace TeleportEverything
 
         public static bool IsNamed(Character t)
         {
-            
-            return !t.GetHoverName().Equals("Wolf");
+           if(t.GetHoverName().Equals("Wolf") || t.GetHoverName().Equals("Wolf cub"))
+           {
+               return false;
+           }
+           if(t.GetHoverName().Equals("Boar") || t.GetHoverName().Equals("Boar piggy"))
+           {
+               return false;
+           }
+
+           return true;
         }
 
         public static bool IsFollow(Character f)
         {
+            if (f.GetComponent<MonsterAI>() == null)
+            {
+                return false;
+            }
+
             MonsterAI mAi = f.GetComponent<MonsterAI>();
+            
             if (mAi.GetFollowTarget() != null && mAi.GetFollowTarget().Equals(Player.m_localPlayer.gameObject))
             {
                 return true;
