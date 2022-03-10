@@ -324,9 +324,13 @@ namespace TeleportEverything
                 {
                     foreach (Character ally in transportTargets)
                     {
-                        Vector3 offset = __instance.m_lookDir * 1;
+                        Vector3 offset = __instance.m_lookDir * 2;
                         offset.y = 0;
                         ally.transform.position = __instance.m_teleportTargetPos + offset;
+                        if (IncludeFollow)
+                        {
+                            SetFollow(ally);
+                        }
                     }
 
                     return __result;
@@ -336,7 +340,15 @@ namespace TeleportEverything
                 return __result;
             }
         }
-
+        public static void SetFollow(Character f)
+        {
+            MonsterAI mAi = f.GetComponent<MonsterAI>();
+            
+            if (mAi.GetFollowTarget() == null)
+            {
+                mAi.SetFollowTarget(Player.m_localPlayer.gameObject);
+            }
+        }
 
         [HarmonyPatch(typeof(Humanoid))]
         [HarmonyPatch("IsTeleportable")]
