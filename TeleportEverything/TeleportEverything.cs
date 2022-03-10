@@ -171,7 +171,7 @@ namespace TeleportEverything
             return Mathf.Abs(VectorToEntity(e).y);
         }
 
-        public static bool IsElegibleAlly(Character c)
+        public static bool IsEligibleAlly(Character c)
         {
             if (c.m_name.ToLower().Contains("wolf") && TransportWolves.Value)
                 return true;
@@ -234,7 +234,7 @@ namespace TeleportEverything
 
             foreach (Character c in characters)
             {
-                if (IsElegibleAlly(c) && IsAllyTransportable(c) && TransportAllies)
+                if (IsEligibleAlly(c) && IsAllyTransportable(c) && TransportAllies)
                 {
                     if (HorizontalDistance(c) <= TransportRadius.Value &&
                         VerticalDistance(c) <= TransportVerticalTolerance.Value)
