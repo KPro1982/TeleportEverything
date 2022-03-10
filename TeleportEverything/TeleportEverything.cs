@@ -22,6 +22,7 @@ namespace TeleportEverything
         // General
         public static ConfigEntry<bool> EnableMod;
         public static ConfigEntry<string> TeleportMode;
+        public static ConfigEntry<string> MessageMode;
 
         // Transport Allies
         public static bool TransportAllies;
@@ -66,6 +67,9 @@ namespace TeleportEverything
 
             // General
             EnableMod = Config.Bind("Mod", "Enable Mod", true);
+            MessageMode = Config.Bind("Mod", "Message Mode", "No messages",
+                new ConfigDescription("Ally Mode",
+                    new AcceptableValueList<string>("No messages", "top left", "centered")));
 
             // Transport
             
@@ -251,6 +255,20 @@ namespace TeleportEverything
             }
         }
 
+        public static void DisplayMessage(string msg)
+        {
+            if(MessageMode.Value.Equals("top left"))
+            {
+                MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft,
+                msg);
+            }
+            else if (MessageMode.Value.Equals("centered"))
+            {
+                MessageHud.instance.ShowMessage(MessageHud.MessageType.Center,
+                    msg);
+            }
+        }
+
         [HarmonyPatch(typeof(Player))]
         [HarmonyPatch("TeleportTo")]
         public class TeleportTo_Patch
@@ -265,8 +283,8 @@ namespace TeleportEverything
 
                 if (GetEnemies().Count > 0 && TeleportMode.Value.Contains("Take"))
                 {
-                    MessageHud.instance.ShowMessage(MessageHud.MessageType.Center,
-                        $"Taking Enemies With You! {GetEnemies().Count} enemies charge the portal!!!");
+                    DisplayMessage($"Taking Enemies With You! {GetEnemies().Count} enemies charge the portal!!!");
+                    
                     foreach (Character e in enemies) 
                     {
                         if (UnityEngine.Random.Range(0, 100) <= 25)
@@ -324,23 +342,20 @@ namespace TeleportEverything
 
                 if (TransportAllies && GetTransportTargets().Count > 0)
                 {
-                    MessageHud.instance.ShowMessage(MessageHud.MessageType.Center,
-                        $"{GetTransportTargets().Count} allies will teleport with you!");
+                   DisplayMessage($"{GetTransportTargets().Count} allies will teleport with you!");
                 }
 
                 if (GetEnemies().Count > 0)
                 {
                     if (TeleportMode.Value.Contains("Run"))
                     {
-                        MessageHud.instance.ShowMessage(MessageHud.MessageType.Center,
-                            $"Vikings Don't run from a fight: {GetEnemies().Count} enemies with in {SearchRadius.Value} meters.");
+                     DisplayMessage($"Vikings Don't run from a fight: {GetEnemies().Count} enemies with in {SearchRadius.Value} meters.");
                         return false;
                     }
                     else if (TeleportMode.Value.Contains("Take"))
 
                     {
-                        MessageHud.instance.ShowMessage(MessageHud.MessageType.Center,
-                            $"Beware: {GetEnemies().Count} enemies may charge the portal!");
+                        DisplayMessage($"Beware: {GetEnemies().Count} enemies may charge the portal!");
                     }
                 }
 
