@@ -15,7 +15,7 @@ namespace TeleportEverything
     {
         public const string PluginGUID = "com.kpro.TeleportEverything";
         public const string PluginName = "TeleportEverything";
-        public const string PluginVersion = "1.1";
+        public const string PluginVersion = "1.2";
 
        private readonly Harmony harmony = new Harmony("com.kpro.TeleportEverything");
 
@@ -353,7 +353,7 @@ namespace TeleportEverything
                 }
 
 
-                if (TransportAllies)
+                if (TransportAllies && GetTransportTargets().Count > 0)
                 {
                     MessageHud.instance.ShowMessage(MessageHud.MessageType.Center,
                         $"{GetTransportTargets().Count} allies will teleport with you!");
