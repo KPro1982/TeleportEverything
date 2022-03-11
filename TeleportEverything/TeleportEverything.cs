@@ -10,14 +10,13 @@ using Random = UnityEngine.Random;
 namespace TeleportEverything
 {
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
-    
     internal class SmartSave : BaseUnityPlugin
     {
         public const string PluginGUID = "com.kpro.TeleportEverything";
         public const string PluginName = "TeleportEverything";
         public const string PluginVersion = "1.2";
 
-       private readonly Harmony harmony = new Harmony("com.kpro.TeleportEverything");
+        private readonly Harmony harmony = new Harmony("com.kpro.TeleportEverything");
 
         // General
         public static ConfigEntry<bool> EnableMod;
@@ -43,14 +42,14 @@ namespace TeleportEverything
         public static ConfigEntry<float> SearchRadius;
         public static ConfigEntry<float> MaximumDisplacement;
         public static List<Character> enemies;
-        public static List<Character> transportTargets;
+        public static List<Character> allies;
 
         private void Awake()
         {
             harmony.PatchAll();
-            CreateConfigValues();
+            CreateConfigValues(); 
             enemies = new List<Character>();
-            transportTargets = new List<Character>();
+            allies = new List<Character>();
 
             ClearIncludeVars();
         }
@@ -72,7 +71,7 @@ namespace TeleportEverything
                     new AcceptableValueList<string>("No messages", "top left", "centered")));
 
             // Transport
-            
+
             TransportBoar = Config.Bind("Transport", "Transport Boar", false);
             TransportWolves = Config.Bind("Transport", "Transport Wolves", false);
             TransportLox = Config.Bind("Transport", "Transport Lox", false);
@@ -82,7 +81,7 @@ namespace TeleportEverything
                 new ConfigDescription("Ally Mode",
                     new AcceptableValueList<string>("No Allies", "All tamed", "Only Follow",
                         "All tamed except Named", "Only Named")));
-            
+
             TransportRadius = Config.Bind("Transport", "Transport Radius", 10f);
             TransportVerticalTolerance =
                 Config.Bind("Transport", "Transport Vertical Tolerance", 2f);
@@ -121,24 +120,25 @@ namespace TeleportEverything
                 IncludeNamed = true;
                 IncludeFollow = true;
             }
-            
-            if(IncludeMode.Value.Contains("Only Follow"))
+
+            if (IncludeMode.Value.Contains("Only Follow"))
             {
                 IncludeFollow = true;
             }
 
-            if(IncludeMode.Value.Contains("All tamed except Named"))
+            if (IncludeMode.Value.Contains("All tamed except Named"))
             {
                 IncludeTamed = true;
                 ExcludeNamed = true;
                 IncludeFollow = true;
             }
 
-            if(IncludeMode.Value.Contains("Only Named"))
+            if (IncludeMode.Value.Contains("Only Named"))
             {
                 IncludeNamed = true;
             }
         }
+
         public static List<Character> GetEnemies()
         {
             PopulateEntityLists();
@@ -146,11 +146,11 @@ namespace TeleportEverything
             return enemies;
         }
 
-        public static List<Character> GetTransportTargets()
+        public static List<Character> GetAllies()
         {
             PopulateEntityLists();
 
-            return transportTargets;
+            return allies;
         }
 
         public static float CalcDistToEntity(Character e)
@@ -184,7 +184,7 @@ namespace TeleportEverything
             if (c.name.ToLower().Contains("lox") && TransportLox.Value)
                 return true;
             if (c.name.ToLower().Contains(TransportMask.Value.ToLower()) &&
-                     TransportMask.Value != "")
+                TransportMask.Value != "")
                 return true;
 
             return false;
@@ -210,16 +210,17 @@ namespace TeleportEverything
 
         public static bool IsNamed(Character t)
         {
-           string name = t.GetComponent<Tameable>()?.GetText();
+            string name = t.GetComponent<Tameable>()?.GetText();
 
-           return !String.IsNullOrEmpty(name);
+            return !String.IsNullOrEmpty(name);
         }
 
         public static bool IsFollow(Character f)
         {
             MonsterAI mAi = f.GetComponent<MonsterAI>();
-            
-            if (mAi != null && mAi.GetFollowTarget() != null && mAi.GetFollowTarget().Equals(Player.m_localPlayer.gameObject))
+
+            if (mAi != null && mAi.GetFollowTarget() != null &&
+                mAi.GetFollowTarget().Equals(Player.m_localPlayer.gameObject))
             {
                 return true;
             }
@@ -229,11 +230,12 @@ namespace TeleportEverything
 
         private static void PopulateEntityLists()
         {
-            transportTargets.Clear();
+            allies.Clear();
             enemies.Clear();
 
             List<Character> characters = new List<Character>();
-            Character.GetCharactersInRange(Player.m_localPlayer.transform.position, SearchRadius.Value, characters);
+            Character.GetCharactersInRange(Player.m_localPlayer.transform.position,
+                SearchRadius.Value, characters);
 
 
             foreach (Character c in characters)
@@ -243,7 +245,7 @@ namespace TeleportEverything
                     if (HorizontalDistance(c) <= TransportRadius.Value &&
                         VerticalDistance(c) <= TransportVerticalTolerance.Value)
                     {
-                        transportTargets.Add(c);
+                        allies.Add(c);
                     }
                 }
 
@@ -257,15 +259,13 @@ namespace TeleportEverything
 
         public static void DisplayMessage(string msg)
         {
-            if(MessageMode.Value.Equals("top left"))
+            if (MessageMode.Value.Equals("top left"))
             {
-                MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft,
-                msg);
+                MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft, msg);
             }
             else if (MessageMode.Value.Equals("centered"))
             {
-                MessageHud.instance.ShowMessage(MessageHud.MessageType.Center,
-                    msg);
+                MessageHud.instance.ShowMessage(MessageHud.MessageType.Center, msg);
             }
         }
 
@@ -273,6 +273,7 @@ namespace TeleportEverything
         [HarmonyPatch("TeleportTo")]
         public class TeleportTo_Patch
         {
+            
             static bool Postfix(bool __result, Player __instance, Vector3 pos, Quaternion rot,
                 bool distantTeleport)
             {
@@ -281,11 +282,14 @@ namespace TeleportEverything
                     return __result;
                 }
 
+                SetIncludeMode();
+                
                 if (GetEnemies().Count > 0 && TeleportMode.Value.Contains("Take"))
                 {
-                    DisplayMessage($"Taking Enemies With You! {GetEnemies().Count} enemies charge the portal!!!");
-                    
-                    foreach (Character e in enemies) 
+                    DisplayMessage(
+                        $"Taking Enemies With You! {GetEnemies().Count} enemies charge the portal!!!");
+
+                    foreach (Character e in GetEnemies())
                     {
                         if (UnityEngine.Random.Range(0, 100) <= 25)
                         {
@@ -297,10 +301,11 @@ namespace TeleportEverything
 
                     return __result;
                 }
-
-                if (GetTransportTargets().Count > 0 && TransportAllies)
+                
+                Debug.Log($"allies: {GetAllies().Count} and flag {TransportAllies}");
+                if (GetAllies().Count > 0 && TransportAllies)
                 {
-                    foreach (Character ally in transportTargets)
+                    foreach (Character ally in GetAllies())
                     {
                         Vector3 offset = __instance.m_lookDir * 2;
                         offset.y = 0;
@@ -317,15 +322,28 @@ namespace TeleportEverything
                 return __result;
             }
         }
+
         public static void SetFollow(Character f)
         {
             MonsterAI mAi = f.GetComponent<MonsterAI>();
-            
+
             if (mAi.GetFollowTarget() == null)
             {
                 mAi.SetFollowTarget(Player.m_localPlayer.gameObject);
             }
         }
+
+        // Test patch -- Delete for release
+        [HarmonyPatch(typeof(TeleportWorld))]
+        [HarmonyPatch("Teleport")]
+        public class Interact_Patch
+        {
+            static bool prefix(bool __result, TeleportWorld __instance)
+            {
+                return true;
+            }
+        }
+
 
         [HarmonyPatch(typeof(Humanoid))]
         [HarmonyPatch("IsTeleportable")]
@@ -334,28 +352,30 @@ namespace TeleportEverything
             static bool Postfix(bool __result, Humanoid __instance)
             {
                 SetIncludeMode();
-                
+
                 if (!EnableMod.Value)
                 {
                     return __result;
                 }
 
-                if (TransportAllies && GetTransportTargets().Count > 0)
+                if (TransportAllies && GetAllies().Count > 0)
                 {
-                   DisplayMessage($"{GetTransportTargets().Count} allies will teleport with you!");
+                    DisplayMessage($"{GetAllies().Count} allies will teleport with you!");
                 }
 
                 if (GetEnemies().Count > 0)
                 {
                     if (TeleportMode.Value.Contains("Run"))
                     {
-                     DisplayMessage($"Vikings Don't run from a fight: {GetEnemies().Count} enemies with in {SearchRadius.Value} meters.");
+                        DisplayMessage(
+                            $"Vikings Don't run from a fight: {GetEnemies().Count} enemies with in {SearchRadius.Value} meters.");
                         return false;
                     }
                     else if (TeleportMode.Value.Contains("Take"))
 
                     {
-                        DisplayMessage($"Beware: {GetEnemies().Count} enemies may charge the portal!");
+                        DisplayMessage(
+                            $"Beware: {GetEnemies().Count} enemies may charge the portal!");
                     }
                 }
 
