@@ -31,6 +31,7 @@ namespace TeleportEverything
         public static ConfigEntry<string> TransportMask;
         public static ConfigEntry<float> TransportRadius;
         public static ConfigEntry<float> TransportVerticalTolerance;
+        public static ConfigEntry<float> SpawnForwardOffset;
         public static bool IncludeTamed;
         public static bool IncludeNamed;
         public static bool IncludeWild;
@@ -85,6 +86,9 @@ namespace TeleportEverything
             TransportRadius = Config.Bind("Transport", "Transport Radius", 10f);
             TransportVerticalTolerance =
                 Config.Bind("Transport", "Transport Vertical Tolerance", 2f);
+            SpawnForwardOffset =
+                Config.Bind("Transport", "Spawn forward Tolerance", .5f);
+            
 
             // Teleport Self
             SearchRadius = Config.Bind("Teleport Self", "Search Radius", 10f);
@@ -183,9 +187,22 @@ namespace TeleportEverything
                 return true;
             if (c.name.ToLower().Contains("lox") && TransportLox.Value)
                 return true;
-            if (c.name.ToLower().Contains(TransportMask.Value.ToLower()) &&
-                TransportMask.Value != "")
+            if (IsInMask(c) && TransportMask.Value != "")
                 return true;
+
+            return false;
+        }
+        
+        private static bool IsInMask(Character c)
+        {
+            String[] includeList = TransportMask.Value.Split(',');
+            foreach (string s in includeList)
+            {
+                if (c.m_name.ToLower().Contains(s.ToLower().Trim()))
+                {
+                    return true;
+                }
+            }
 
             return false;
         }
@@ -227,6 +244,8 @@ namespace TeleportEverything
 
             return false;
         }
+        
+
 
         private static void PopulateEntityLists()
         {
@@ -307,9 +326,9 @@ namespace TeleportEverything
                 {
                     foreach (Character ally in GetAllies())
                     {
-                        Vector3 offset = __instance.m_lookDir * 2;
-                        offset.y = 0;
-                        ally.transform.position = __instance.m_teleportTargetPos + offset;
+                        Vector3 offset = __instance.transform.forward * SpawnForwardOffset.Value;
+                        ally.transform.position = pos + offset;
+                        ally.transform.rotation = rot;
                         if (IncludeFollow)
                         {
                             SetFollow(ally);
