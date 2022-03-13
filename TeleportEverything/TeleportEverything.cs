@@ -10,13 +10,13 @@ using Random = UnityEngine.Random;
 namespace TeleportEverything
 {
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
-    internal class SmartSave : BaseUnityPlugin
+    internal class Plugin : BaseUnityPlugin
     {
         public const string PluginGUID = "com.kpro.TeleportEverything";
         public const string PluginName = "TeleportEverything";
-        public const string PluginVersion = "1.2";
+        public const string PluginVersion = "1.2.0";
 
-        private readonly Harmony harmony = new Harmony("com.kpro.TeleportEverything");
+        private readonly Harmony harmony = new Harmony(PluginGUID);
 
         // General
         public static ConfigEntry<bool> EnableMod;
