@@ -10,7 +10,7 @@ using TeleportEverything;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("kpro")]
 [assembly: AssemblyProduct(Plugin.PluginName)]
-[assembly: AssemblyCopyright("Copyright © 2022")]
+[assembly: AssemblyCopyright("Copyright Â© 2022")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -34,4 +34,3 @@ using TeleportEverything;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion(Plugin.PluginVersion)]
 [assembly: AssemblyFileVersion(Plugin.PluginVersion)]
-
