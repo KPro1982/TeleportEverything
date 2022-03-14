@@ -14,7 +14,7 @@ namespace TeleportEverything
     {
         public const string PluginGUID = "com.kpro.TeleportEverything";
         public const string PluginName = "TeleportEverything";
-        public const string PluginVersion = "1.2.0";
+        public const string PluginVersion = "1.3.0";
 
         private readonly Harmony harmony = new Harmony(PluginGUID);
 
@@ -245,6 +245,14 @@ namespace TeleportEverything
             return false;
         }
         
+        public static void SetFollow(Character f)
+        {
+            MonsterAI mAi = f.GetComponent<MonsterAI>();
+
+           
+                mAi.SetFollowTarget(Player.m_localPlayer.gameObject);
+           
+        }
 
 
         private static void PopulateEntityLists()
@@ -312,9 +320,11 @@ namespace TeleportEverything
                     {
                         if (UnityEngine.Random.Range(0, 100) <= 25)
                         {
-                            Vector3 offset = Random.insideUnitSphere * MaximumDisplacement.Value;
-                            offset.y = 0;
-                            e.transform.position = __instance.m_teleportTargetPos + offset;
+                            Vector3 displacement = Random.insideUnitSphere * MaximumDisplacement.Value;
+                            displacement.y = 0;
+                            Vector3 offset = __instance.transform.forward * SpawnForwardOffset.Value ;
+                            e.transform.position = pos + offset + displacement;
+                            e.transform.rotation = rot;
                         }
                     }
 
@@ -342,15 +352,7 @@ namespace TeleportEverything
             }
         }
 
-        public static void SetFollow(Character f)
-        {
-            MonsterAI mAi = f.GetComponent<MonsterAI>();
 
-            if (mAi.GetFollowTarget() == null)
-            {
-                mAi.SetFollowTarget(Player.m_localPlayer.gameObject);
-            }
-        }
 
         // Test patch -- Delete for release
         [HarmonyPatch(typeof(TeleportWorld))]
