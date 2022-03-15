@@ -8,17 +8,44 @@ namespace TeleportEverything
         [HarmonyPatch(typeof(Inventory), nameof(Inventory.IsTeleportable))]
         public static class Inventory_IsTeleportable_Patch
         {
-            private static bool Prefix(ref bool __result)
+            private static bool Prefix(ref bool __result, ref Inventory __instance)
             {
-                if (EnableMod.Value)
+                if (!EnableMod.Value)
+                    return true; //go to original method
+
+                if (ItemsRestriction.Value)
                 {
-                    if (TransportOres.Value)
+                    __result = true;
+                    return false; //skip original method
+                }
+                hasOre = false;
+
+                foreach (var a in __instance.GetAllItems())
+                {
+                    if (a.m_shared.m_teleportable)
+                        continue;
+
+                    if (a.m_dropPrefab.name.Equals("DragonEgg"))
                     {
-                        __result = true;
-                        return false; //skip original method
+                        if (!TransportDragonEggs.Value)
+                        {
+                            __result = false;
+                            return false;                           
+                        }
+                    }
+                    else
+                    {
+                        if (!TransportOres.Value)
+                        {
+                            __result = false;
+                            return false;
+                        }
+                        hasOre = true;
                     }
                 }
-                return true;
+
+                __result = true;
+                return false;
             }
         }
         [HarmonyPatch(typeof(Teleport), nameof(Teleport.GetHoverText))]

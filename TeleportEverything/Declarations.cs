@@ -40,8 +40,11 @@ namespace TeleportEverything
         public static List<Character> enemies;
         public static List<Character> allies;
 
-        //Ores
+        //Items
+        public static ConfigEntry<bool> ItemsRestriction;
+        public static ConfigEntry<bool> TransportDragonEggs;
         public static ConfigEntry<bool> TransportOres;
+        public static bool hasOre;
 
         private readonly Harmony harmony = new Harmony(PluginGUID);
 
@@ -71,8 +74,12 @@ namespace TeleportEverything
                 new ConfigDescription("Ally Mode",
                     new AcceptableValueList<string>("No messages", "top left", "centered")));
 
-            // Ores
-            TransportOres = Config.Bind("Ores", "Transport Ores", false);
+            // Items
+            ItemsRestriction = Config.Bind("Items", "Remove Items Restriction", false, 
+                new ConfigDescription("Allows transporting all items."));
+            TransportDragonEggs = Config.Bind("Items", "Transport Dragon Eggs", false);
+            TransportOres = Config.Bind("Items", "Transport Ores", false, 
+                new ConfigDescription("Allows transporting ores, ingots and other restricted items."));
 
             // Transport
 
