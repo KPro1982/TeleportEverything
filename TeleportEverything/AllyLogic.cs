@@ -1,13 +1,32 @@
+using System.Collections.Generic;
+using UnityEngine;
+
 namespace TeleportEverything
 {
     internal partial class Plugin
     {
-        public static string GetName(Character c)
+
+        public static bool IsValidAlly(Character c)
+        {
+            if (IsEligibleCreature(c) && IsTransportable(c))
+            {
+                if (HorizontalDistance(c) <= TransportRadius.Value &&
+                    VerticalDistance(c) <= TransportVerticalTolerance.Value)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        
+         
+		public static string GetName(Character c)
         {
             return c?.name.Replace("(Clone)", "").ToLower();
         }
         
-        public static bool IsEligibleAlly(Character c)
+       public static bool IsEligibleCreature(Character c)
         {
             if (GetName(c).Contains("wolf") && TransportWolves.Value)
             {
@@ -24,7 +43,7 @@ namespace TeleportEverything
                 return true;
             }
 
-            if (IsInMask(c) && TransportMask.Value != "")
+            if (IsInCreatureMask(c) && TransportMask.Value != "")
             {
                 return true;
             }
@@ -32,7 +51,7 @@ namespace TeleportEverything
             return false;
         }
 
-        private static bool IsInMask(Character c)
+        private static bool IsInCreatureMask(Character c)
         {
             var includeList = TransportMask.Value.Split(',');
             foreach (var s in includeList)
@@ -46,14 +65,14 @@ namespace TeleportEverything
             return false;
         }
 
-        public static bool IsAllyTransportable(Character ally)
+        public static bool IsTransportable(Character ally)
         {
             if (IsNamed(ally) && ExcludeNamed)
             {
                 return false;
             }
 
-            if (IsFollow(ally) && IncludeFollow)
+            if (IsFollowing(ally) && IncludeFollow)
             {
                 return true;
             }
@@ -79,7 +98,7 @@ namespace TeleportEverything
             return !string.IsNullOrEmpty(name);
         }
 
-        public static bool IsFollow(Character f)
+        public static bool IsFollowing(Character f)
         {
             var mAi = f.GetComponent<MonsterAI>();
 
@@ -97,6 +116,36 @@ namespace TeleportEverything
             var mAi = f.GetComponent<MonsterAI>();
 
             mAi?.SetFollowTarget(Player.m_localPlayer.gameObject);
+        }
+        
+        public static int CountAllies()
+        {
+            var characters = new List<Character>();
+            Character.GetCharactersInRange(Player.m_localPlayer.transform.position,
+                SearchRadius.Value, characters);
+
+            return characters.FindAll(c => IsValidAlly(c) == true).Count;
+           
+            
+        }
+
+        public static List<DelayedSpawn> GetAllyList(Vector3 pos,
+            Quaternion rot, bool follow)
+        {
+            var characters = new List<Character>();
+            var Allies = new List<DelayedSpawn>();
+            
+            Character.GetCharactersInRange(Player.m_localPlayer.transform.position,
+                SearchRadius.Value, characters);
+
+            var characterList = characters.FindAll(c => IsValidAlly(c) == true);
+
+            foreach (Character c in characterList)
+            {
+                Allies.Add(new DelayedSpawn(c, true, 10f, pos, rot, follow));
+            }
+
+            return Allies;
         }
         
     }

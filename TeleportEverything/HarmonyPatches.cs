@@ -80,19 +80,18 @@ namespace TeleportEverything
                     return __result;
                 }
 
-                PopulateEntityLists();
 
-                if (TransportAllies && allies.Count > 0)
+                if (TransportAllies && CountAllies() > 0)
                 {
-                    DisplayMessage($"{allies.Count} allies will teleport with you!");
+                    DisplayMessage($"{CountAllies()} allies will teleport with you!");
                 }
 
-                if (enemies.Count > 0)
+                if (CountEnemies() > 0)
                 {
                     if (TeleportMode.Value.Contains("Run"))
                     {
                         DisplayMessage(
-                            $"Vikings Don't run from a fight: {enemies.Count} enemies with in {SearchRadius.Value} meters.");
+                            $"Vikings Don't run from a fight: {CountEnemies()} enemies with in {SearchRadius.Value} meters.");
                         return false;
                     }
 
@@ -100,7 +99,7 @@ namespace TeleportEverything
 
                     {
                         DisplayMessage(
-                            $"Beware: {enemies.Count} enemies may charge the portal!");
+                            $"Beware: {CountEnemies()} enemies may charge the portal!");
                     }
                 }
 
@@ -125,35 +124,26 @@ namespace TeleportEverything
 
                 PopulateEntityLists();
 
-                if (enemies.Count > 0 && TeleportMode.Value.Contains("Take"))
+
+                if (CountEnemies() > 0 && TeleportMode.Value.Contains("Take"))
                 {
                     DisplayMessage(
-                        $"Taking Enemies With You! {enemies.Count} enemies charge the portal!!!");
+                        $"Taking Enemies With You! {CountEnemies()} enemies charge the portal!!!");
 
-                    foreach (var e in enemies)
-                    {
-                        if (Random.Range(0, 100) <= 25)
-                        {
-                            var displacement = Random.insideUnitSphere * MaximumDisplacement.Value;
-                            displacement.y = 0;
-                            var offset = __instance.transform.forward * SpawnForwardOffset.Value;
-                            e.transform.position = pos + offset + displacement;
-                            e.transform.rotation = rot;
-                        }
-                    }
+ 
                 }
 
-                Debug.Log($"allies: {allies.Count} and flag {TransportAllies}");
-                if (allies.Count > 0 && TransportAllies)
+
+                if (CountAllies() > 0 && TransportAllies)
                 {
-                    foreach (var ally in allies)
+                    foreach (var ally in GetAllyList(pos, rot, IncludeFollow))
                     {
                         var offset = __instance.transform.forward * SpawnForwardOffset.Value;
                         ally.transform.position = pos + offset;
                         ally.transform.rotation = rot;
                         if (IncludeFollow)
                         {
-                            SetFollow(ally);
+                            SetFollow(ally.character);
                         }
                     }
                 }

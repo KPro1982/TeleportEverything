@@ -5,37 +5,48 @@ namespace TeleportEverything
 {
     internal partial class Plugin
     {
-        private static void PopulateEntityLists()
+       public static bool IsValidEnemy(Character c)
         {
-            SetIncludeMode();
 
-            allies.Clear();
-            enemies.Clear();
+            if (c.GetComponent<BaseAI>() != null &&
+                c.GetComponent<BaseAI>().IsEnemey(Player.m_localPlayer) && !c.IsTamed())
+            {
+                return true;
+            }
 
+            return false;
+        }
+        public static int CountEnemies()
+        {
             var characters = new List<Character>();
             Character.GetCharactersInRange(Player.m_localPlayer.transform.position,
                 SearchRadius.Value, characters);
 
-
-            foreach (var c in characters)
-            {
-                if (IsEligibleAlly(c) && IsAllyTransportable(c) && TransportAllies)
-                {
-                    if (HorizontalDistance(c) <= TransportRadius.Value &&
-                        VerticalDistance(c) <= TransportVerticalTolerance.Value)
-                    {
-                        allies.Add(c);
-                    }
-                }
-
-                if (c.GetComponent<BaseAI>() != null &&
-                    c.GetComponent<BaseAI>().IsEnemey(Player.m_localPlayer) && !c.IsTamed())
-                {
-                    enemies.Add(c);
-                }
-            }
+            return characters.FindAll(c => IsValidEnemy(c) == true).Count;
+           
+            
         }
         
+
+        public static List<DelayedSpawn> GetEnemyList(Vector3 pos,
+            Quaternion rot)
+        {
+            var characters = new List<Character>();
+            var Enemies = new List<DelayedSpawn>();
+            
+            Character.GetCharactersInRange(Player.m_localPlayer.transform.position,
+                SearchRadius.Value, characters);
+
+            var characterList = characters.FindAll(c => IsValidEnemy(c) == true);
+
+            foreach (Character c in characterList)
+            {
+                Enemies.Add(new DelayedSpawn(c, false, 10f, pos, rot, null));
+            }
+
+            return Enemies;
+        }
+
         public static float CalcDistToEntity(Character e) => VectorToEntity(e).magnitude;
 
         public static Vector3 VectorToEntity(Character e) =>

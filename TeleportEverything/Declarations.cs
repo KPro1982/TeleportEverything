@@ -43,6 +43,7 @@ namespace TeleportEverything
         public static ConfigEntry<string>? IncludeMode;
 
         //Teleport Self
+
         public static ConfigEntry<float>? SearchRadius;
         public static ConfigEntry<float>? MaximumDisplacement;
         public static List<Character>? enemies;
@@ -53,6 +54,10 @@ namespace TeleportEverything
         public static ConfigEntry<bool>? TransportOres;
         public static ConfigEntry<int>? TransportFee;
         public static bool hasOre;
+
+        public static ConfigEntry<float> SearchRadius;
+        public static ConfigEntry<float> MaximumDisplacement;
+
 
         private readonly Harmony harmony = new Harmony(PluginGUID);
 
@@ -69,6 +74,7 @@ namespace TeleportEverything
 
             enemies = new List<Character>();
             allies = new List<Character>();
+
 
             ClearIncludeVars();
         }
