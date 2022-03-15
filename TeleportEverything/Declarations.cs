@@ -40,6 +40,9 @@ namespace TeleportEverything
         public static List<Character> enemies;
         public static List<Character> allies;
 
+        //Ores
+        public static ConfigEntry<bool> TransportOres;
+
         private readonly Harmony harmony = new Harmony(PluginGUID);
 
         private void Awake()
@@ -67,6 +70,9 @@ namespace TeleportEverything
             MessageMode = Config.Bind("Mod", "Message Mode", "No messages",
                 new ConfigDescription("Ally Mode",
                     new AcceptableValueList<string>("No messages", "top left", "centered")));
+
+            // Ores
+            TransportOres = Config.Bind("Ores", "Transport Ores", false);
 
             // Transport
 
