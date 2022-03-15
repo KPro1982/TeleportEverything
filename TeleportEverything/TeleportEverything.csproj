@@ -83,6 +83,7 @@
     <ItemGroup>
         <Compile Include="AllyLogic.cs" />
         <Compile Include="CoreLogic.cs" />
+        <Compile Include="DelayedSpawn.cs" />
         <Compile Include="HarmonyPatches.cs" />
         <Compile Include="Properties\IgnoreAccessModifiers.cs" />
         <Compile Include="Declarations.cs" />

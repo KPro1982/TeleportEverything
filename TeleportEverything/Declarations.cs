@@ -37,8 +37,7 @@ namespace TeleportEverything
         //Teleport Self
         public static ConfigEntry<float> SearchRadius;
         public static ConfigEntry<float> MaximumDisplacement;
-        public static List<Character> enemies;
-        public static List<Character> allies;
+       
 
         private readonly Harmony harmony = new Harmony(PluginGUID);
 
@@ -46,9 +45,7 @@ namespace TeleportEverything
         {
             harmony.PatchAll();
             CreateConfigValues();
-            enemies = new List<Character>();
-            allies = new List<Character>();
-
+           
             ClearIncludeVars();
         }
 

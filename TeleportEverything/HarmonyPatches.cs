@@ -18,17 +18,17 @@ namespace TeleportEverything
                     return __result;
                 }
 
-                if (TransportAllies && GetAllies().Count > 0)
+                if (TransportAllies && CountAllies() > 0)
                 {
-                    DisplayMessage($"{GetAllies().Count} allies will teleport with you!");
+                    DisplayMessage($"{CountAllies()} allies will teleport with you!");
                 }
 
-                if (GetEnemies().Count > 0)
+                if (CountEnemies() > 0)
                 {
                     if (TeleportMode.Value.Contains("Run"))
                     {
                         DisplayMessage(
-                            $"Vikings Don't run from a fight: {GetEnemies().Count} enemies with in {SearchRadius.Value} meters.");
+                            $"Vikings Don't run from a fight: {CountEnemies()} enemies with in {SearchRadius.Value} meters.");
                         return false;
                     }
 
@@ -36,7 +36,7 @@ namespace TeleportEverything
 
                     {
                         DisplayMessage(
-                            $"Beware: {GetEnemies().Count} enemies may charge the portal!");
+                            $"Beware: {CountEnemies()} enemies may charge the portal!");
                     }
                 }
 
@@ -57,12 +57,12 @@ namespace TeleportEverything
 
                 SetIncludeMode();
 
-                if (GetEnemies().Count > 0 && TeleportMode.Value.Contains("Take"))
+                if (CountEnemies() > 0 && TeleportMode.Value.Contains("Take"))
                 {
                     DisplayMessage(
-                        $"Taking Enemies With You! {GetEnemies().Count} enemies charge the portal!!!");
+                        $"Taking Enemies With You! {CountEnemies()} enemies charge the portal!!!");
 
-                    foreach (var e in GetEnemies())
+                    foreach (var e in GetEnemyList(pos, rot))
                     {
                         if (Random.Range(0, 100) <= 25)
                         {
@@ -77,17 +77,17 @@ namespace TeleportEverything
                     return __result;
                 }
 
-                Debug.Log($"allies: {GetAllies().Count} and flag {TransportAllies}");
-                if (GetAllies().Count > 0 && TransportAllies)
+                Debug.Log($"allies: {CountAllies()} and flag {TransportAllies}");
+                if (CountAllies() > 0 && TransportAllies)
                 {
-                    foreach (var ally in GetAllies())
+                    foreach (var ally in GetAllyList(pos, rot, IncludeFollow))
                     {
                         var offset = __instance.transform.forward * SpawnForwardOffset.Value;
                         ally.transform.position = pos + offset;
                         ally.transform.rotation = rot;
                         if (IncludeFollow)
                         {
-                            SetFollow(ally);
+                            SetFollow(ally.character);
                         }
                     }
 
