@@ -13,24 +13,24 @@ namespace TeleportEverything
                 if (!EnableMod.Value)
                     return true; //go to original method
 
-                if (ItemsRestriction.Value)
+                if (RemoveItemsRestriction.Value)
                 {
                     __result = true;
                     return false; //skip original method
                 }
                 hasOre = false;
 
-                foreach (var a in __instance.GetAllItems())
+                foreach (var item in __instance.GetAllItems())
                 {
-                    if (a.m_shared.m_teleportable)
+                    if (item.m_shared.m_teleportable)
                         continue;
 
-                    if (a.m_dropPrefab.name.Equals("DragonEgg"))
+                    if (IsDragonEgg(item))
                     {
                         if (!TransportDragonEggs.Value)
                         {
                             __result = false;
-                            return false;                           
+                            return false;
                         }
                     }
                     else
@@ -114,6 +114,7 @@ namespace TeleportEverything
             private static bool Postfix(bool __result, Player __instance, Vector3 pos,
                 Quaternion rot, bool distantTeleport)
             {
+                Debug.Log($"Player.TeleportTo reached");
                 if (!EnableMod.Value)
                 {
                     return __result;
@@ -158,6 +159,27 @@ namespace TeleportEverything
                 }
 
                 return __result;
+            }
+        }
+        [HarmonyPatch(typeof(TeleportWorld))]
+        [HarmonyPatch(nameof(TeleportWorld.Teleport))]
+        public class Teleport_Patch
+        {
+            private static void Prefix(ref Player player)
+            {
+                Debug.Log($"TeleportWorld.Teleport prefix reached");
+                if (!EnableMod.Value)
+                    return;
+
+                if (!RemoveItemsRestriction.Value && !TransportOres.Value)
+                    return;
+
+                if (TransportOreKeepPct.Value >= 100)
+                    return;
+
+                ReduceStacks(player);
+
+                RemoveEmptyItems(player);
             }
         }
     }
