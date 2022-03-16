@@ -8,17 +8,44 @@ namespace TeleportEverything
         [HarmonyPatch(typeof(Inventory), nameof(Inventory.IsTeleportable))]
         public static class Inventory_IsTeleportable_Patch
         {
-            private static bool Prefix(ref bool __result)
+            private static bool Prefix(ref bool __result, ref Inventory __instance)
             {
-                if (EnableMod.Value)
+                if (!EnableMod.Value)
+                    return true; //go to original method
+
+                if (RemoveItemsRestriction.Value)
                 {
-                    if (TransportOres.Value)
+                    __result = true;
+                    return false; //skip original method
+                }
+                hasOre = false;
+
+                foreach (var item in __instance.GetAllItems())
+                {
+                    if (item.m_shared.m_teleportable)
+                        continue;
+
+                    if (IsDragonEgg(item))
                     {
-                        __result = true;
-                        return false; //skip original method
+                        if (!TransportDragonEggs.Value)
+                        {
+                            __result = false;
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        if (!TransportOres.Value)
+                        {
+                            __result = false;
+                            return false;
+                        }
+                        hasOre = true;
                     }
                 }
-                return true;
+
+                __result = true;
+                return false;
             }
         }
         [HarmonyPatch(typeof(Teleport), nameof(Teleport.GetHoverText))]
@@ -87,6 +114,7 @@ namespace TeleportEverything
             private static bool Postfix(bool __result, Player __instance, Vector3 pos,
                 Quaternion rot, bool distantTeleport)
             {
+                Debug.Log($"Player.TeleportTo reached");
                 if (!EnableMod.Value)
                 {
                     return __result;
@@ -131,6 +159,27 @@ namespace TeleportEverything
                 }
 
                 return __result;
+            }
+        }
+        [HarmonyPatch(typeof(TeleportWorld))]
+        [HarmonyPatch(nameof(TeleportWorld.Teleport))]
+        public class Teleport_Patch
+        {
+            private static void Prefix(ref Player player)
+            {
+                Debug.Log($"TeleportWorld.Teleport prefix reached");
+                if (!EnableMod.Value)
+                    return;
+
+                if (!RemoveItemsRestriction.Value && !TransportOres.Value)
+                    return;
+
+                if (TransportOreKeepPct.Value >= 100)
+                    return;
+
+                ReduceStacks(player);
+
+                RemoveEmptyItems(player);
             }
         }
     }

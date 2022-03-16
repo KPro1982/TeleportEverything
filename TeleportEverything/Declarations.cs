@@ -40,8 +40,12 @@ namespace TeleportEverything
         public static List<Character> enemies;
         public static List<Character> allies;
 
-        //Ores
+        //Items
+        public static ConfigEntry<bool> RemoveItemsRestriction;
+        public static ConfigEntry<bool> TransportDragonEggs;
         public static ConfigEntry<bool> TransportOres;
+        public static ConfigEntry<int> TransportOreKeepPct;
+        public static bool hasOre;
 
         private readonly Harmony harmony = new Harmony(PluginGUID);
 
@@ -71,8 +75,6 @@ namespace TeleportEverything
                 new ConfigDescription("Ally Mode",
                     new AcceptableValueList<string>("No messages", "top left", "centered")));
 
-            // Ores
-            TransportOres = Config.Bind("Ores", "Transport Ores", false);
 
             // Transport
 
@@ -91,6 +93,15 @@ namespace TeleportEverything
                 Config.Bind("Transport", "Transport Vertical Tolerance", 2f);
             SpawnForwardOffset = Config.Bind("Transport", "Spawn forward Tolerance", .5f);
 
+            // Transport.Items
+            RemoveItemsRestriction = Config.Bind("Transport Items", "Remove Items Restriction", false,
+                new ConfigDescription("Allows transporting all items."));
+            TransportDragonEggs = Config.Bind("Transport Items", "Transport Dragon Eggs", false);
+            TransportOres = Config.Bind("Transport Items", "Transport Ores", false,
+                new ConfigDescription("Allows transporting ores, ingots and other restricted items."));
+            TransportOreKeepPct = Config.Bind("Transport Items Config", "Transport Ore Keep Percentage", 100,
+                new ConfigDescription("Percentage of ore to be keept on inventory when teleporting. (%)",
+                new AcceptableValueRange<int>(0, 100)));
 
             // Teleport Self
             SearchRadius = Config.Bind("Teleport Self", "Search Radius", 10f);
