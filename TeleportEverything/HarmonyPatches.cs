@@ -167,14 +167,14 @@ namespace TeleportEverything
         {
             private static void Prefix(ref Player player)
             {
-                Debug.Log($"TeleportWorld.Teleport prefix reached");
+                
                 if (!EnableMod.Value)
                     return;
 
                 if (!RemoveItemsRestriction.Value && !TransportOres.Value)
                     return;
 
-                if (TransportOreKeepPct.Value >= 100)
+                if (TransportFee.Value == 0)
                     return;
 
                 ReduceStacks(player);

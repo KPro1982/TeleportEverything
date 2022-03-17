@@ -17,9 +17,9 @@ namespace TeleportEverything
                     continue;
 
                 var totalStack = item.m_stack;
-                item.m_stack = System.Convert.ToInt32(totalStack * TransportOreKeepPct.Value / 100);
+                item.m_stack = System.Convert.ToInt32(totalStack * (1-(float)TransportFee.Value / 100));
 
-                Debug.Log($"Lost: {totalStack - item.m_stack} out of {totalStack}. Item: {item.m_dropPrefab.name} at keep percentage: {TransportOreKeepPct.Value}%");
+                DisplayMessage($"{totalStack - item.m_stack} out of {totalStack} deducted as a fee for transporting contraband.");
             }
         }
 
