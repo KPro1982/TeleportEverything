@@ -7,6 +7,7 @@ namespace TeleportEverything
     {
        public static bool IsValidEnemy(Character c)
         {
+
             if (c.GetComponent<BaseAI>() != null &&
                 c.GetComponent<BaseAI>().IsEnemey(Player.m_localPlayer) && !c.IsTamed())
             {
@@ -15,6 +16,7 @@ namespace TeleportEverything
 
             return false;
         }
+      
         public static int CountEnemies()
         {
             var characters = new List<Character>();
@@ -26,6 +28,7 @@ namespace TeleportEverything
             
         }
         
+
         public static List<DelayedSpawn> GetEnemyList(Vector3 pos,
             Quaternion rot)
         {
@@ -58,8 +61,6 @@ namespace TeleportEverything
         }
 
         public static float VerticalDistance(Character e) => Mathf.Abs(VectorToEntity(e).y);
-        
-      
 
         public static void DisplayMessage(string msg)
         {

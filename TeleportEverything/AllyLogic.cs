@@ -5,6 +5,7 @@ namespace TeleportEverything
 {
     internal partial class Plugin
     {
+
         public static bool IsValidAlly(Character c)
         {
             if (IsEligibleCreature(c) && IsTransportable(c))
@@ -20,18 +21,26 @@ namespace TeleportEverything
         }
         
          public static bool IsEligibleCreature(Character c)
+
+        public static string GetName(Character c)
+
         {
-            if (c.m_name.ToLower().Contains("wolf") && TransportWolves.Value)
+            return c?.name.Replace("(Clone)", "").ToLower();
+        }
+        
+        public static bool IsEligibleAlly(Character c)
+        {
+            if (GetName(c).Contains("wolf") && TransportWolves.Value)
             {
                 return true;
             }
 
-            if (c.name.ToLower().Contains("boar") && TransportBoar.Value)
+            if (GetName(c).Contains("boar") && TransportBoar.Value)
             {
                 return true;
             }
 
-            if (c.name.ToLower().Contains("lox") && TransportLox.Value)
+            if (GetName(c).Contains("lox") && TransportLox.Value)
             {
                 return true;
             }
@@ -49,7 +58,7 @@ namespace TeleportEverything
             var includeList = TransportMask.Value.Split(',');
             foreach (var s in includeList)
             {
-                if (c.m_name.ToLower().Contains(s.ToLower().Trim()))
+                if (GetName(c).Contains(s.ToLower().Trim()))
                 {
                     return true;
                 }
@@ -108,8 +117,7 @@ namespace TeleportEverything
         {
             var mAi = f.GetComponent<MonsterAI>();
 
-
-            mAi.SetFollowTarget(Player.m_localPlayer.gameObject);
+            mAi?.SetFollowTarget(Player.m_localPlayer.gameObject);
         }
         
         public static int CountAllies()
