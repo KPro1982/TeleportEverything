@@ -1,7 +1,10 @@
 using System.Collections.Generic;
+using System.IO;
 using BepInEx;
 using BepInEx.Configuration;
+using BepInEx.Logging;
 using HarmonyLib;
+using ServerSync;
 using UnityEngine;
 
 namespace TeleportEverything
@@ -12,6 +15,10 @@ namespace TeleportEverything
         public const string PluginGUID = "com.kpro.TeleportEverything";
         public const string PluginName = "TeleportEverything";
         public const string PluginVersion = "1.4.0";
+        private static string ConfigFileName = PluginGUID + ".cfg";
+        private static string ConfigFileFullPath = Paths.ConfigPath + Path.DirectorySeparatorChar + ConfigFileName;
+
+        private static ConfigEntry<bool>? _serverConfigLocked;
 
         // General
         public static ConfigEntry<bool> EnableMod;
@@ -49,10 +56,17 @@ namespace TeleportEverything
 
         private readonly Harmony harmony = new Harmony(PluginGUID);
 
+        public static readonly ManualLogSource TeleportEverythingLogger =
+            BepInEx.Logging.Logger.CreateLogSource(PluginName);
+
+        private static readonly ConfigSync ConfigSync = new(PluginGUID) { DisplayName = PluginName, CurrentVersion = PluginVersion, MinimumRequiredVersion = PluginVersion };
+
         private void Awake()
         {
             harmony.PatchAll();
             CreateConfigValues();
+            SetupWatcher();
+
             enemies = new List<Character>();
             allies = new List<Character>();
 
@@ -67,46 +81,44 @@ namespace TeleportEverything
 
         private void CreateConfigValues()
         {
-            Config.SaveOnConfigSet = true;
+            _serverConfigLocked = config("General", "Force Server Config", true, "Force Server Config");
+            _ = ConfigSync.AddLockingConfigEntry(_serverConfigLocked);
 
             // General
-            EnableMod = Config.Bind("Mod", "Enable Mod", true);
-            MessageMode = Config.Bind("Mod", "Message Mode", "No messages",
-                new ConfigDescription("Ally Mode",
-                    new AcceptableValueList<string>("No messages", "top left", "centered")));
-
+            EnableMod = config("Mod", "Enable Mod", true, "Enable/Disable mod");
+            MessageMode = config("Mod", "Message Mode", "No messages",
+                new ConfigDescription("Message Mode",
+                    new AcceptableValueList<string>("No messages", "top left", "centered")),
+                false);
 
             // Transport
+            TransportBoar = config("Transport", "Transport Boar", false, "");
+            TransportWolves = config("Transport", "Transport Wolves", false, "");
+            TransportLox = config("Transport", "Transport Lox", false, "");
+            TransportMask = config("Transport", "Transport Mask", "", "");
 
-            TransportBoar = Config.Bind("Transport", "Transport Boar", false);
-            TransportWolves = Config.Bind("Transport", "Transport Wolves", false);
-            TransportLox = Config.Bind("Transport", "Transport Lox", false);
-            TransportMask = Config.Bind("Transport", "Transport Mask", "");
-
-            IncludeMode = Config.Bind("Transport", "Ally Mode", "No Allies",
+            IncludeMode = config("Transport", "Ally Mode", "No Allies",
                 new ConfigDescription("Ally Mode",
                     new AcceptableValueList<string>("No Allies", "All tamed", "Only Follow",
-                        "All tamed except Named", "Only Named")));
+                        "All tamed except Named", "Only Named")), false);
 
-            TransportRadius = Config.Bind("Transport", "Transport Radius", 10f);
+            TransportRadius = config("Transport", "Transport Radius", 10f, "");
             TransportVerticalTolerance =
-                Config.Bind("Transport", "Transport Vertical Tolerance", 2f);
-            SpawnForwardOffset = Config.Bind("Transport", "Spawn forward Tolerance", .5f);
+                config("Transport", "Transport Vertical Tolerance", 2f, "");
+            SpawnForwardOffset = config("Transport", "Spawn forward Tolerance", .5f, "");
 
             // Transport.Items
-            RemoveItemsRestriction = Config.Bind("Transport Items", "Remove Items Restriction", false,
-                new ConfigDescription("Allows transporting all items."));
-            TransportDragonEggs = Config.Bind("Transport Items", "Transport Dragon Eggs", false);
-            TransportOres = Config.Bind("Transport Items", "Transport Ores", false,
-                new ConfigDescription("Allows transporting ores, ingots and other restricted items."));
-            TransportFee = Config.Bind("Transport Items Config", "Transport fee", 10,
+            RemoveItemsRestriction = config("Transport Items", "Remove Items Restriction", false, "Allows transporting all items.");
+            TransportDragonEggs = config("Transport Items", "Transport Dragon Eggs", false, "");
+            TransportOres = config("Transport Items", "Transport Ores", false, "Allows transporting ores, ingots and other restricted items.");
+            TransportFee = config("Transport Items Config", "Transport fee", 10,
                 new ConfigDescription("Transport fee in (%) ore",
                 new AcceptableValueRange<int>(0, 100)));
 
             // Teleport Self
-            SearchRadius = Config.Bind("Teleport Self", "Search Radius", 10f);
-            MaximumDisplacement = Config.Bind("Teleport Self", "Max Enemy Displacement", 5f);
-            TeleportMode = Config.Bind("Teleport Self", "Teleport Mode", "Standard",
+            SearchRadius = config("Teleport Self", "Search Radius", 10f, "");
+            MaximumDisplacement = config("Teleport Self", "Max Enemy Displacement", 5f, "");
+            TeleportMode = config("Teleport Self", "Teleport Mode", "Standard",
                 new ConfigDescription("Teleport Mode",
                     new AcceptableValueList<string>("Standard", "Vikings Don't Run",
                         "Take Them With You")));
@@ -156,8 +168,53 @@ namespace TeleportEverything
             }
         }
 
-       
+        private void SetupWatcher()
+        {
+            FileSystemWatcher watcher = new(Paths.ConfigPath, ConfigFileName);
+            watcher.Changed += ReadConfigValues;
+            watcher.Created += ReadConfigValues;
+            watcher.Renamed += ReadConfigValues;
+            watcher.IncludeSubdirectories = true;
+            watcher.SynchronizingObject = ThreadingHelper.SynchronizingObject;
+            watcher.EnableRaisingEvents = true;
+        }
 
-        
+        private void ReadConfigValues(object sender, FileSystemEventArgs e)
+        {
+            if (!File.Exists(ConfigFileFullPath)) return;
+            try
+            {
+                TeleportEverythingLogger.LogDebug("ReadConfigValues called");
+                Config.Reload();
+            }
+            catch
+            {
+                TeleportEverythingLogger.LogError($"There was an issue loading your {ConfigFileName}");
+                TeleportEverythingLogger.LogError("Please check your config entries for spelling and format!");
+            }
+        }
+
+
+        #region ConfigOptions
+
+        private ConfigEntry<T> config<T>(string group, string name, T value, ConfigDescription description,
+            bool synchronizedSetting = true)
+        {
+            ConfigDescription extendedDescription =
+                new(
+                    description.Description +
+                    (synchronizedSetting ? " [Synced with Server]" : " [Not Synced with Server]"),
+                    description.AcceptableValues, description.Tags);
+            ConfigEntry<T> configEntry = Config.Bind(group, name, value, extendedDescription);
+
+            SyncedConfigEntry<T> syncedConfigEntry = ConfigSync.AddConfigEntry(configEntry);
+            syncedConfigEntry.SynchronizedConfig = synchronizedSetting;
+
+            return configEntry;
+        }
+
+        ConfigEntry<T> config<T>(string group, string name, T value, string description, bool synchronizedSetting = true) => config(group, name, value, new ConfigDescription(description), synchronizedSetting);
+
+        #endregion 
     }
 }
