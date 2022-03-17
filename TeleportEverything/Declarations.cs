@@ -87,13 +87,11 @@ namespace TeleportEverything
             // General
             EnableMod = config("Mod", "Enable Mod", true, "Enable/Disable mod");
             MessageMode = config("Mod", "Message Mode", "No messages",
-                new ConfigDescription("Ally Mode",
+                new ConfigDescription("Message Mode",
                     new AcceptableValueList<string>("No messages", "top left", "centered")),
                 false);
 
-
             // Transport
-
             TransportBoar = config("Transport", "Transport Boar", false, "");
             TransportWolves = config("Transport", "Transport Wolves", false, "");
             TransportLox = config("Transport", "Transport Lox", false, "");

@@ -12,6 +12,7 @@ using HarmonyLib;
 using JetBrains.Annotations;
 using UnityEngine;
 
+#nullable enable
 namespace ServerSync
 {
 
