@@ -7,6 +7,8 @@ namespace TeleportEverything
     {
         private static void PopulateEntityLists()
         {
+            SetIncludeMode();
+
             allies.Clear();
             enemies.Clear();
 
@@ -34,20 +36,6 @@ namespace TeleportEverything
             }
         }
         
-        public static List<Character> GetEnemies()
-        {
-            PopulateEntityLists();
-
-            return enemies;
-        }
-
-        public static List<Character> GetAllies()
-        {
-            PopulateEntityLists();
-
-            return allies;
-        }
-        
         public static float CalcDistToEntity(Character e) => VectorToEntity(e).magnitude;
 
         public static Vector3 VectorToEntity(Character e) =>
@@ -61,8 +49,6 @@ namespace TeleportEverything
         }
 
         public static float VerticalDistance(Character e) => Mathf.Abs(VectorToEntity(e).y);
-        
-      
 
         public static void DisplayMessage(string msg)
         {
