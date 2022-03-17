@@ -12,6 +12,8 @@
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <LangVersion>9</LangVersion>
+    <Nullable>enable</Nullable>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
@@ -82,6 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AllyLogic.cs" />
+    <Compile Include="ConfigSync.cs" />
     <Compile Include="CoreLogic.cs" />
     <Compile Include="HarmonyPatches.cs" />
     <Compile Include="ItemLogic.cs" />
