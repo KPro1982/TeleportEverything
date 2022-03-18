@@ -13,7 +13,7 @@ namespace TeleportEverything
                 if (!EnableMod.Value)
                     return true; //go to original method
 
-                if (RemoveItemsRestriction.Value)
+                if (TransportDragonEggs.Value && TransportOres.Value)
                 {
                     __result = true;
                     return false; //skip original method
@@ -171,7 +171,7 @@ namespace TeleportEverything
                 if (!EnableMod.Value)
                     return;
 
-                if (!RemoveItemsRestriction.Value && !TransportOres.Value)
+                if (!TransportOres.Value)
                     return;
 
                 if (TransportFee.Value == 0)
