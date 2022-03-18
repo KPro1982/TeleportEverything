@@ -7,6 +7,7 @@ using HarmonyLib;
 using ServerSync;
 using UnityEngine;
 
+#nullable enable
 namespace TeleportEverything
 {
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
@@ -21,37 +22,36 @@ namespace TeleportEverything
         private static ConfigEntry<bool>? _serverConfigLocked;
 
         // General
-        public static ConfigEntry<bool> EnableMod;
-        public static ConfigEntry<string> TeleportMode;
-        public static ConfigEntry<string> MessageMode;
+        public static ConfigEntry<bool>? EnableMod;
+        public static ConfigEntry<string>? TeleportMode;
+        public static ConfigEntry<string>? MessageMode;
 
         // Transport Allies
         public static bool TransportAllies;
-        public static ConfigEntry<bool> TransportBoar;
-        public static ConfigEntry<bool> TransportWolves;
-        public static ConfigEntry<bool> TransportLox;
-        public static ConfigEntry<string> TransportMask;
-        public static ConfigEntry<float> TransportRadius;
-        public static ConfigEntry<float> TransportVerticalTolerance;
-        public static ConfigEntry<float> SpawnForwardOffset;
+        public static ConfigEntry<bool>? TransportBoar;
+        public static ConfigEntry<bool>? TransportWolves;
+        public static ConfigEntry<bool>? TransportLox;
+        public static ConfigEntry<string>? TransportMask;
+        public static ConfigEntry<float>? TransportRadius;
+        public static ConfigEntry<float>? TransportVerticalTolerance;
+        public static ConfigEntry<float>? SpawnForwardOffset;
         public static bool IncludeTamed;
         public static bool IncludeNamed;
         public static bool IncludeWild;
         public static bool IncludeFollow;
         public static bool ExcludeNamed;
-        public static ConfigEntry<string> IncludeMode;
+        public static ConfigEntry<string>? IncludeMode;
 
         //Teleport Self
-        public static ConfigEntry<float> SearchRadius;
-        public static ConfigEntry<float> MaximumDisplacement;
-        public static List<Character> enemies;
-        public static List<Character> allies;
+        public static ConfigEntry<float>? SearchRadius;
+        public static ConfigEntry<float>? MaximumDisplacement;
+        public static List<Character>? enemies;
+        public static List<Character>? allies;
 
         //Items
-        public static ConfigEntry<bool> RemoveItemsRestriction;
-        public static ConfigEntry<bool> TransportDragonEggs;
-        public static ConfigEntry<bool> TransportOres;
-        public static ConfigEntry<int> TransportFee;
+        public static ConfigEntry<bool>? TransportDragonEggs;
+        public static ConfigEntry<bool>? TransportOres;
+        public static ConfigEntry<int>? TransportFee;
         public static bool hasOre;
 
         private readonly Harmony harmony = new Harmony(PluginGUID);
@@ -108,7 +108,6 @@ namespace TeleportEverything
             SpawnForwardOffset = config("Transport", "Spawn forward Tolerance", .5f, "");
 
             // Transport.Items
-            RemoveItemsRestriction = config("Transport Items", "Remove Items Restriction", false, "Allows transporting all items.");
             TransportDragonEggs = config("Transport Items", "Transport Dragon Eggs", false, "");
             TransportOres = config("Transport Items", "Transport Ores", false, "Allows transporting ores, ingots and other restricted items.");
             TransportFee = config("Transport Items Config", "Transport fee", 10,
