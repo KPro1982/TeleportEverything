@@ -142,7 +142,7 @@ namespace TeleportEverything
                     }
                 }
 
-                TeleportEverythingLogger.LogDebug($"Allies: {allies.Count} and flag {TransportAllies}");
+                TeleportEverythingLogger.LogInfo($"Allies: {allies.Count} and flag {TransportAllies}");
                 if (allies.Count > 0 && TransportAllies)
                 {
                     foreach (var ally in allies)

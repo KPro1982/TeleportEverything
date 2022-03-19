@@ -96,7 +96,7 @@ namespace TeleportEverything
 
             // Transport Allies
             ServerEnableMask = config("Transport Allies", "Filter By Mask", false, "Enable to filter which tameable creatures can teleport on server.");
-            ServerTransportMask = config("Transport Allies", "Transport Mask", "", "Add the prefab names to allow if server filter is enabled");
+            ServerTransportMask = config("Transport Allies", "Transport Mask", "", "Add the prefab names to filter creatures to transport");
 
             // Transport.Items
             TransportDragonEggs = config("Transport Items", "Transport Dragon Eggs", false, "");
@@ -119,7 +119,7 @@ namespace TeleportEverything
                     new AcceptableValueList<string>("No messages", "top left", "centered")),
                 false);
             UserEnableMask = config("User Settings - Transport Allies", "User Filter By Mask", false, "Enable to filter which tameable creatures can teleport.", false);
-            UserTransportMask = config("User Settings - Transport Allies", "User Transport Mask", "", "Add the prefab names to allow if filter is enabled", false);
+            UserTransportMask = config("User Settings - Transport Allies", "User Transport Mask", "", "Add the prefab names to filter creatures to transport", false);
             IncludeMode = config("User Settings - Transport Allies", "Ally Mode", "No Allies",
                 new ConfigDescription("Ally Mode",
                     new AcceptableValueList<string>("No Allies", "All tamed", "Only Follow",
