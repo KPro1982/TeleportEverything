@@ -114,7 +114,6 @@ namespace TeleportEverything
             private static bool Postfix(bool __result, Player __instance, Vector3 pos,
                 Quaternion rot, bool distantTeleport)
             {
-                Debug.Log($"Player.TeleportTo reached");
                 if (!EnableMod.Value)
                 {
                     return __result;
@@ -143,7 +142,7 @@ namespace TeleportEverything
                     }
                 }
 
-                Debug.Log($"allies: {allies.Count} and flag {TransportAllies}");
+                TeleportEverythingLogger.LogDebug($"Allies: {allies.Count} and flag {TransportAllies}");
                 if (allies.Count > 0 && TransportAllies)
                 {
                     foreach (var ally in allies)
