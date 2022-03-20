@@ -5,7 +5,7 @@ namespace TeleportEverything
 {
     internal partial class Plugin
     {
-
+        public static List<DelayedSpawn> Allies;
         public static bool IsValidAlly(Character c)
         {
             if (IsEligibleCreature(c) && IsTransportable(c))
@@ -19,17 +19,22 @@ namespace TeleportEverything
 
             return false;
         }
-        
-         
-		public static string GetName(Character c)
+
+
+
+        public static string GetName(Character c)
+
         {
-            return c?.name.Replace("(Clone)", "").ToLower();
+            string r = c?.name.Replace("(Clone)", "").ToLower();
+            
+            return r;
         }
-        
-       public static bool IsEligibleCreature(Character c)
+
+        public static bool IsEligibleCreature(Character c)
         {
             if (GetName(c).Contains("wolf") && TransportWolves.Value)
             {
+
                 return true;
             }
 
@@ -69,11 +74,14 @@ namespace TeleportEverything
         {
             if (IsNamed(ally) && ExcludeNamed)
             {
+
                 return false;
             }
 
+
             if (IsFollowing(ally) && IncludeFollow)
             {
+
                 return true;
             }
 
@@ -105,8 +113,10 @@ namespace TeleportEverything
             if (mAi != null && mAi.GetFollowTarget() != null &&
                 mAi.GetFollowTarget().Equals(Player.m_localPlayer.gameObject))
             {
+
                 return true;
             }
+
 
             return false;
         }
@@ -117,36 +127,41 @@ namespace TeleportEverything
 
             mAi?.SetFollowTarget(Player.m_localPlayer.gameObject);
         }
-        
+
         public static int CountAllies()
         {
             var characters = new List<Character>();
             Character.GetCharactersInRange(Player.m_localPlayer.transform.position,
                 SearchRadius.Value, characters);
-
-            return characters.FindAll(c => IsValidAlly(c) == true).Count;
-           
             
+
+            List<Character> lAlly = characters.FindAll(IsValidAlly);
+
+            return lAlly.Count;
         }
 
-        public static List<DelayedSpawn> GetAllyList(Vector3 pos,
-            Quaternion rot, bool follow)
+        public static void CreateAllyList(Vector3 pos, Quaternion rot, bool follow)
         {
             var characters = new List<Character>();
-            var Allies = new List<DelayedSpawn>();
-            
+            Allies = new List<DelayedSpawn>();
+
             Character.GetCharactersInRange(Player.m_localPlayer.transform.position,
                 SearchRadius.Value, characters);
 
             var characterList = characters.FindAll(c => IsValidAlly(c) == true);
 
+            Vector3 offset = Player.m_localPlayer.transform.forward * SpawnForwardOffset.Value;
+
             foreach (Character c in characterList)
             {
-                Allies.Add(new DelayedSpawn(c, true, 10f, pos, rot, follow));
+                Allies.Add(new DelayedSpawn(c, true, 10f, GetDelayTimer(), pos, rot, offset, follow));
             }
+            
+        }
 
+        public static List<DelayedSpawn> GetAllyList()
+        {
             return Allies;
         }
-        
     }
 }

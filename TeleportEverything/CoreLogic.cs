@@ -38,10 +38,11 @@ namespace TeleportEverything
                 SearchRadius.Value, characters);
 
             var characterList = characters.FindAll(c => IsValidEnemy(c) == true);
-
+            Vector3 offset = Player.m_localPlayer.transform.forward * SpawnForwardOffset.Value;
+            
             foreach (Character c in characterList)
             {
-                Enemies.Add(new DelayedSpawn(c, false, 10f, pos, rot, null));
+                Enemies.Add(new DelayedSpawn(c,false, 10f, GetDelayTimer(), pos, rot, offset, false));
             }
 
             return Enemies;
@@ -71,6 +72,29 @@ namespace TeleportEverything
             {
                 MessageHud.instance.ShowMessage(MessageHud.MessageType.Center, msg);
             }
+        }
+
+        public static void UpdateDelayTimer(float dt)
+        {
+            DelayTimer += dt;
+        
+            if (Allies != null)
+            {
+                foreach (DelayedSpawn ds in Allies)
+                {
+                    ds.TrySpawn(DelayTimer);
+                }
+            }
+
+        }
+
+        public static float GetDelayTimer()
+        {
+            return DelayTimer;
+        }
+        public static void ResetDelayTimer()
+        {
+            // DelayTimer = 0f;
         }
     }
 }

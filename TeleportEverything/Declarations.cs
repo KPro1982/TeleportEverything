@@ -60,6 +60,9 @@ namespace TeleportEverything
 
 
         private readonly Harmony harmony = new Harmony(PluginGUID);
+        
+        //Teleport Timer
+        public static float DelayTimer;
 
         public static readonly ManualLogSource TeleportEverythingLogger =
             BepInEx.Logging.Logger.CreateLogSource(PluginName);
@@ -70,6 +73,7 @@ namespace TeleportEverything
         {
             harmony.PatchAll();
             CreateConfigValues();
+
             SetupWatcher();
 
             enemies = new List<Character>();
@@ -77,6 +81,7 @@ namespace TeleportEverything
 
 
             ClearIncludeVars();
+            DelayTimer = 0;
         }
 
         private void OnDestroy()
@@ -102,6 +107,7 @@ namespace TeleportEverything
             TransportWolves = config("Transport", "Transport Wolves", false, "");
             TransportLox = config("Transport", "Transport Lox", false, "");
             TransportMask = config("Transport", "Transport Mask", "", "");
+
 
             IncludeMode = config("Transport", "Ally Mode", "No Allies",
                 new ConfigDescription("Ally Mode",
@@ -221,5 +227,6 @@ namespace TeleportEverything
         ConfigEntry<T> config<T>(string group, string name, T value, string description, bool synchronizedSetting = true) => config(group, name, value, new ConfigDescription(description), synchronizedSetting);
 
         #endregion 
+
     }
 }
