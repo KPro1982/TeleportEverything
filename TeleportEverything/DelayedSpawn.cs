@@ -8,7 +8,7 @@ using Object = UnityEngine.Object;
 
 namespace TeleportEverything
 {
-    public class DelayedSpawn 
+    public class DelayedSpawn
     {
         public Character character { get; set; }
         public float delay { get; set; }
@@ -23,12 +23,15 @@ namespace TeleportEverything
         public Vector3 Offset { get; set; }
 
         private bool spawned = false;
-        
+
+        private ZDO saveZDO;
+
         public float CreationTime { get; set; }
 
         public int Version;
-        public DelayedSpawn(Character _original, bool _ally, float _delay, float _creationTime, Vector3 _pos,
-            Quaternion _rot, Vector3 _offset, bool _follow)
+
+        public DelayedSpawn(Character _original, bool _ally, float _delay, float _creationTime,
+            Vector3 _pos, Quaternion _rot, Vector3 _offset, bool _follow)
         {
             delay = _delay;
             CreationTime = _creationTime;
@@ -39,22 +42,26 @@ namespace TeleportEverything
             Transform = _original.transform;
             Offset = _offset;
             character = _original;
-            SaveZdoToDisk(character.m_nview.GetZDO());
+            saveZDO = character.m_nview.GetZDO().Clone();
+            if (saveZDO == null)
+            {
+                Debug.Log("Warning: saveZDO is null in constructor");
+            }
+            else
+            {
+                Debug.Log($"Constructor: saveZDO IsPersistent = {saveZDO.m_persistent}");
+            }
+            // SaveZdoToDisk(character.m_nview.GetZDO());
             Destroy(_original);
-            
-            
         }
 
         private void Destroy(Character orig)
         {
-            
             ZNetScene.instance.Destroy(orig.gameObject);
-
         }
 
         private void SaveZdoToDisk(ZDO zdo)
         {
-            
             Directory.CreateDirectory(Utils.GetSaveDataPath() + "/characters");
             string savename = Utils.GetSaveDataPath() + "/characters/ally.dat";
 
@@ -65,8 +72,8 @@ namespace TeleportEverything
 
             ZPackage zpackage = new ZPackage();
             zdo.Save(zpackage);
-            
-                
+
+
             byte[] array = zpackage.GenerateHash();
             byte[] array2 = zpackage.GetArray();
             FileStream fileStream = File.Create(savename);
@@ -79,12 +86,11 @@ namespace TeleportEverything
             fileStream.Flush(true);
             fileStream.Close();
             fileStream.Dispose();
-            
         }
 
         private ZDO LoadZdoFromDisk()
         {
-           string text = Utils.GetSaveDataPath() + "/characters/ally.dat";
+            string text = Utils.GetSaveDataPath() + "/characters/ally.dat";
             FileStream fileStream;
             try
             {
@@ -95,6 +101,7 @@ namespace TeleportEverything
                 ZLog.Log("  failed to load " + text);
                 return null;
             }
+
             byte[] data;
             try
             {
@@ -108,35 +115,42 @@ namespace TeleportEverything
             {
                 fileStream.Dispose();
                 return null;
-
             }
+
             fileStream.Dispose();
 
             ZDO zdo = ZDOMan.instance.CreateNewZDO(Pos);
             zdo.Load(new ZPackage(data), 24);
             return zdo;
         }
-        
+
+        public ZDO GetZdo()
+        {
+            // return LoadZdoFromDisk();
+
+            saveZDO.SetPosition(Pos + Offset);
+            
+            return saveZDO;
+        }
 
         public void SpawnNow()
         {
-           
             GameObject clone = null;
-            ZDO zdo = LoadZdoFromDisk();
+            ZDO zdo = GetZdo();
             Debug.Log($"Spawning {character.m_name}");
             if (zdo != null)
             {
-             
                 clone = ZNetScene.instance.CreateObject(zdo);
-                
             }
-
-
-
-            clone.transform.position = Pos + Offset;
+            else
+            {
+                Debug.Log("Warning zdo = null in SpawnNow");
+            }
+            
             clone.transform.rotation = Rot;
-         //   clone.gameObject.GetComponent<Tameable>().m_monsterAI.m_follow =
-         //       Player.m_localPlayer.gameObject;
+
+            //   clone.gameObject.GetComponent<Tameable>().m_monsterAI.m_follow =
+            //       Player.m_localPlayer.gameObject;
         }
 
 
@@ -146,12 +160,9 @@ namespace TeleportEverything
             {
                 spawned = true;
                 MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft,
-                                        $"Attempting to spawn");
+                    $"Attempting to spawn");
                 SpawnNow();
-                
-            }    
-            
-                
+            }
         }
     }
 }
