@@ -39,7 +39,7 @@ namespace TeleportEverything
             Transform = _original.transform;
             Offset = _offset;
             character = _original;
-            SaveZDOToDisk();
+            SaveZdoToDisk(character.m_nview.GetZDO());
             Destroy(_original);
             
             
@@ -47,16 +47,12 @@ namespace TeleportEverything
 
         private void Destroy(Character orig)
         {
-            // ZNetView znv = orig.m_nview;
-            // ZDO zdo = znv.GetZDO();
-            // znv.ResetZDO();
-            // UnityEngine.Object.Destroy(znv.gameObject);
-            // ZDOMan.instance.DestroyZDO(zdo);
+            
             ZNetScene.instance.Destroy(orig.gameObject);
 
         }
 
-        private void SaveZDOToDisk()
+        private void SaveZdoToDisk(ZDO zdo)
         {
             
             Directory.CreateDirectory(Utils.GetSaveDataPath() + "/characters");
@@ -68,7 +64,7 @@ namespace TeleportEverything
             }
 
             ZPackage zpackage = new ZPackage();
-            character.m_nview.GetZDO().Save(zpackage);
+            zdo.Save(zpackage);
             
                 
             byte[] array = zpackage.GenerateHash();
@@ -86,7 +82,7 @@ namespace TeleportEverything
             
         }
 
-        private ZDO LoadZDOFromDisk()
+        private ZDO LoadZdoFromDisk()
         {
            string text = Utils.GetSaveDataPath() + "/characters/ally.dat";
             FileStream fileStream;
@@ -126,7 +122,7 @@ namespace TeleportEverything
         {
            
             GameObject clone = null;
-            ZDO zdo = LoadZDOFromDisk();
+            ZDO zdo = LoadZdoFromDisk();
             Debug.Log($"Spawning {character.m_name}");
             if (zdo != null)
             {
@@ -139,8 +135,8 @@ namespace TeleportEverything
 
             clone.transform.position = Pos + Offset;
             clone.transform.rotation = Rot;
-            clone.gameObject.GetComponent<Tameable>().m_monsterAI.m_follow =
-                Player.m_localPlayer.gameObject;
+         //   clone.gameObject.GetComponent<Tameable>().m_monsterAI.m_follow =
+         //       Player.m_localPlayer.gameObject;
         }
 
 

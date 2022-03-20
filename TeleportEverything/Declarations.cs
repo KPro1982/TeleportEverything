@@ -57,6 +57,7 @@ namespace TeleportEverything
             CreateConfigValues();
             ClearIncludeVars();
             DelayTimer = 0;
+            DisplayMessage($"Teleport Everything Loaded...");
         }
 
         private void OnDestroy()
