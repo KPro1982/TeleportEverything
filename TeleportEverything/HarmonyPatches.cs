@@ -1,3 +1,4 @@
+using System.Dynamic;
 using HarmonyLib;
 using UnityEngine;
 
@@ -18,6 +19,7 @@ namespace TeleportEverything
                     __result = true;
                     return false; //skip original method
                 }
+
                 hasOre = false;
 
                 foreach (var item in __instance.GetAllItems())
@@ -40,6 +42,7 @@ namespace TeleportEverything
                             __result = false;
                             return false;
                         }
+
                         hasOre = true;
                     }
                 }
@@ -48,6 +51,7 @@ namespace TeleportEverything
                 return false;
             }
         }
+
         [HarmonyPatch(typeof(Teleport), nameof(Teleport.GetHoverText))]
         public static class Teleport_GetHoverText_Patch
         {
@@ -56,19 +60,19 @@ namespace TeleportEverything
                 if (!EnableMod.Value)
                     return;
 
-                PopulateEntityLists();
-
-                if (TransportAllies && allies.Count > 0)
+               
+                if (TransportAllies && CountAllies() > 0)
                 {
-                    DisplayMessage($"{allies.Count} allies will teleport with you!");
+                    DisplayMessage($"{CountAllies()} allies will teleport with you!");
                 }
 
-                if (enemies.Count > 0 && TeleportMode.Value.Contains("Take"))
+                if (CountEnemies() > 0 && TeleportMode.Value.Contains("Take"))
                 {
-                    DisplayMessage($"Beware: {enemies.Count} enemies may charge the portal!");
+                    DisplayMessage($"Beware: {CountEnemies()} enemies may charge the portal!");
                 }
             }
         }
+
         [HarmonyPatch(typeof(Humanoid))]
         [HarmonyPatch(nameof(Humanoid.IsTeleportable))]
         public class IsTeleportable_Patch
@@ -80,10 +84,13 @@ namespace TeleportEverything
                     return __result;
                 }
 
+                SetIncludeMode();
+                
 
                 if (TransportAllies && CountAllies() > 0)
                 {
-                    DisplayMessage($"{CountAllies()} allies will teleport with you!");
+                    ResetDelayTimer();
+                    DisplayMessage($"Transporting {CountAllies()} allies!");
                 }
 
                 if (CountEnemies() > 0)
@@ -91,7 +98,6 @@ namespace TeleportEverything
                     if (TeleportMode.Value.Contains("Run"))
                     {
                         DisplayMessage(
-
                             $"Vikings Don't run from a fight: {CountEnemies()} enemies with in {SearchRadius.Value} meters.");
 
                         return false;
@@ -100,15 +106,14 @@ namespace TeleportEverything
                     if (TeleportMode.Value.Contains("Take"))
 
                     {
-                        DisplayMessage(
-
-                            $"Beware: {CountEnemies()} enemies may charge the portal!");
+                        DisplayMessage($"Beware: {CountEnemies()} enemies may charge the portal!");
                     }
                 }
 
                 return __result;
             }
         }
+
         [HarmonyPatch(typeof(Player))]
         [HarmonyPatch(nameof(Player.TeleportTo))]
         public class TeleportTo_Patch
@@ -116,16 +121,16 @@ namespace TeleportEverything
             private static bool Postfix(bool __result, Player __instance, Vector3 pos,
                 Quaternion rot, bool distantTeleport)
             {
-                Debug.Log($"Player.TeleportTo reached");
                 if (!EnableMod.Value)
                 {
                     return __result;
                 }
 
+                SetIncludeMode();
+                Debug.Log($"Player.TeleportTo reached");
+
                 if (!__instance.IsTeleporting())
                     return __result;
-
-                PopulateEntityLists();
 
 
                 if (CountEnemies() > 0 && TeleportMode.Value.Contains("Take"))
@@ -133,45 +138,35 @@ namespace TeleportEverything
                     DisplayMessage(
                         $"Taking Enemies With You! {CountEnemies()} enemies charge the portal!!!");
 
-                    foreach (var e in GetEnemyList(pos, rot))
-                    {
-                        if (Random.Range(0, 100) <= 25)
-                        {
-                            var displacement = Random.insideUnitSphere * MaximumDisplacement.Value;
-                            displacement.y = 0;
-                            var offset = __instance.transform.forward * SpawnForwardOffset.Value;
-                            e.transform.position = pos + offset + displacement;
-                            e.transform.rotation = rot;
-                        }
-                    }
+                    // foreach (var e in GetEnemyList(pos, rot))
+                    // {
+                    //     if (Random.Range(0, 100) <= 25)
+                    //     {
+                    //         var displacement = Random.insideUnitSphere * MaximumDisplacement.Value;
+                    //         displacement.y = 0;
+                    //         var offset = __instance.transform.forward * SpawnForwardOffset.Value;
+                    //         e.Transform.position = pos + offset + displacement;
+                    //         e.Transform.rotation = rot;
+                    //     }
+                    // }
                 }
 
-                Debug.Log($"allies: {CountAllies()} and flag {TransportAllies}");
+
                 if (CountAllies() > 0 && TransportAllies)
                 {
-                    foreach (var ally in GetAllyList(pos, rot, IncludeFollow))
-
-                    {
-                        var offset = __instance.transform.forward * SpawnForwardOffset.Value;
-                        ally.transform.position = pos + offset;
-                        ally.transform.rotation = rot;
-                        if (IncludeFollow)
-                        {
-                            SetFollow(ally.character);
-                        }
-                    }
+                   CreateAllyList(pos, rot, IncludeFollow);
                 }
 
                 return __result;
             }
         }
+
         [HarmonyPatch(typeof(TeleportWorld))]
         [HarmonyPatch(nameof(TeleportWorld.Teleport))]
         public class Teleport_Patch
         {
             private static void Prefix(ref Player player)
             {
-                
                 if (!EnableMod.Value)
                     return;
 
@@ -184,6 +179,17 @@ namespace TeleportEverything
                 ReduceStacks(player);
 
                 RemoveEmptyItems(player);
+            }
+        }
+
+        [HarmonyPatch(typeof(Player))]
+        [HarmonyPatch("UpdateTeleport")]
+        public class UpdateTeleport_Patch
+        {
+            static void  Postfix( Player __instance, float dt)
+            {
+                UpdateDelayTimer(dt);
+                
             }
         }
     }

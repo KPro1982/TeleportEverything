@@ -47,13 +47,16 @@ namespace TeleportEverything
         public static bool hasOre;
 
         private readonly Harmony harmony = new Harmony(PluginGUID);
+        
+        //Teleport Timer
+        public static float DelayTimer;
 
         private void Awake()
         {
             harmony.PatchAll();
             CreateConfigValues();
-           
             ClearIncludeVars();
+            DelayTimer = 0;
         }
 
         private void OnDestroy()
@@ -80,7 +83,7 @@ namespace TeleportEverything
             TransportLox = Config.Bind("Transport", "Transport Lox", false);
             TransportMask = Config.Bind("Transport", "Transport Mask", "");
 
-            IncludeMode = Config.Bind("Transport", "Ally Mode", "No Allies",
+            IncludeMode = Config.Bind("Transport", "Ally Mode", "Only Follow",
                 new ConfigDescription("Ally Mode",
                     new AcceptableValueList<string>("No Allies", "All tamed", "Only Follow",
                         "All tamed except Named", "Only Named")));
@@ -152,9 +155,5 @@ namespace TeleportEverything
                 IncludeNamed = true;
             }
         }
-
-       
-
-        
     }
 }

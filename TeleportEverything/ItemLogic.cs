@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace TeleportEverything
 {
@@ -17,7 +18,7 @@ namespace TeleportEverything
                     continue;
 
                 var totalStack = item.m_stack;
-                item.m_stack = System.Convert.ToInt32(totalStack * (1-(float)TransportFee.Value / 100));
+                item.m_stack = Convert.ToInt32(totalStack * (1-(float)TransportFee.Value / 100));
 
                 DisplayMessage($"{totalStack - item.m_stack} out of {totalStack} deducted as a fee for transporting contraband.");
             }
