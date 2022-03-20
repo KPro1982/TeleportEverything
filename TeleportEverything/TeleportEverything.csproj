@@ -86,7 +86,6 @@
         <Compile Include="DelayedSpawn.cs" />
         <Compile Include="HarmonyPatches.cs" />
         <Compile Include="ItemLogic.cs" />
-        <Compile Include="PersistEntity.cs" />
         <Compile Include="Properties\IgnoreAccessModifiers.cs" />
         <Compile Include="Declarations.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
