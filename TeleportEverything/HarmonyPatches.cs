@@ -144,6 +144,7 @@ namespace TeleportEverything
                 }
 
 
+
                 if (CountAllies() > 0 && TransportAllies)
                 {
                    CreateAllyList(pos, rot, IncludeFollow);

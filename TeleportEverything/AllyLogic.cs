@@ -1,5 +1,9 @@
+
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+
 
 namespace TeleportEverything
 {
@@ -31,25 +35,16 @@ namespace TeleportEverything
             return r;
         }
 
+
         public static bool IsEligibleCreature(Character c)
         {
             if (GetName(c).Contains("wolf") && TransportWolves.Value)
             {
 
                 return true;
-            }
 
-            if (GetName(c).Contains("boar") && TransportBoar.Value)
-            {
-                return true;
-            }
-
-            if (GetName(c).Contains("lox") && TransportLox.Value)
-            {
-                return true;
-            }
-
-            if (IsInCreatureMask(c) && TransportMask.Value != "")
+            if (IsAllowedInMask(c, ServerEnableMask.Value, ServerTransportMask.Value) && 
+                IsAllowedInMask(c, UserEnableMask.Value, UserTransportMask.Value))
             {
                 return true;
             }
@@ -57,18 +52,29 @@ namespace TeleportEverything
             return false;
         }
 
-        private static bool IsInCreatureMask(Character c)
+        private static bool IsAllowedInMask(Character c, bool enableMask, string transportMask)
         {
-            var includeList = TransportMask.Value.Split(',');
-            foreach (var s in includeList)
-            {
-                if (GetName(c).Contains(s.ToLower().Trim()))
-                {
-                    return true;
-                }
-            }
+            if (!enableMask)
+                return true;
+
+
+            if (String.IsNullOrWhiteSpace(transportMask))
+                return false;
+
+            if (IsInFilterMask(c, transportMask))
+                return true;
 
             return false;
+        }
+
+
+        private static bool IsInFilterMask(Character c, string mask)
+
+        {
+            List<string> maskList = mask.Split(',').Select(p => p.Trim().ToLower()).ToList();
+            string isInMask = maskList.FirstOrDefault(s => s.Contains(GetName(c)));
+
+            return isInMask != null;
         }
 
         public static bool IsTransportable(Character ally)

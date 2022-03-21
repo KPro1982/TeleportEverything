@@ -12,16 +12,23 @@ namespace TeleportEverything
 
         internal static void ReduceStacks(Player player)
         {
+            int deductedCount = 0, totalCount = 0;
+
             foreach (var item in player.GetInventory().GetAllItems())
             {
                 if (item.m_shared.m_teleportable || IsDragonEgg(item))
                     continue;
 
+
                 var totalStack = item.m_stack;
                 item.m_stack = Convert.ToInt32(totalStack * (1-(float)TransportFee.Value / 100));
 
-                DisplayMessage($"{totalStack - item.m_stack} out of {totalStack} deducted as a fee for transporting contraband.");
+                TeleportEverythingLogger.LogMessage($"{totalStack - item.m_stack} out of {totalStack} {item.m_dropPrefab.name} deducted as a fee for transporting contraband.");
+                //counts
+                deductedCount += totalStack - item.m_stack;
+                totalCount += totalStack;
             }
+            DisplayMessage($"{deductedCount} out of {totalCount} items deducted as a fee for transporting contraband.");
         }
 
         internal static void RemoveEmptyItems(Player player)

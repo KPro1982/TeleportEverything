@@ -28,6 +28,7 @@ namespace TeleportEverything
             
         }
 
+
         public static List<DelayedSpawn> Enemies;
         public static void CreateEnemyList(Vector3 pos,
             Quaternion rot)
