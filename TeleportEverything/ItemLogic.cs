@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace TeleportEverything
 {
@@ -18,8 +19,9 @@ namespace TeleportEverything
                 if (item.m_shared.m_teleportable || IsDragonEgg(item))
                     continue;
 
-                int totalStack = item.m_stack;
-                item.m_stack = System.Convert.ToInt32(totalStack * (1-(float)TransportFee.Value / 100));
+
+                var totalStack = item.m_stack;
+                item.m_stack = Convert.ToInt32(totalStack * (1-(float)TransportFee.Value / 100));
 
                 TeleportEverythingLogger.LogMessage($"{totalStack - item.m_stack} out of {totalStack} {item.m_dropPrefab.name} deducted as a fee for transporting contraband.");
                 //counts

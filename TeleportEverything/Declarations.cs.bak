@@ -15,6 +15,7 @@ namespace TeleportEverything
     {
         public const string PluginGUID = "com.kpro.TeleportEverything";
         public const string PluginName = "TeleportEverything";
+        
         public const string PluginVersion = "1.5.0";
         private static string ConfigFileName = PluginGUID + ".cfg";
         private static string ConfigFileFullPath = Paths.ConfigPath + Path.DirectorySeparatorChar + ConfigFileName;
@@ -32,16 +33,22 @@ namespace TeleportEverything
         public static ConfigEntry<float>? SpawnForwardOffset;
 
         //Teleport Self
+
         public static ConfigEntry<float>? SearchRadius;
         public static ConfigEntry<float>? MaximumDisplacement;
         public static List<Character>? enemies;
         public static List<Character>? allies;
+
+        public static ConfigEntry<float> SearchRadius;
+        public static ConfigEntry<float> MaximumDisplacement;
+       
 
         //Items
         public static ConfigEntry<bool>? TransportDragonEggs;
         public static ConfigEntry<bool>? TransportOres;
         public static ConfigEntry<int>? TransportFee;
         public static bool hasOre;
+
         
         //User Settings
         public static ConfigEntry<string>? IncludeMode;
@@ -59,21 +66,37 @@ namespace TeleportEverything
 
         private readonly Harmony harmony = new Harmony(PluginGUID);
 
+
+        public static ConfigEntry<float> SearchRadius;
+        public static ConfigEntry<float> MaximumDisplacement;
+
+
+        private readonly Harmony harmony = new Harmony(PluginGUID);
+        
+        //Teleport Timer
+        public static float DelayTimer;
+
+
         public static readonly ManualLogSource TeleportEverythingLogger =
             BepInEx.Logging.Logger.CreateLogSource(PluginName);
 
         private static readonly ConfigSync ConfigSync = new(PluginGUID) { DisplayName = PluginName, CurrentVersion = PluginVersion, MinimumRequiredVersion = PluginVersion };
 
+
         private void Awake()
         {
             harmony.PatchAll();
             CreateConfigValues();
+
             SetupWatcher();
 
             enemies = new List<Character>();
             allies = new List<Character>();
 
             ClearIncludeVars();
+            DelayTimer = 0;
+            DisplayMessage($"Teleport Everything Loaded...");
+
         }
 
         private void OnDestroy()
@@ -90,30 +113,30 @@ namespace TeleportEverything
             EnableMod = config("Mod", "Enable Mod", true, "Enable/Disable mod");
 
             // Transport
-<<<<<<< HEAD
+
             TransportBoar = config("Transport", "Transport Boar", false, "");
             TransportWolves = config("Transport", "Transport Wolves", false, "");
             TransportLox = config("Transport", "Transport Lox", false, "");
             TransportMask = config("Transport", "Transport Mask", "", "");
 
-            IncludeMode = config("Transport", "Ally Mode", "No Allies",
+
+            IncludeMode = Config.Bind("Transport", "Ally Mode", "Only Follow",
                 new ConfigDescription("Ally Mode",
                     new AcceptableValueList<string>("No Allies", "All tamed", "Only Follow",
                         "All tamed except Named", "Only Named")), false);
+
 
             TransportRadius = config("Transport", "Transport Radius", 10f,new ConfigDescription("", null, new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));
             TransportVerticalTolerance =
                 config("Transport", "Transport Vertical Tolerance", 2f, "");
             Config.AddSetting("X", "1", 1, new ConfigDescription("", null, new ConfigurationManagerAttributes { IsAdvanced = true, Order = 3 }));
-=======
-            TransportRadius = config("Transport", "Transport Radius", 10f, "");
-            TransportVerticalTolerance = config("Transport", "Transport Vertical Tolerance", 2f, "");
->>>>>>> 877f194d8339e6ab835e93c80720f439b0239790
+
             SpawnForwardOffset = config("Transport", "Spawn forward Tolerance", .5f, "");
 
             // Transport Allies
             ServerEnableMask = config("Transport Allies", "Filter By Mask", false, "Enable to filter which tameable creatures can teleport on server.");
             ServerTransportMask = config("Transport Allies", "Transport Mask", "", "Add the prefab names to filter creatures to transport");
+
 
             // Transport.Items
             TransportDragonEggs = config("Transport Items", "Transport Dragon Eggs", false, "");
@@ -129,6 +152,7 @@ namespace TeleportEverything
                 new ConfigDescription("Teleport Mode",
                     new AcceptableValueList<string>("Standard", "Vikings Don't Run",
                         "Take Them With You")));
+
 
             //User Settings
             MessageMode = config("User Settings", "Message Mode", "No messages",

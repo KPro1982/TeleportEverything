@@ -32,10 +32,12 @@ namespace TeleportEverything
         public static ConfigEntry<float>? SpawnForwardOffset;
 
         //Teleport Self
+
         public static ConfigEntry<float>? SearchRadius;
         public static ConfigEntry<float>? MaximumDisplacement;
         public static List<Character>? enemies;
         public static List<Character>? allies;
+
 
         //Items
         public static ConfigEntry<bool>? TransportDragonEggs;
@@ -57,23 +59,36 @@ namespace TeleportEverything
         public static bool IncludeFollow;
         public static bool ExcludeNamed;
 
+        public static ConfigEntry<float> SearchRadius;
+        public static ConfigEntry<float> MaximumDisplacement;
+
+
         private readonly Harmony harmony = new Harmony(PluginGUID);
+        
+        //Teleport Timer
+        public static float DelayTimer;
+
 
         public static readonly ManualLogSource TeleportEverythingLogger =
             BepInEx.Logging.Logger.CreateLogSource(PluginName);
 
         private static readonly ConfigSync ConfigSync = new(PluginGUID) { DisplayName = PluginName, CurrentVersion = PluginVersion, MinimumRequiredVersion = PluginVersion };
 
+
         private void Awake()
         {
             harmony.PatchAll();
             CreateConfigValues();
+
+
             SetupWatcher();
 
             enemies = new List<Character>();
             allies = new List<Character>();
 
             ClearIncludeVars();
+            DelayTimer = 0;
+            DisplayMessage($"Teleport Everything Loaded...");
         }
 
         private void OnDestroy()
@@ -96,7 +111,9 @@ namespace TeleportEverything
             TransportLox = config("Transport", "Transport Lox", false, "");
             TransportMask = config("Transport", "Transport Mask", "", "");
 
-            IncludeMode = config("Transport", "Ally Mode", "No Allies",
+
+
+            IncludeMode = Config.Bind("Transport", "Ally Mode", "Only Follow",
                 new ConfigDescription("Ally Mode",
                     new AcceptableValueList<string>("No Allies", "All tamed", "Only Follow",
                         "All tamed except Named", "Only Named")), false);
@@ -233,5 +250,6 @@ namespace TeleportEverything
         ConfigEntry<T> config<T>(string group, string name, T value, string description, bool synchronizedSetting = true) => config(group, name, value, new ConfigDescription(description), synchronizedSetting);
 
         #endregion 
+
     }
 }

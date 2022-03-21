@@ -1,9 +1,5 @@
-
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-
 
 namespace TeleportEverything
 {
@@ -26,7 +22,10 @@ namespace TeleportEverything
         }
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> d3101526a78e20a1d9c890ef9c17bd8052fe9be8
         public static string GetName(Character c)
 
         {
@@ -35,16 +34,25 @@ namespace TeleportEverything
             return r;
         }
 
-
         public static bool IsEligibleCreature(Character c)
         {
             if (GetName(c).Contains("wolf") && TransportWolves.Value)
             {
 
                 return true;
+            }
 
-            if (IsAllowedInMask(c, ServerEnableMask.Value, ServerTransportMask.Value) && 
-                IsAllowedInMask(c, UserEnableMask.Value, UserTransportMask.Value))
+            if (GetName(c).Contains("boar") && TransportBoar.Value)
+            {
+                return true;
+            }
+
+            if (GetName(c).Contains("lox") && TransportLox.Value)
+            {
+                return true;
+            }
+
+            if (IsInCreatureMask(c) && TransportMask.Value != "")
             {
                 return true;
             }
@@ -52,29 +60,18 @@ namespace TeleportEverything
             return false;
         }
 
-        private static bool IsAllowedInMask(Character c, bool enableMask, string transportMask)
+        private static bool IsInCreatureMask(Character c)
         {
-            if (!enableMask)
-                return true;
-
-
-            if (String.IsNullOrWhiteSpace(transportMask))
-                return false;
-
-            if (IsInFilterMask(c, transportMask))
-                return true;
+            var includeList = TransportMask.Value.Split(',');
+            foreach (var s in includeList)
+            {
+                if (GetName(c).Contains(s.ToLower().Trim()))
+                {
+                    return true;
+                }
+            }
 
             return false;
-        }
-
-
-        private static bool IsInFilterMask(Character c, string mask)
-
-        {
-            List<string> maskList = mask.Split(',').Select(p => p.Trim().ToLower()).ToList();
-            string isInMask = maskList.FirstOrDefault(s => s.Contains(GetName(c)));
-
-            return isInMask != null;
         }
 
         public static bool IsTransportable(Character ally)
@@ -135,10 +132,15 @@ namespace TeleportEverything
             Character.GetCharactersInRange(Player.m_localPlayer.transform.position,
                 SearchRadius.Value, characters);
             
-
+<<<<<<< HEAD
 
             List<Character> lAlly = characters.FindAll(IsValidAlly);
 
+=======
+
+            List<Character> lAlly = characters.FindAll(IsValidAlly);
+
+>>>>>>> d3101526a78e20a1d9c890ef9c17bd8052fe9be8
             return lAlly.Count;
         }
 
