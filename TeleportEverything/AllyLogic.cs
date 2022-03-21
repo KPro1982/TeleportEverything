@@ -130,6 +130,7 @@ namespace TeleportEverything
                 SearchRadius.Value, characters);
             
 
+
             List<Character> lAlly = characters.FindAll(IsValidAlly);
 
             return lAlly.Count;

@@ -49,6 +49,7 @@ namespace TeleportEverything
         public static List<Character>? enemies;
         public static List<Character>? allies;
 
+
         //Items
         public static ConfigEntry<bool>? TransportDragonEggs;
         public static ConfigEntry<bool>? TransportOres;
@@ -64,21 +65,23 @@ namespace TeleportEverything
         //Teleport Timer
         public static float DelayTimer;
 
+
         public static readonly ManualLogSource TeleportEverythingLogger =
             BepInEx.Logging.Logger.CreateLogSource(PluginName);
 
         private static readonly ConfigSync ConfigSync = new(PluginGUID) { DisplayName = PluginName, CurrentVersion = PluginVersion, MinimumRequiredVersion = PluginVersion };
+
 
         private void Awake()
         {
             harmony.PatchAll();
             CreateConfigValues();
 
+
             SetupWatcher();
 
             enemies = new List<Character>();
             allies = new List<Character>();
-
 
             ClearIncludeVars();
             DelayTimer = 0;
@@ -110,7 +113,8 @@ namespace TeleportEverything
             TransportMask = config("Transport", "Transport Mask", "", "");
 
 
-            IncludeMode = config("Transport", "Ally Mode", "No Allies",
+
+            IncludeMode = Config.Bind("Transport", "Ally Mode", "Only Follow",
                 new ConfigDescription("Ally Mode",
                     new AcceptableValueList<string>("No Allies", "All tamed", "Only Follow",
                         "All tamed except Named", "Only Named")), false);

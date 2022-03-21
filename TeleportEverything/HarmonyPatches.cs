@@ -99,6 +99,7 @@ namespace TeleportEverything
                     {
                         DisplayMessage(
                             $"Vikings Don't run from a fight: {CountEnemies()} enemies with in {SearchRadius.Value} meters.");
+
                         return false;
                     }
 

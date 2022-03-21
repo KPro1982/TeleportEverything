@@ -16,6 +16,7 @@ namespace TeleportEverything
 
             return false;
         }
+
         public static int CountEnemies()
         {
             var characters = new List<Character>();
@@ -49,6 +50,7 @@ namespace TeleportEverything
 
             
         }
+
 
         public static float CalcDistToEntity(Character e) => VectorToEntity(e).magnitude;
 
