@@ -47,10 +47,10 @@ namespace TeleportEverything
 
         private void Destroy(Character orig)
         {
-            
-           // ZNetScene.instance.Destroy(orig.gameObject);
-           // Object.Destroy(orig.gameObject);
-           orig.m_nview.Destroy();
+            orig.transform.position *= 1000f;
+            // ZNetScene.instance.Destroy(orig.gameObject);
+            // Object.Destroy(orig.gameObject);
+            //orig.m_nview.Destroy();
         }
 
        
