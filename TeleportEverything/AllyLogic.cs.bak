@@ -6,6 +6,7 @@ namespace TeleportEverything
     internal partial class Plugin
     {
         public static List<DelayedSpawn> Allies;
+       
         public static bool IsValidAlly(Character c)
         {
             if (IsEligibleCreature(c) && IsTransportable(c))
@@ -19,28 +20,21 @@ namespace TeleportEverything
 
             return false;
         }
+
+
 <<<<<<< HEAD
-        
-         
-		public static string GetName(Character c)
+
 =======
-
-
+>>>>>>> d3101526a78e20a1d9c890ef9c17bd8052fe9be8
         public static string GetName(Character c)
 
->>>>>>> ce82893 (Refactor for delayed spawn)
         {
             string r = c?.name.Replace("(Clone)", "").ToLower();
             
             return r;
         }
-<<<<<<< HEAD
-        
-       public static bool IsEligibleCreature(Character c)
-=======
 
         public static bool IsEligibleCreature(Character c)
->>>>>>> ce82893 (Refactor for delayed spawn)
         {
             if (GetName(c).Contains("wolf") && TransportWolves.Value)
             {
@@ -130,13 +124,7 @@ namespace TeleportEverything
 
             return false;
         }
-
-        public static void SetFollow(Character f)
-        {
-            var mAi = f.GetComponent<MonsterAI>();
-
-            mAi?.SetFollowTarget(Player.m_localPlayer.gameObject);
-        }
+        
 
         public static int CountAllies()
         {
@@ -144,9 +132,15 @@ namespace TeleportEverything
             Character.GetCharactersInRange(Player.m_localPlayer.transform.position,
                 SearchRadius.Value, characters);
             
+<<<<<<< HEAD
 
             List<Character> lAlly = characters.FindAll(IsValidAlly);
 
+=======
+
+            List<Character> lAlly = characters.FindAll(IsValidAlly);
+
+>>>>>>> d3101526a78e20a1d9c890ef9c17bd8052fe9be8
             return lAlly.Count;
         }
 
@@ -162,9 +156,11 @@ namespace TeleportEverything
 
             Vector3 offset = Player.m_localPlayer.transform.forward * SpawnForwardOffset.Value;
 
+            float addDelay = 0f;
             foreach (Character c in characterList)
             {
-                Allies.Add(new DelayedSpawn(c, true, 10f, GetDelayTimer(), pos, rot, offset, follow));
+                Allies.Add(new DelayedSpawn(c, true, 10f + addDelay, GetDelayTimer(), pos, rot, offset, follow));
+                addDelay += 0.5f;
             }
             
         }

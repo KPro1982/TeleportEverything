@@ -99,6 +99,10 @@ namespace TeleportEverything
                     {
                         DisplayMessage(
                             $"Vikings Don't run from a fight: {CountEnemies()} enemies with in {SearchRadius.Value} meters.");
+<<<<<<< HEAD
+=======
+
+>>>>>>> d3101526a78e20a1d9c890ef9c17bd8052fe9be8
                         return false;
                     }
 
@@ -106,7 +110,10 @@ namespace TeleportEverything
 
                     {
                         DisplayMessage($"Beware: {CountEnemies()} enemies may charge the portal!");
+<<<<<<< HEAD
 
+=======
+>>>>>>> d3101526a78e20a1d9c890ef9c17bd8052fe9be8
                     }
                 }
 
@@ -139,29 +146,20 @@ namespace TeleportEverything
                         $"Taking Enemies With You! {CountEnemies()} enemies charge the portal!!!");
 <<<<<<< HEAD
 
-
-                    // foreach (var e in GetEnemyList(pos, rot))
-                    // {
-                    //     if (Random.Range(0, 100) <= 25)
-                    //     {
-                    //         var displacement = Random.insideUnitSphere * MaximumDisplacement.Value;
-                    //         displacement.y = 0;
-                    //         var offset = __instance.transform.forward * SpawnForwardOffset.Value;
-                    //         e.Transform.position = pos + offset + displacement;
-                    //         e.Transform.rotation = rot;
-                    //     }
-                    // }
 =======
+>>>>>>> d3101526a78e20a1d9c890ef9c17bd8052fe9be8
                     CreateEnemyList(pos, rot);
                    
->>>>>>> d310152 (95 percent there)
                 }
 
 
                 if (CountAllies() > 0 && TransportAllies)
                 {
                    CreateAllyList(pos, rot, IncludeFollow);
+<<<<<<< HEAD
 
+=======
+>>>>>>> d3101526a78e20a1d9c890ef9c17bd8052fe9be8
                 }
 
                 return __result;

@@ -43,11 +43,17 @@ namespace TeleportEverything
         public static ConfigEntry<string>? IncludeMode;
 
         //Teleport Self
+<<<<<<< HEAD
 
         public static ConfigEntry<float>? SearchRadius;
         public static ConfigEntry<float>? MaximumDisplacement;
         public static List<Character>? enemies;
         public static List<Character>? allies;
+=======
+        public static ConfigEntry<float> SearchRadius;
+        public static ConfigEntry<float> MaximumDisplacement;
+       
+>>>>>>> d3101526a78e20a1d9c890ef9c17bd8052fe9be8
 
         //Items
         public static ConfigEntry<bool>? TransportDragonEggs;
@@ -63,17 +69,21 @@ namespace TeleportEverything
         
         //Teleport Timer
         public static float DelayTimer;
+<<<<<<< HEAD
 
         public static readonly ManualLogSource TeleportEverythingLogger =
             BepInEx.Logging.Logger.CreateLogSource(PluginName);
 
         private static readonly ConfigSync ConfigSync = new(PluginGUID) { DisplayName = PluginName, CurrentVersion = PluginVersion, MinimumRequiredVersion = PluginVersion };
+=======
+>>>>>>> d3101526a78e20a1d9c890ef9c17bd8052fe9be8
 
         private void Awake()
         {
             harmony.PatchAll();
             CreateConfigValues();
 <<<<<<< HEAD
+
             SetupWatcher();
 
             enemies = new List<Character>();
@@ -81,9 +91,10 @@ namespace TeleportEverything
 
 
 =======
->>>>>>> ce82893 (Refactor for delayed spawn)
+>>>>>>> d3101526a78e20a1d9c890ef9c17bd8052fe9be8
             ClearIncludeVars();
             DelayTimer = 0;
+            DisplayMessage($"Teleport Everything Loaded...");
         }
 
         private void OnDestroy()
@@ -110,16 +121,12 @@ namespace TeleportEverything
             TransportLox = config("Transport", "Transport Lox", false, "");
             TransportMask = config("Transport", "Transport Mask", "", "");
 
+
 <<<<<<< HEAD
             IncludeMode = config("Transport", "Ally Mode", "No Allies",
 =======
-            TransportBoar = Config.Bind("Transport", "Transport Boar", false);
-            TransportWolves = Config.Bind("Transport", "Transport Wolves", false);
-            TransportLox = Config.Bind("Transport", "Transport Lox", false);
-            TransportMask = Config.Bind("Transport", "Transport Mask", "");
-
             IncludeMode = Config.Bind("Transport", "Ally Mode", "Only Follow",
->>>>>>> ce82893 (Refactor for delayed spawn)
+>>>>>>> d3101526a78e20a1d9c890ef9c17bd8052fe9be8
                 new ConfigDescription("Ally Mode",
                     new AcceptableValueList<string>("No Allies", "All tamed", "Only Follow",
                         "All tamed except Named", "Only Named")), false);
@@ -238,7 +245,8 @@ namespace TeleportEverything
         ConfigEntry<T> config<T>(string group, string name, T value, string description, bool synchronizedSetting = true) => config(group, name, value, new ConfigDescription(description), synchronizedSetting);
 
         #endregion 
+
 =======
->>>>>>> ce82893 (Refactor for delayed spawn)
+>>>>>>> d3101526a78e20a1d9c890ef9c17bd8052fe9be8
     }
 }
