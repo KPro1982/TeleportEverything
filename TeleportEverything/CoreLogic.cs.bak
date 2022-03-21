@@ -16,7 +16,10 @@ namespace TeleportEverything
 
             return false;
         }
-
+<<<<<<< HEAD
+=======
+      
+>>>>>>> d3101526a78e20a1d9c890ef9c17bd8052fe9be8
         public static int CountEnemies()
         {
             var characters = new List<Character>();
@@ -51,7 +54,11 @@ namespace TeleportEverything
             
         }
 
+<<<<<<< HEAD
+=======
+        
 
+>>>>>>> d3101526a78e20a1d9c890ef9c17bd8052fe9be8
         public static float CalcDistToEntity(Character e) => VectorToEntity(e).magnitude;
 
         public static Vector3 VectorToEntity(Character e) =>

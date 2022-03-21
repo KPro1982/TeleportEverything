@@ -43,12 +43,17 @@ namespace TeleportEverything
         public static ConfigEntry<string>? IncludeMode;
 
         //Teleport Self
+<<<<<<< HEAD
 
         public static ConfigEntry<float>? SearchRadius;
         public static ConfigEntry<float>? MaximumDisplacement;
         public static List<Character>? enemies;
         public static List<Character>? allies;
-
+=======
+        public static ConfigEntry<float> SearchRadius;
+        public static ConfigEntry<float> MaximumDisplacement;
+       
+>>>>>>> d3101526a78e20a1d9c890ef9c17bd8052fe9be8
 
         //Items
         public static ConfigEntry<bool>? TransportDragonEggs;
@@ -64,25 +69,29 @@ namespace TeleportEverything
         
         //Teleport Timer
         public static float DelayTimer;
-
+<<<<<<< HEAD
 
         public static readonly ManualLogSource TeleportEverythingLogger =
             BepInEx.Logging.Logger.CreateLogSource(PluginName);
 
         private static readonly ConfigSync ConfigSync = new(PluginGUID) { DisplayName = PluginName, CurrentVersion = PluginVersion, MinimumRequiredVersion = PluginVersion };
-
+=======
+>>>>>>> d3101526a78e20a1d9c890ef9c17bd8052fe9be8
 
         private void Awake()
         {
             harmony.PatchAll();
             CreateConfigValues();
-
+<<<<<<< HEAD
 
             SetupWatcher();
 
             enemies = new List<Character>();
             allies = new List<Character>();
 
+
+=======
+>>>>>>> d3101526a78e20a1d9c890ef9c17bd8052fe9be8
             ClearIncludeVars();
             DelayTimer = 0;
             DisplayMessage($"Teleport Everything Loaded...");
@@ -113,8 +122,11 @@ namespace TeleportEverything
             TransportMask = config("Transport", "Transport Mask", "", "");
 
 
-
+<<<<<<< HEAD
+            IncludeMode = config("Transport", "Ally Mode", "No Allies",
+=======
             IncludeMode = Config.Bind("Transport", "Ally Mode", "Only Follow",
+>>>>>>> d3101526a78e20a1d9c890ef9c17bd8052fe9be8
                 new ConfigDescription("Ally Mode",
                     new AcceptableValueList<string>("No Allies", "All tamed", "Only Follow",
                         "All tamed except Named", "Only Named")), false);
@@ -183,6 +195,7 @@ namespace TeleportEverything
                 IncludeNamed = true;
             }
         }
+<<<<<<< HEAD
 
         private void SetupWatcher()
         {
@@ -233,5 +246,7 @@ namespace TeleportEverything
 
         #endregion 
 
+=======
+>>>>>>> d3101526a78e20a1d9c890ef9c17bd8052fe9be8
     }
 }

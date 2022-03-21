@@ -22,7 +22,10 @@ namespace TeleportEverything
         }
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> d3101526a78e20a1d9c890ef9c17bd8052fe9be8
         public static string GetName(Character c)
 
         {
@@ -129,10 +132,15 @@ namespace TeleportEverything
             Character.GetCharactersInRange(Player.m_localPlayer.transform.position,
                 SearchRadius.Value, characters);
             
-
+<<<<<<< HEAD
 
             List<Character> lAlly = characters.FindAll(IsValidAlly);
 
+=======
+
+            List<Character> lAlly = characters.FindAll(IsValidAlly);
+
+>>>>>>> d3101526a78e20a1d9c890ef9c17bd8052fe9be8
             return lAlly.Count;
         }
 
