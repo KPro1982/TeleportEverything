@@ -102,9 +102,10 @@ namespace TeleportEverything
                     new AcceptableValueList<string>("No Allies", "All tamed", "Only Follow",
                         "All tamed except Named", "Only Named")), false);
 
-            TransportRadius = config("Transport", "Transport Radius", 10f, "");
+            TransportRadius = config("Transport", "Transport Radius", 10f,new ConfigDescription("", null, new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));
             TransportVerticalTolerance =
                 config("Transport", "Transport Vertical Tolerance", 2f, "");
+            Config.AddSetting("X", "1", 1, new ConfigDescription("", null, new ConfigurationManagerAttributes { IsAdvanced = true, Order = 3 }));
             SpawnForwardOffset = config("Transport", "Spawn forward Tolerance", .5f, "");
 
             // Transport.Items
