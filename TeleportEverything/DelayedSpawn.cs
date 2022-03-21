@@ -51,8 +51,8 @@ namespace TeleportEverything
             {
                 Debug.Log($"Constructor: saveZDO IsPersistent = {saveZDO.m_persistent}");
             }
-            // SaveZdoToDisk(character.m_nview.GetZDO());
-            Destroy(_original);
+            
+            // Destroy(_original);
         }
 
         private void Destroy(Character orig)
@@ -60,7 +60,50 @@ namespace TeleportEverything
             ZNetScene.instance.Destroy(orig.gameObject);
         }
 
-        private void SaveZdoToDisk(ZDO zdo)
+       
+        public ZDO GetZdo()
+        {
+           // ZDO zdo = ZDOMan.instance.CreateNewZDO(Pos);
+            saveZDO.Initialize(ZDOMan.instance, saveZDO.m_uid, Pos);
+            saveZDO.m_owner = ZDOMan.instance.m_myid;
+            saveZDO.m_timeCreated = ZNet.instance.GetTime().Ticks;
+            ZDOMan.instance.m_objectsByID.Remove(saveZDO.m_uid);
+            ZDOMan.instance.m_objectsByID.Add(saveZDO.m_uid, saveZDO);
+            
+            return saveZDO;
+        }
+
+        public void SpawnNow()
+        {
+            GameObject clone = null;
+            ZDO zdo = GetZdo();
+            Debug.Log($"Spawning {character.m_name}");
+            if (zdo != null)
+            {
+                clone = ZNetScene.instance.CreateObject(zdo);
+            }
+            else
+            {
+                Debug.Log("Warning zdo = null in SpawnNow");
+            }
+            
+            //   clone.gameObject.GetComponent<Tameable>().m_monsterAI.m_follow =
+            //       Player.m_localPlayer.gameObject;
+        }
+
+
+        public void TrySpawn(float delayT)
+        {
+            if (!spawned && delayT - CreationTime > delay)
+            {
+                spawned = true;
+                MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft,
+                    $"Attempting to spawn");
+                SpawnNow();
+            }
+        }
+        
+        private void SaveZdoToDisk(ZDO zdo)  // backup strategy
         {
             Directory.CreateDirectory(Utils.GetSaveDataPath() + "/characters");
             string savename = Utils.GetSaveDataPath() + "/characters/ally.dat";
@@ -124,45 +167,5 @@ namespace TeleportEverything
             return zdo;
         }
 
-        public ZDO GetZdo()
-        {
-            // return LoadZdoFromDisk();
-
-            saveZDO.SetPosition(Pos + Offset);
-            
-            return saveZDO;
-        }
-
-        public void SpawnNow()
-        {
-            GameObject clone = null;
-            ZDO zdo = GetZdo();
-            Debug.Log($"Spawning {character.m_name}");
-            if (zdo != null)
-            {
-                clone = ZNetScene.instance.CreateObject(zdo);
-            }
-            else
-            {
-                Debug.Log("Warning zdo = null in SpawnNow");
-            }
-            
-            clone.transform.rotation = Rot;
-
-            //   clone.gameObject.GetComponent<Tameable>().m_monsterAI.m_follow =
-            //       Player.m_localPlayer.gameObject;
-        }
-
-
-        public void TrySpawn(float delayT)
-        {
-            if (!spawned && delayT - CreationTime > delay)
-            {
-                spawned = true;
-                MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft,
-                    $"Attempting to spawn");
-                SpawnNow();
-            }
-        }
     }
 }
