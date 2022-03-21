@@ -6,6 +6,7 @@ namespace TeleportEverything
     internal partial class Plugin
     {
         public static List<DelayedSpawn> Allies;
+       
         public static bool IsValidAlly(Character c)
         {
             if (IsEligibleCreature(c) && IsTransportable(c))
@@ -119,13 +120,7 @@ namespace TeleportEverything
 
             return false;
         }
-
-        public static void SetFollow(Character f)
-        {
-            var mAi = f.GetComponent<MonsterAI>();
-
-            mAi?.SetFollowTarget(Player.m_localPlayer.gameObject);
-        }
+        
 
         public static int CountAllies()
         {

@@ -47,10 +47,12 @@ namespace TeleportEverything
 
         private void Destroy(Character orig)
         {
-            orig.transform.position *= 1000f;
-            // ZNetScene.instance.Destroy(orig.gameObject);
+            orig.transform.position *= 1000f;  // Kludge 
+            
+            // Each of the strategies below result in complications.
+            // ZNetScene.instance.Destroy(orig.gameObject);  
             // Object.Destroy(orig.gameObject);
-            //orig.m_nview.Destroy();
+            // orig.m_nview.Destroy();
         }
 
        
@@ -79,9 +81,14 @@ namespace TeleportEverything
             {
                 Debug.Log("Warning zdo = null in SpawnNow");
             }
-            
-               clone.gameObject.GetComponent<Tameable>().m_monsterAI.m_follow =
-                   Player.m_localPlayer.gameObject;
+
+
+            Tameable tame = clone.gameObject.GetComponent<Tameable>();
+            if (tame != null)
+            {
+                tame.m_monsterAI.m_follow =
+                    Player.m_localPlayer.gameObject;
+            }
         }
 
 

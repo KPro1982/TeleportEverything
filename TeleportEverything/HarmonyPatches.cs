@@ -137,18 +137,8 @@ namespace TeleportEverything
                 {
                     DisplayMessage(
                         $"Taking Enemies With You! {CountEnemies()} enemies charge the portal!!!");
-
-                    // foreach (var e in GetEnemyList(pos, rot))
-                    // {
-                    //     if (Random.Range(0, 100) <= 25)
-                    //     {
-                    //         var displacement = Random.insideUnitSphere * MaximumDisplacement.Value;
-                    //         displacement.y = 0;
-                    //         var offset = __instance.transform.forward * SpawnForwardOffset.Value;
-                    //         e.Transform.position = pos + offset + displacement;
-                    //         e.Transform.rotation = rot;
-                    //     }
-                    // }
+                    CreateEnemyList(pos, rot);
+                   
                 }
 
 

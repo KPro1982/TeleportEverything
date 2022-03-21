@@ -27,14 +27,14 @@ namespace TeleportEverything
            
             
         }
-        
 
-        public static List<DelayedSpawn> GetEnemyList(Vector3 pos,
+        public static List<DelayedSpawn> Enemies;
+        public static void CreateEnemyList(Vector3 pos,
             Quaternion rot)
         {
             var characters = new List<Character>();
-            var Enemies = new List<DelayedSpawn>();
-            
+            Enemies = new List<DelayedSpawn>();
+
             Character.GetCharactersInRange(Player.m_localPlayer.transform.position,
                 SearchRadius.Value, characters);
 
@@ -43,12 +43,16 @@ namespace TeleportEverything
             
             foreach (Character c in characterList)
             {
-                Enemies.Add(new DelayedSpawn(c,false, 10f, GetDelayTimer(), pos, rot, offset, false));
+                float distDelay = HorizontalDistance(c) / 10f + 10f;  // assume mobs can run at 10m/s
+                Debug.Log($"{c.m_name} will charge the gate in {distDelay} seconds");
+                Enemies.Add(new DelayedSpawn(c,false, 10f + distDelay, GetDelayTimer(), pos, rot, offset, false));
             }
 
-            return Enemies;
+            
         }
+
         
+
         public static float CalcDistToEntity(Character e) => VectorToEntity(e).magnitude;
 
         public static Vector3 VectorToEntity(Character e) =>
@@ -74,7 +78,7 @@ namespace TeleportEverything
                 MessageHud.instance.ShowMessage(MessageHud.MessageType.Center, msg);
             }
         }
-
+        
         public static void UpdateDelayTimer(float dt)
         {
             DelayTimer += dt;
@@ -82,6 +86,16 @@ namespace TeleportEverything
             if (Allies != null)
             {
                 foreach (DelayedSpawn ds in Allies)
+                {
+                    ds.TrySpawn(DelayTimer);
+                }
+                
+                
+            }
+
+            if (Enemies != null)
+            {
+                foreach (DelayedSpawn ds in Enemies)
                 {
                     ds.TrySpawn(DelayTimer);
                 }
