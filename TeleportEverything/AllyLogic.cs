@@ -151,9 +151,11 @@ namespace TeleportEverything
 
             Vector3 offset = Player.m_localPlayer.transform.forward * SpawnForwardOffset.Value;
 
+            float addDelay = 0f;
             foreach (Character c in characterList)
             {
-                Allies.Add(new DelayedSpawn(c, true, 10f, GetDelayTimer(), pos, rot, offset, follow));
+                Allies.Add(new DelayedSpawn(c, true, 10f + addDelay, GetDelayTimer(), pos, rot, offset, follow));
+                addDelay += 0.5f;
             }
             
         }

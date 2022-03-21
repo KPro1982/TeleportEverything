@@ -10,15 +10,13 @@ namespace TeleportEverything
 {
     public class DelayedSpawn
     {
-        public Character character { get; set; }
+        public Character Original { get; set; }
         public float delay { get; set; }
         public Vector3 Pos { get; set; }
         public Quaternion Rot { get; set; }
         public bool Follow { get; set; }
 
         public bool Ally { get; set; }
-
-        public Transform Transform { get; set; }
 
         public Vector3 Offset { get; set; }
 
@@ -39,31 +37,25 @@ namespace TeleportEverything
             Rot = _rot;
             Follow = _follow;
             Ally = _ally;
-            Transform = _original.transform;
             Offset = _offset;
-            character = _original;
-            saveZDO = character.m_nview.GetZDO().Clone();
-            if (saveZDO == null)
-            {
-                Debug.Log("Warning: saveZDO is null in constructor");
-            }
-            else
-            {
-                Debug.Log($"Constructor: saveZDO IsPersistent = {saveZDO.m_persistent}");
-            }
+            Original = _original;
+            saveZDO = Original.m_nview.GetZDO().Clone();
             
-            // Destroy(_original);
+            
+              Destroy(_original);
         }
 
         private void Destroy(Character orig)
         {
-            ZNetScene.instance.Destroy(orig.gameObject);
+            
+           // ZNetScene.instance.Destroy(orig.gameObject);
+           // Object.Destroy(orig.gameObject);
+           orig.m_nview.Destroy();
         }
 
        
         public ZDO GetZdo()
         {
-           // ZDO zdo = ZDOMan.instance.CreateNewZDO(Pos);
             saveZDO.Initialize(ZDOMan.instance, saveZDO.m_uid, Pos);
             saveZDO.m_owner = ZDOMan.instance.m_myid;
             saveZDO.m_timeCreated = ZNet.instance.GetTime().Ticks;
@@ -77,18 +69,19 @@ namespace TeleportEverything
         {
             GameObject clone = null;
             ZDO zdo = GetZdo();
-            Debug.Log($"Spawning {character.m_name}");
+            
             if (zdo != null)
             {
                 clone = ZNetScene.instance.CreateObject(zdo);
+                Debug.Log($"Spawning {clone.gameObject.name}");
             }
             else
             {
                 Debug.Log("Warning zdo = null in SpawnNow");
             }
             
-            //   clone.gameObject.GetComponent<Tameable>().m_monsterAI.m_follow =
-            //       Player.m_localPlayer.gameObject;
+               clone.gameObject.GetComponent<Tameable>().m_monsterAI.m_follow =
+                   Player.m_localPlayer.gameObject;
         }
 
 
