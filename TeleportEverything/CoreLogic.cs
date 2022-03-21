@@ -19,7 +19,7 @@ namespace TeleportEverything
 
             foreach (var c in characters)
             {
-                if (IsEligibleAlly(c) && IsAllyTransportable(c) && TransportAllies)
+                if (IsAllowedAlly(c) && IsAllyTransportable(c) && TransportAllies)
                 {
                     if (HorizontalDistance(c) <= TransportRadius.Value &&
                         VerticalDistance(c) <= TransportVerticalTolerance.Value)
