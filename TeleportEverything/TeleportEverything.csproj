@@ -89,6 +89,7 @@
     <Compile Include="CoreLogic.cs" />
     <Compile Include="DelayedSpawn.cs" />
     <Compile Include="HarmonyPatches.cs" />
+    <Compile Include="InvokeHelper.cs" />
     <Compile Include="ItemLogic.cs" />
     <Compile Include="Properties\IgnoreAccessModifiers.cs" />
     <Compile Include="Declarations.cs" />
