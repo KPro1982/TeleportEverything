@@ -11,19 +11,24 @@ namespace TeleportEverything
             private static bool Prefix(ref bool __result, ref Inventory __instance)
             {
                 if (!EnableMod.Value)
+                {
                     return true; //go to original method
+                }
 
                 if (TransportDragonEggs.Value && TransportOres.Value)
                 {
                     __result = true;
                     return false; //skip original method
                 }
+
                 hasOre = false;
 
                 foreach (var item in __instance.GetAllItems())
                 {
                     if (item.m_shared.m_teleportable)
+                    {
                         continue;
+                    }
 
                     if (IsDragonEgg(item))
                     {
@@ -40,6 +45,7 @@ namespace TeleportEverything
                             __result = false;
                             return false;
                         }
+
                         hasOre = true;
                     }
                 }
@@ -48,13 +54,16 @@ namespace TeleportEverything
                 return false;
             }
         }
+
         [HarmonyPatch(typeof(Teleport), nameof(Teleport.GetHoverText))]
         public static class Teleport_GetHoverText_Patch
         {
             private static void Postfix()
             {
                 if (!EnableMod.Value)
+                {
                     return;
+                }
 
                 PopulateEntityLists();
 
@@ -69,6 +78,7 @@ namespace TeleportEverything
                 }
             }
         }
+
         [HarmonyPatch(typeof(Humanoid))]
         [HarmonyPatch(nameof(Humanoid.IsTeleportable))]
         public class IsTeleportable_Patch
@@ -99,14 +109,14 @@ namespace TeleportEverything
                     if (TeleportMode.Value.Contains("Take"))
 
                     {
-                        DisplayMessage(
-                            $"Beware: {enemies.Count} enemies may charge the portal!");
+                        DisplayMessage($"Beware: {enemies.Count} enemies may charge the portal!");
                     }
                 }
 
                 return __result;
             }
         }
+
         [HarmonyPatch(typeof(Player))]
         [HarmonyPatch(nameof(Player.TeleportTo))]
         public class TeleportTo_Patch
@@ -120,7 +130,9 @@ namespace TeleportEverything
                 }
 
                 if (!__instance.IsTeleporting())
+                {
                     return __result;
+                }
 
                 PopulateEntityLists();
 
@@ -142,7 +154,8 @@ namespace TeleportEverything
                     }
                 }
 
-                TeleportEverythingLogger.LogInfo($"Allies: {allies.Count} and flag {TransportAllies}");
+                TeleportEverythingLogger.LogInfo(
+                    $"Allies: {allies.Count} and flag {TransportAllies}");
                 if (allies.Count > 0 && TransportAllies)
                 {
                     foreach (var ally in allies)
@@ -160,21 +173,27 @@ namespace TeleportEverything
                 return __result;
             }
         }
+
         [HarmonyPatch(typeof(TeleportWorld))]
         [HarmonyPatch(nameof(TeleportWorld.Teleport))]
         public class Teleport_Patch
         {
             private static void Prefix(ref Player player)
             {
-                
                 if (!EnableMod.Value)
+                {
                     return;
+                }
 
                 if (!TransportOres.Value)
+                {
                     return;
+                }
 
                 if (TransportFee.Value == 0)
+                {
                     return;
+                }
 
                 ReduceStacks(player);
 

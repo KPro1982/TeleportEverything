@@ -6,17 +6,16 @@ namespace TeleportEverything
 {
     internal partial class Plugin
     {
-        public static string GetName(Character c)
-        {
-            return c?.name.Replace("(Clone)", "").ToLower();
-        }
-        
+        public static string GetName(Character c) => c?.name.Replace("(Clone)", "").ToLower();
+
         public static bool IsAllowedAlly(Character c)
         {
             if (!ServerEnableMask.Value && !UserEnableMask.Value)
+            {
                 return true;
+            }
 
-            if (IsAllowedInMask(c, ServerEnableMask.Value, ServerTransportMask.Value) && 
+            if (IsAllowedInMask(c, ServerEnableMask.Value, ServerTransportMask.Value) &&
                 IsAllowedInMask(c, UserEnableMask.Value, UserTransportMask.Value))
             {
                 return true;
@@ -28,13 +27,19 @@ namespace TeleportEverything
         private static bool IsAllowedInMask(Character c, bool enableMask, string transportMask)
         {
             if (!enableMask)
+            {
                 return true;
+            }
 
-            if (String.IsNullOrWhiteSpace(transportMask))
+            if (string.IsNullOrWhiteSpace(transportMask))
+            {
                 return false;
+            }
 
             if (IsInFilterMask(c, transportMask))
+            {
                 return true;
+            }
 
             return false;
         }
@@ -42,7 +47,7 @@ namespace TeleportEverything
         private static bool IsInFilterMask(Character c, string mask)
         {
             List<string> maskList = mask.Split(',').Select(p => p.Trim().ToLower()).ToList();
-            string isInMask = maskList.FirstOrDefault(s => s.Contains(GetName(c)));
+            var isInMask = maskList.FirstOrDefault(s => s.Contains(GetName(c)));
 
             return isInMask != null;
         }
@@ -99,6 +104,5 @@ namespace TeleportEverything
 
             mAi?.SetFollowTarget(Player.m_localPlayer.gameObject);
         }
-        
     }
 }

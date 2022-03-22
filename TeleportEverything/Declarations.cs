@@ -17,7 +17,9 @@ namespace TeleportEverything
         public const string PluginName = "TeleportEverything";
         public const string PluginVersion = "1.5.0";
         private static string ConfigFileName = PluginGUID + ".cfg";
-        private static string ConfigFileFullPath = Paths.ConfigPath + Path.DirectorySeparatorChar + ConfigFileName;
+
+        private static string ConfigFileFullPath =
+            Paths.ConfigPath + Path.DirectorySeparatorChar + ConfigFileName;
 
         // Mod
         private static ConfigEntry<bool>? _serverConfigLocked;
@@ -34,8 +36,7 @@ namespace TeleportEverything
         public static ConfigEntry<bool>? TransportWolves;
         public static ConfigEntry<bool>? TransportBoar;
         public static ConfigEntry<bool>? TransportLox;
-        
-        
+
 
         //Teleport Self
         public static ConfigEntry<float>? SearchRadius;
@@ -48,7 +49,7 @@ namespace TeleportEverything
         public static ConfigEntry<bool>? TransportOres;
         public static ConfigEntry<int>? TransportFee;
         public static bool hasOre;
-        
+
         //User Settings
         public static ConfigEntry<string>? IncludeMode;
         public static ConfigEntry<string>? MessageMode;
@@ -63,12 +64,16 @@ namespace TeleportEverything
         public static bool IncludeFollow;
         public static bool ExcludeNamed;
 
-        private readonly Harmony harmony = new Harmony(PluginGUID);
+        private readonly Harmony harmony = new(PluginGUID);
 
         public static readonly ManualLogSource TeleportEverythingLogger =
             BepInEx.Logging.Logger.CreateLogSource(PluginName);
 
-        private static readonly ConfigSync ConfigSync = new(PluginGUID) { DisplayName = PluginName, CurrentVersion = PluginVersion, MinimumRequiredVersion = PluginVersion };
+        private static readonly ConfigSync ConfigSync = new(PluginGUID)
+        {
+            DisplayName = PluginName, CurrentVersion = PluginVersion,
+            MinimumRequiredVersion = PluginVersion
+        };
 
         private void Awake()
         {
@@ -91,60 +96,88 @@ namespace TeleportEverything
         private void CreateConfigValues()
         {
             //Mod
-            _serverConfigLocked = config("Mod", "Force Server Config", true, "Force Server Config");
+            _serverConfigLocked = config("---", "Force Server Config", true, "Force Server Config");
             _ = ConfigSync.AddLockingConfigEntry(_serverConfigLocked);
-            EnableMod = config("Mod", "Enable Mod", true, "Enable/Disable mod");
+            EnableMod = config("---", "Enable Mod", true, "Enable/Disable mod");
+            MessageMode = config("---", "Message Mode", "No messages",
+                new ConfigDescription("Message Mode",
+                    new AcceptableValueList<string>("No messages", "top left", "centered")), false);
 
             // Transport
 
-            TransportBoar = config("Transport", "Transport Boar", false, "");
-            TransportWolves = config("Transport", "Transport Wolves", false, "");
-            TransportLox = config("Transport", "Transport Lox", false, "");
-            PlayerTransportMask = config("Transport", "Transport Mask", "", "");
+            IncludeMode = config("--- Transport ---", "Ally Mode", "No Allies",
+                new ConfigDescription("Ally Mode",
+                    new AcceptableValueList<string>("No Allies", "All tamed", "Only Follow",
+                        "All tamed except Named", "Only Named"),
+                    new ConfigurationManagerAttributes { IsAdvanced = false, Order = 7 }), false);
+            
+            TransportWolves = config("--- Transport ---", "Transport Wolves", false,
+                new ConfigDescription("", null,
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 6 }));
+            
+            TransportBoar = config("--- Transport ---", "Transport Boar", false,
+                new ConfigDescription("", null,
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 5 }));
+           
+            TransportLox = config("--- Transport ---", "Transport Lox", false,
+                new ConfigDescription("", null,
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 4 }));
+            PlayerTransportMask = config("--- Transport ---", "Transport Mask", "",
+                new ConfigDescription("", null,
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 3 }));
 
-            IncludeMode = config("Transport", "Ally Mode", "No Allies",
+            TransportRadius = config("--- Transport ---", "Transport Radius", 10f,
+                new ConfigDescription("", null,
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }));
+            
+            TransportVerticalTolerance = config("--- Transport ---", "Vertical Tolerance", 2f,
+                new ConfigDescription("", null,
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));
+
+            UserEnableMask = config("--- Transport ---", "User Filter By Mask",
+                false, "Enable to filter which tameable creatures can teleport.", false);
+            UserTransportMask = config("--- Transport ---", "User Transport Mask",
+                "", "Add the prefab names to filter creatures to transport", false);
+            IncludeMode = config("--- Transport ---", "Ally Mode", "No Allies",
                 new ConfigDescription("Ally Mode",
                     new AcceptableValueList<string>("No Allies", "All tamed", "Only Follow",
                         "All tamed except Named", "Only Named")), false);
+            
+            
 
-            TransportRadius = config("Transport", "Transport Radius", 10f,new ConfigDescription("", null, new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));
-            TransportVerticalTolerance =
-                config("Transport", "Transport Vertical Tolerance", 2f, "");
-            Config.AddSetting("X", "1", 1, new ConfigDescription("", null, new ConfigurationManagerAttributes { IsAdvanced = true, Order = 3 }));
-
-            SpawnForwardOffset = config("Transport", "Spawn forward Tolerance", .5f, "");
-
-            // Transport Allies
-            ServerEnableMask = config("Transport Allies", "Filter By Mask", false, "Enable to filter which tameable creatures can teleport on server.");
-            ServerTransportMask = config("Transport Allies", "Transport Mask", "", "Add the prefab names to filter creatures to transport");
+            ServerEnableMask = config("--- Server ---", "Filter By Mask", false,
+                new ConfigDescription(
+                    "Enable to filter which tameable creatures can teleport on server.", null,
+                    new ConfigurationManagerAttributes { IsAdvanced = true }));
+            ServerTransportMask = config("--- Server ---", "Server Transport Mask", "",
+                new ConfigDescription("", null,
+                    new ConfigurationManagerAttributes { IsAdvanced = true }));
 
             // Transport.Items
-            TransportDragonEggs = config("Transport Items", "Transport Dragon Eggs", false, "");
-            TransportOres = config("Transport Items", "Transport Ores", false, "Allows transporting ores, ingots and other restricted items.");
-            TransportFee = config("Transport Items Config", "Transport fee", 10,
+            TransportDragonEggs = config("--- Transport Items ---", "Transport Dragon Eggs", false,
+                new ConfigDescription("", null,
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 3 }));
+            TransportOres = config("--- Transport Items ---", "Transport Ores", false,
+                new ConfigDescription(
+                    "Allows transporting ores, ingots and other restricted items.", null,
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }));
+            TransportFee = config("--- Transport Items ---", "Transport fee", 10,
                 new ConfigDescription("Transport fee in (%) ore",
-                new AcceptableValueRange<int>(0, 100)));
+                    new AcceptableValueRange<int>(0, 100),
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));
 
             // Teleport Self
-            SearchRadius = config("Teleport Self", "Search Radius", 10f, "");
-            MaximumDisplacement = config("Teleport Self", "Max Enemy Displacement", 5f, "");
-            TeleportMode = config("Teleport Self", "Teleport Mode", "Standard",
+            SearchRadius = config("--- Portal Behavior ---", "Search Radius", 10f,
+                new ConfigDescription("", null,
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));
+            TeleportMode = config("--- Portal Behavior ---", "Teleport Mode", "Standard",
                 new ConfigDescription("Teleport Mode",
                     new AcceptableValueList<string>("Standard", "Vikings Don't Run",
-                        "Take Them With You")));
+                        "Take Them With You"), new ConfigurationManagerAttributes { IsAdvanced = false, Order = 2 }));
 
             //User Settings
-            MessageMode = config("User Settings", "Message Mode", "No messages",
-                new ConfigDescription("Message Mode",
-                    new AcceptableValueList<string>("No messages", "top left", "centered")),
-                false);
-            UserEnableMask = config("User Settings - Transport Allies", "User Filter By Mask", false, "Enable to filter which tameable creatures can teleport.", false);
-            UserTransportMask = config("User Settings - Transport Allies", "User Transport Mask", "", "Add the prefab names to filter creatures to transport", false);
-            IncludeMode = config("User Settings - Transport Allies", "Ally Mode", "No Allies",
-                new ConfigDescription("Ally Mode",
-                    new AcceptableValueList<string>("No Allies", "All tamed", "Only Follow",
-                        "All tamed except Named", "Only Named")), false);
 
+            
         }
 
         private static void ClearIncludeVars()
@@ -204,7 +237,11 @@ namespace TeleportEverything
 
         private void ReadConfigValues(object sender, FileSystemEventArgs e)
         {
-            if (!File.Exists(ConfigFileFullPath)) return;
+            if (!File.Exists(ConfigFileFullPath))
+            {
+                return;
+            }
+
             try
             {
                 TeleportEverythingLogger.LogDebug("ReadConfigValues called");
@@ -212,32 +249,37 @@ namespace TeleportEverything
             }
             catch
             {
-                TeleportEverythingLogger.LogError($"There was an issue loading your {ConfigFileName}");
-                TeleportEverythingLogger.LogError("Please check your config entries for spelling and format!");
+                TeleportEverythingLogger.LogError(
+                    $"There was an issue loading your {ConfigFileName}");
+                TeleportEverythingLogger.LogError(
+                    "Please check your config entries for spelling and format!");
             }
         }
 
 
         #region ConfigOptions
 
-        private ConfigEntry<T> config<T>(string group, string name, T value, ConfigDescription description,
-            bool synchronizedSetting = true)
+        private ConfigEntry<T> config<T>(string group, string name, T value,
+            ConfigDescription description, bool synchronizedSetting = true)
         {
             ConfigDescription extendedDescription =
                 new(
-                    description.Description +
-                    (synchronizedSetting ? " [Synced with Server]" : " [Not Synced with Server]"),
-                    description.AcceptableValues, description.Tags);
-            ConfigEntry<T> configEntry = Config.Bind(group, name, value, extendedDescription);
+                    description.Description + (synchronizedSetting
+                        ? " [Synced with Server]"
+                        : " [Not Synced with Server]"), description.AcceptableValues,
+                    description.Tags);
+            var configEntry = Config.Bind(group, name, value, extendedDescription);
 
-            SyncedConfigEntry<T> syncedConfigEntry = ConfigSync.AddConfigEntry(configEntry);
+            var syncedConfigEntry = ConfigSync.AddConfigEntry(configEntry);
             syncedConfigEntry.SynchronizedConfig = synchronizedSetting;
 
             return configEntry;
         }
 
-        ConfigEntry<T> config<T>(string group, string name, T value, string description, bool synchronizedSetting = true) => config(group, name, value, new ConfigDescription(description), synchronizedSetting);
+        private ConfigEntry<T> config<T>(string group, string name, T value, string description,
+            bool synchronizedSetting = true) => config(group, name, value,
+            new ConfigDescription(description), synchronizedSetting);
 
-        #endregion 
+        #endregion
     }
 }

@@ -35,7 +35,7 @@ namespace TeleportEverything
                 }
             }
         }
-        
+
         public static float CalcDistToEntity(Character e) => VectorToEntity(e).magnitude;
 
         public static Vector3 VectorToEntity(Character e) =>
