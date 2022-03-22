@@ -1,3 +1,4 @@
+using System.Dynamic;
 using HarmonyLib;
 using UnityEngine;
 
@@ -65,16 +66,15 @@ namespace TeleportEverything
                     return;
                 }
 
-                PopulateEntityLists();
-
-                if (TransportAllies && allies.Count > 0)
+               
+                if (TransportAllies && CountAllies() > 0)
                 {
-                    DisplayMessage($"{allies.Count} allies will teleport with you!");
+                    DisplayMessage($"{CountAllies()} allies will teleport with you!");
                 }
 
-                if (enemies.Count > 0 && TeleportMode.Value.Contains("Take"))
+                if (CountEnemies() > 0 && TeleportMode.Value.Contains("Take"))
                 {
-                    DisplayMessage($"Beware: {enemies.Count} enemies may charge the portal!");
+                    DisplayMessage($"Beware: {CountEnemies()} enemies may charge the portal!");
                 }
             }
         }
@@ -90,19 +90,22 @@ namespace TeleportEverything
                     return __result;
                 }
 
-                PopulateEntityLists();
+                SetIncludeMode();
+                
 
-                if (TransportAllies && allies.Count > 0)
+                if (TransportAllies && CountAllies() > 0)
                 {
-                    DisplayMessage($"{allies.Count} allies will teleport with you!");
+                    ResetDelayTimer();
+                    DisplayMessage($"Transporting {CountAllies()} allies!");
                 }
 
-                if (enemies.Count > 0)
+                if (CountEnemies() > 0)
                 {
                     if (TeleportMode.Value.Contains("Run"))
                     {
                         DisplayMessage(
-                            $"Vikings Don't run from a fight: {enemies.Count} enemies with in {SearchRadius.Value} meters.");
+                            $"Vikings Don't run from a fight: {CountEnemies()} enemies with in {SearchRadius.Value} meters.");
+
                         return false;
                     }
 
@@ -129,45 +132,30 @@ namespace TeleportEverything
                     return __result;
                 }
 
+                SetIncludeMode();
+                Debug.Log($"Player.TeleportTo reached");
+
                 if (!__instance.IsTeleporting())
                 {
                     return __result;
                 }
 
-                PopulateEntityLists();
 
-                if (enemies.Count > 0 && TeleportMode.Value.Contains("Take"))
+                if (CountEnemies() > 0 && TeleportMode.Value.Contains("Take"))
                 {
                     DisplayMessage(
-                        $"Taking Enemies With You! {enemies.Count} enemies charge the portal!!!");
+                        $"Taking Enemies With You! {CountEnemies()} enemies charge the portal!!!");
 
-                    foreach (var e in enemies)
-                    {
-                        if (Random.Range(0, 100) <= 25)
-                        {
-                            var displacement = Random.insideUnitSphere * MaximumDisplacement.Value;
-                            displacement.y = 0;
-                            var offset = __instance.transform.forward * SpawnForwardOffset.Value;
-                            e.transform.position = pos + offset + displacement;
-                            e.transform.rotation = rot;
-                        }
-                    }
+                    CreateEnemyList(pos, rot);
+                   
                 }
 
                 TeleportEverythingLogger.LogInfo(
                     $"Allies: {allies.Count} and flag {TransportAllies}");
                 if (allies.Count > 0 && TransportAllies)
                 {
-                    foreach (var ally in allies)
-                    {
-                        var offset = __instance.transform.forward * SpawnForwardOffset.Value;
-                        ally.transform.position = pos + offset;
-                        ally.transform.rotation = rot;
-                        if (IncludeFollow)
-                        {
-                            SetFollow(ally);
-                        }
-                    }
+                   CreateAllyList(pos, rot, IncludeFollow);
+
                 }
 
                 return __result;
@@ -198,6 +186,17 @@ namespace TeleportEverything
                 ReduceStacks(player);
 
                 RemoveEmptyItems(player);
+            }
+        }
+
+        [HarmonyPatch(typeof(Player))]
+        [HarmonyPatch("UpdateTeleport")]
+        public class UpdateTeleport_Patch
+        {
+            static void  Postfix( Player __instance, float dt)
+            {
+                UpdateDelayTimer(dt);
+                
             }
         }
     }

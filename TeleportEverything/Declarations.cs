@@ -39,10 +39,12 @@ namespace TeleportEverything
 
 
         //Teleport Self
+
         public static ConfigEntry<float>? SearchRadius;
         public static ConfigEntry<float>? MaximumDisplacement;
         public static List<Character>? enemies;
         public static List<Character>? allies;
+
 
         //Items
         public static ConfigEntry<bool>? TransportDragonEggs;
@@ -65,6 +67,10 @@ namespace TeleportEverything
         public static bool ExcludeNamed;
 
         private readonly Harmony harmony = new(PluginGUID);
+        
+        //Teleport Timer
+        public static float DelayTimer;
+
 
         public static readonly ManualLogSource TeleportEverythingLogger =
             BepInEx.Logging.Logger.CreateLogSource(PluginName);
@@ -75,16 +81,21 @@ namespace TeleportEverything
             MinimumRequiredVersion = PluginVersion
         };
 
+
         private void Awake()
         {
             harmony.PatchAll();
             CreateConfigValues();
+
+
             SetupWatcher();
 
             enemies = new List<Character>();
             allies = new List<Character>();
 
             ClearIncludeVars();
+            DelayTimer = 0;
+            DisplayMessage($"Teleport Everything Loaded...");
         }
 
         private void OnDestroy()

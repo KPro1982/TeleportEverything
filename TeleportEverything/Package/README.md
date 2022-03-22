@@ -1,6 +1,8 @@
 ﻿# TeleportEverything
  > Produced by: Kpro and Elg
 
+![](https://staticdelivery.nexusmods.com/mods/3667/images/1806/1806-1647282849-1161973402.png)
+
 ## About
 
 This mod is intended to add additional excitement and functionality to the portal system. Use it to brings wolves to the fight or use it to lure trolls into a trap!  These modes also work with dungeons! So its possible to bring a wolf into a swamp crypt and for a wraith to follow you into the crypt!
@@ -43,6 +45,9 @@ Teleport Everything will search for allies within a search cylinder. It should n
 1. Select the teleport mode. Currently you can select "**Standard**" which will give you vanilla behavior.  "**Vikings don't run**" mode will prevent you from teleporting if mobs are within a search sphere. The search radius is configurable in the **F1** configuration menu. "**Take them with you**" will give mobs a small chance of following you through the portal. If this mode is selected, a dash through the portal with a troll in pursuit may end up in troll fight within your base! Its a super fun mode.
 2. At present, enemies will spawn at a random location within 5 meters (default) of the portal. However, this "**Max Enemy Displacement**" can be set in the F1 configuration menu. A smaller number means that the mobs will be on you as soon as you materialize. A larger number may mean that the mobs spawn in other rooms, on the roof, etc.
 
+#### **Transport Items**
+If this mode is toggled on, players may transport **ores, ingots, and eggs**. In order to offset the advantage of transporting ores, players may set a **"transport fee"** that deducts a percentage of the contraband ores, ingots, and eggs.
+
 ## Install Notes
 
 It is recommended that you install the BepInEx Configuration Manager mod too. This mod will enable you to access the configuration settings simply by hitting F1 and edit your mods configs in game. 
@@ -78,12 +83,20 @@ To make it work properly you will need some other mods or tools called dependenc
 </p>
 
 ## Changelog
+- Version 1.4
+  - Added transport of ores, ingots, and eggs.
+  - Added optional "transport fee" that reduces ore, ingots, and eggs as a fee for transport these "contraband" items.
+  - Added configurations settings for this feature.
+- Version 1.3
+  - Added display messages top left, center, or none
+  - Fixed teleport bug out of sunken crypts
+  - Added configurable spawn location for allys
+  - Transport mask now accepts comma delimited list. Ignores case and white space.
 - Version 1.2
   - Fixed error in calculation of vertical distance. Fixed error determine whether boars or wolves are named.
 - Version 1.1
   - Update provides additional control over transport mechanic including control over the search radius and ability to limit transport to tamed, named, follow, etc.
 - Version 1.0
   - This is the alpha-version of the mod. Feedback and bug reports are appreciated.
-This is the alpha-version of the mod. Feedback and bug reports are appreciated.
 
 [YES]: https://img.shields.io/badge/YES-success?style=flat-square
