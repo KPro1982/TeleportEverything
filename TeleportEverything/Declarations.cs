@@ -27,9 +27,15 @@ namespace TeleportEverything
         // Transport Allies
         public static ConfigEntry<bool>? ServerEnableMask;
         public static ConfigEntry<string>? ServerTransportMask;
+        public static ConfigEntry<string>? PlayerTransportMask;
         public static ConfigEntry<float>? TransportRadius;
         public static ConfigEntry<float>? TransportVerticalTolerance;
         public static ConfigEntry<float>? SpawnForwardOffset;
+        public static ConfigEntry<bool>? TransportWolves;
+        public static ConfigEntry<bool>? TransportBoar;
+        public static ConfigEntry<bool>? TransportLox;
+        
+        
 
         //Teleport Self
         public static ConfigEntry<float>? SearchRadius;
@@ -94,7 +100,7 @@ namespace TeleportEverything
             TransportBoar = config("Transport", "Transport Boar", false, "");
             TransportWolves = config("Transport", "Transport Wolves", false, "");
             TransportLox = config("Transport", "Transport Lox", false, "");
-            TransportMask = config("Transport", "Transport Mask", "", "");
+            PlayerTransportMask = config("Transport", "Transport Mask", "", "");
 
             IncludeMode = config("Transport", "Ally Mode", "No Allies",
                 new ConfigDescription("Ally Mode",
