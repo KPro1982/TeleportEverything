@@ -29,8 +29,11 @@ namespace TeleportEverything
                 totalCount += totalStack;
             }
 
-            DisplayMessage(
-                $"{deductedCount} out of {totalCount} items deducted as a fee for transporting contraband.");
+            if (totalCount > 0)
+            {
+                DisplayMessage(
+                    $"{deductedCount} out of {totalCount} items deducted as a fee for transporting contraband.");
+            }
         }
 
         internal static void RemoveEmptyItems(Player player)

@@ -29,7 +29,6 @@ namespace TeleportEverything
         // Transport Allies
         public static ConfigEntry<bool>? ServerEnableMask;
         public static ConfigEntry<string>? ServerTransportMask;
-        public static ConfigEntry<string>? PlayerTransportMask;
         public static ConfigEntry<float>? TransportRadius;
         public static ConfigEntry<float>? TransportVerticalTolerance;
         public static ConfigEntry<float>? SpawnForwardOffset;
@@ -37,14 +36,10 @@ namespace TeleportEverything
         public static ConfigEntry<bool>? TransportBoar;
         public static ConfigEntry<bool>? TransportLox;
 
-
         //Teleport Self
-
         public static ConfigEntry<float>? SearchRadius;
-        public static ConfigEntry<float>? MaximumDisplacement;
         public static List<Character>? enemies;
         public static List<Character>? allies;
-
 
         //Items
         public static ConfigEntry<bool>? TransportDragonEggs;
@@ -55,8 +50,8 @@ namespace TeleportEverything
         //User Settings
         public static ConfigEntry<string>? IncludeMode;
         public static ConfigEntry<string>? MessageMode;
-        public static ConfigEntry<bool>? UserEnableMask;
-        public static ConfigEntry<string>? UserTransportMask;
+        public static ConfigEntry<bool>? PlayerEnableMask;
+        public static ConfigEntry<string>? PlayerTransportMask;
 
         // Include vars
         public static bool TransportAllies;
@@ -86,8 +81,6 @@ namespace TeleportEverything
         {
             harmony.PatchAll();
             CreateConfigValues();
-
-
             SetupWatcher();
 
             enemies = new List<Character>();
@@ -95,7 +88,7 @@ namespace TeleportEverything
 
             ClearIncludeVars();
             DelayTimer = 0;
-            DisplayMessage($"Teleport Everything Loaded...");
+            Debug.Log($"{PluginName} Loaded...");
         }
 
         private void OnDestroy()
@@ -103,7 +96,7 @@ namespace TeleportEverything
             harmony.UnpatchSelf();
         }
 
-
+        #region CreateConfigValues
         private void CreateConfigValues()
         {
             //Mod
@@ -122,39 +115,28 @@ namespace TeleportEverything
                         "All tamed except Named", "Only Named"),
                     new ConfigurationManagerAttributes { IsAdvanced = false, Order = 7 }), false);
             
-            TransportWolves = config("--- Transport ---", "Transport Wolves", false,
-                new ConfigDescription("", null,
-                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 6 }));
-            
-            TransportBoar = config("--- Transport ---", "Transport Boar", false,
-                new ConfigDescription("", null,
-                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 5 }));
-           
-            TransportLox = config("--- Transport ---", "Transport Lox", false,
-                new ConfigDescription("", null,
-                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 4 }));
-            PlayerTransportMask = config("--- Transport ---", "Transport Mask", "",
-                new ConfigDescription("", null,
-                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 3 }));
+            TransportWolves = config("--- Transport ---", "Transport Wolves", true, "", false);
+            TransportBoar = config("--- Transport ---", "Transport Boar", true, "", false);
+            TransportLox = config("--- Transport ---", "Transport Lox", true, "", false);
 
             TransportRadius = config("--- Transport ---", "Transport Radius", 10f,
                 new ConfigDescription("", null,
-                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }));
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 5 }));
             
             TransportVerticalTolerance = config("--- Transport ---", "Vertical Tolerance", 2f,
                 new ConfigDescription("", null,
-                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 4 }));
 
-            UserEnableMask = config("--- Transport ---", "User Filter By Mask",
-                false, "Enable to filter which tameable creatures can teleport.", false);
-            UserTransportMask = config("--- Transport ---", "User Transport Mask",
-                "", "Add the prefab names to filter creatures to transport", false);
-            IncludeMode = config("--- Transport ---", "Ally Mode", "No Allies",
-                new ConfigDescription("Ally Mode",
-                    new AcceptableValueList<string>("No Allies", "All tamed", "Only Follow",
-                        "All tamed except Named", "Only Named")), false);
-            
-            
+            SpawnForwardOffset = config("--- Transport ---", "Spawn forward Tolerance", .5f,
+                new ConfigDescription("", null,
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 3 }));
+
+            PlayerEnableMask = config("--- Transport ---", "Player Filter By Mask", false,
+                new ConfigDescription("Enable to filter which tameable creatures can teleport.", null,
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }), false);
+            PlayerTransportMask = config("--- Transport ---", "Player Transport Mask", "", 
+                new ConfigDescription("Add the prefab names to filter creatures to transport", null,
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }), false);
 
             ServerEnableMask = config("--- Server ---", "Filter By Mask", false,
                 new ConfigDescription(
@@ -164,7 +146,7 @@ namespace TeleportEverything
                 new ConfigDescription("", null,
                     new ConfigurationManagerAttributes { IsAdvanced = true }));
 
-            // Transport.Items
+            // Transport Items
             TransportDragonEggs = config("--- Transport Items ---", "Transport Dragon Eggs", false,
                 new ConfigDescription("", null,
                     new ConfigurationManagerAttributes { IsAdvanced = true, Order = 3 }));
@@ -184,12 +166,9 @@ namespace TeleportEverything
             TeleportMode = config("--- Portal Behavior ---", "Teleport Mode", "Standard",
                 new ConfigDescription("Teleport Mode",
                     new AcceptableValueList<string>("Standard", "Vikings Don't Run",
-                        "Take Them With You"), new ConfigurationManagerAttributes { IsAdvanced = false, Order = 2 }));
-
-            //User Settings
-
-            
+                        "Take Them With You"), new ConfigurationManagerAttributes { IsAdvanced = false, Order = 2 }));            
         }
+        #endregion
 
         private static void ClearIncludeVars()
         {
@@ -266,7 +245,6 @@ namespace TeleportEverything
                     "Please check your config entries for spelling and format!");
             }
         }
-
 
         #region ConfigOptions
 
