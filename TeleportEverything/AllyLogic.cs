@@ -11,6 +11,11 @@ namespace TeleportEverything
         public static List<DelayedSpawn> AlliesSpawn;
         public static bool IsValidAlly(Character c)
         {
+            if (!c.IsTamed())
+            {
+                return false;
+            }
+
             if (IsAllowedAlly(c) && IsTransportable(c))
             {
                 if (HorizontalDistance(c) <= TransportRadius.Value &&
