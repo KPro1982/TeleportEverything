@@ -48,10 +48,10 @@ namespace TeleportEverything
 
         private void Destroy(Character orig)
         {
-            orig.transform.position *= 1000f;  // Kludge 
-            
+            //orig.transform.position *= 1000f;  // Kludge 
+
+            ZNetScene.instance.Destroy(orig.gameObject);  
             // Each of the strategies below result in complications.
-            // ZNetScene.instance.Destroy(orig.gameObject);  
             // Object.Destroy(orig.gameObject);
             // orig.m_nview.Destroy();
         }
@@ -61,10 +61,13 @@ namespace TeleportEverything
         {
             saveZDO.Initialize(ZDOMan.instance, saveZDO.m_uid, Pos);
             saveZDO.m_owner = ZDOMan.instance.m_myid;
-            saveZDO.m_timeCreated = ZNet.instance.GetTime().Ticks;
-            ZDOMan.instance.m_objectsByID.Remove(saveZDO.m_uid);
-            ZDOMan.instance.m_objectsByID.Add(saveZDO.m_uid, saveZDO);
+            //saveZDO.m_timeCreated = ZNet.instance.GetTime().Ticks;
             
+            if(!ZDOMan.instance.m_objectsByID.TryGetValue(saveZDO.m_uid, out var zdo))
+            {
+                ZDOMan.instance.m_objectsByID.Add(saveZDO.m_uid, saveZDO);
+            }
+
             return saveZDO;
         }
 
