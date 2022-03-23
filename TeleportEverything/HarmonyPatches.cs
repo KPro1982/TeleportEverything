@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Dynamic;
 using HarmonyLib;
 using UnityEngine;
@@ -6,6 +7,7 @@ namespace TeleportEverything
 {
     internal partial class Plugin
     {
+        public static bool teleportTriggered = false;
         [HarmonyPatch(typeof(Inventory), nameof(Inventory.IsTeleportable))]
         public static class Inventory_IsTeleportable_Patch
         {
@@ -156,7 +158,7 @@ namespace TeleportEverything
             private static bool Postfix(bool __result, Player __instance, Vector3 pos,
                 Quaternion rot, bool distantTeleport)
             {
-                if (!EnableMod.Value)
+                 if (!EnableMod.Value)
                 {
                     return __result;
                 }
@@ -168,7 +170,10 @@ namespace TeleportEverything
 
                 SetIncludeMode();
                 GetCreatures();
-
+                EnemiesSpawn = new List<DelayedSpawn>();
+                AlliesSpawn = new List<DelayedSpawn>();
+                teleportTriggered = true;
+                
                 if (enemies.Count > 0 && TeleportMode.Value.Contains("Take"))
                 {
                     DisplayMessage(
@@ -194,9 +199,29 @@ namespace TeleportEverything
         [HarmonyPatch("UpdateTeleport")]
         public class UpdateTeleport_Patch
         {
-            static void  Postfix( Player __instance, float dt)
+            static void  Postfix( Player __instance, ref bool ___m_teleporting, float dt)
             {
-                UpdateDelayTimer(dt);
+                if (!ZNetScene.instance.IsAreaReady(__instance.m_teleportTargetPos))
+                    return;
+
+                if (!___m_teleporting && teleportTriggered)
+                {
+                    UpdateDelayTimer(dt);
+                }
+            }
+        }
+
+        public static DelayedAction delayedAction;
+        [HarmonyPatch(typeof(Player), nameof(Player.Awake))]
+        public class PlayerAwake_Patch
+        {
+            static void Postfix(Player __instance)
+            {
+                PlayerController controller = __instance.GetComponent<PlayerController>();
+                if (delayedAction == null)
+                {
+                    delayedAction = controller.gameObject.AddComponent<DelayedAction>();
+                }
             }
         }
     }

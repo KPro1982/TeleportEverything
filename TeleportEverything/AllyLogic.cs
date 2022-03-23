@@ -143,22 +143,15 @@ namespace TeleportEverything
 
         public static void CreateAllyList(Vector3 pos, Quaternion rot, bool follow)
         {
-            AlliesSpawn = new List<DelayedSpawn>();
-
             Vector3 offset = Player.m_localPlayer.transform.forward * SpawnForwardOffset.Value;
 
             float addDelay = 0f;
             foreach (Character c in allies)
             {
-                AlliesSpawn.Add(new DelayedSpawn(c, true, 10f + addDelay, GetDelayTimer(), pos, rot, offset, follow));
-                addDelay += 0.5f;
+                AlliesSpawn.Add(new DelayedSpawn(c, true, 2f + addDelay, GetDelayTimer(), pos, rot, offset, follow));
+                addDelay += 0.8f;
             }
             
-        }
-
-        public static List<DelayedSpawn> GetAllyList()
-        {
-            return AlliesSpawn;
         }
     }
 }

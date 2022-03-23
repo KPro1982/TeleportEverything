@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
@@ -69,6 +70,10 @@ namespace TeleportEverything
 
         public void SpawnNow()
         {
+            if (spawned)
+                return;
+
+            spawned = true;
             GameObject clone = null;
             ZDO zdo = GetZdo();
             
@@ -91,17 +96,17 @@ namespace TeleportEverything
             }
         }
 
-
-        public void TrySpawn(float delayT)
-        {
-            if (!spawned && delayT - CreationTime > delay)
-            {
-                spawned = true;
-                MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft,
-                    $"Attempting to spawn");
-                SpawnNow();
-            }
-        }
+        //spawn now is called by a coroutine
+        //public void TrySpawn(float delayT)
+        //{
+        //    if (!spawned && delayT - CreationTime > delay)
+        //    {
+        //        spawned = true;
+        //        MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft,
+        //            $"Attempting to spawn");
+        //        SpawnNow();
+        //    }
+        //}
         
         private void SaveZdoToDisk(ZDO zdo)  // backup strategy
         {

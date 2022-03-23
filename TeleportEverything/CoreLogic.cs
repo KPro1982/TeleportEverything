@@ -33,15 +33,13 @@ namespace TeleportEverything
         public static void CreateEnemyList(Vector3 pos,
             Quaternion rot)
         {
-            EnemiesSpawn = new List<DelayedSpawn>();
-
             Vector3 offset = Player.m_localPlayer.transform.forward * SpawnForwardOffset.Value;
             
             foreach (Character c in enemies)
             {
                 float distDelay = HorizontalDistance(c) / 10f + 10f;  // assume mobs can run at 10m/s
                 TeleportEverythingLogger.LogInfo($"{GetPrefabName(c)} will charge the gate in {distDelay} seconds");
-                EnemiesSpawn.Add(new DelayedSpawn(c,false, 10f + distDelay, GetDelayTimer(), pos, rot, offset, false));
+                EnemiesSpawn.Add(new DelayedSpawn(c,false, distDelay, GetDelayTimer(), pos, rot, offset, false));
             }   
         }
 
@@ -74,21 +72,25 @@ namespace TeleportEverything
         public static void UpdateDelayTimer(float dt)
         {
             DelayTimer += dt;
-        
-            if (AlliesSpawn != null)
-            {
-                foreach (DelayedSpawn ds in AlliesSpawn)
-                {
-                    ds.TrySpawn(DelayTimer);
-                }
-            }
 
-            if (EnemiesSpawn != null)
+            if (teleportTriggered)
             {
-                foreach (DelayedSpawn ds in EnemiesSpawn)
+                if (AlliesSpawn != null)
                 {
-                    ds.TrySpawn(DelayTimer);
+                    foreach (DelayedSpawn ds in AlliesSpawn)
+                    {
+                        delayedAction.InvokeDelayed(ds.SpawnNow, ds.delay);
+                    }
                 }
+
+                if (EnemiesSpawn != null)
+                {
+                    foreach (DelayedSpawn ds in EnemiesSpawn)
+                    {
+                        delayedAction.InvokeDelayed(ds.SpawnNow, ds.delay);
+                    }
+                }
+                teleportTriggered = false;
             }
         }
 
