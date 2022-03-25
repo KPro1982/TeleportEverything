@@ -1,22 +1,56 @@
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace TeleportEverything
 {
     internal partial class Plugin
     {
-        public static string GetName(Character c) => c?.name.Replace("(Clone)", "").ToLower();
+        public static List<DelayedSpawn> AlliesSpawn;
+        public static bool IsValidAlly(Character c)
+        {
+            if (!c.IsTamed())
+            {
+                return false;
+            }
+
+            if (IsAllowedAlly(c) && IsTransportable(c))
+            {
+                if (HorizontalDistance(c) <= TransportRadius.Value &&
+                    VerticalDistance(c) <= TransportVerticalTolerance.Value)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static string GetPrefabName(Character c) => c?.name.Replace("(Clone)", "").ToLower();
 
         public static bool IsAllowedAlly(Character c)
         {
-            if (!ServerEnableMask.Value && !UserEnableMask.Value)
+            if (GetPrefabName(c).Equals("wolf") && !TransportWolves.Value)
+            {
+                return false;
+            }
+            if (GetPrefabName(c).Equals("boar") && !TransportBoar.Value)
+            {
+                return false;
+            }
+            if (GetPrefabName(c).Equals("lox") && !TransportLox.Value)
+            {
+                return false;
+            }
+            if (!ServerEnableMask.Value && !PlayerEnableMask.Value)
             {
                 return true;
             }
 
             if (IsAllowedInMask(c, ServerEnableMask.Value, ServerTransportMask.Value) &&
-                IsAllowedInMask(c, UserEnableMask.Value, UserTransportMask.Value))
+                IsAllowedInMask(c, PlayerEnableMask.Value, PlayerTransportMask.Value))
             {
                 return true;
             }
@@ -44,22 +78,24 @@ namespace TeleportEverything
             return false;
         }
 
+
         private static bool IsInFilterMask(Character c, string mask)
+
         {
             List<string> maskList = mask.Split(',').Select(p => p.Trim().ToLower()).ToList();
-            var isInMask = maskList.FirstOrDefault(s => s.Contains(GetName(c)));
+            var isInMask = maskList.FirstOrDefault(s => s.Contains(GetPrefabName(c)));
 
             return isInMask != null;
         }
 
-        public static bool IsAllyTransportable(Character ally)
+        public static bool IsTransportable(Character ally)
         {
             if (IsNamed(ally) && ExcludeNamed)
             {
                 return false;
             }
 
-            if (IsFollow(ally) && IncludeFollow)
+            if (IsFollowing(ally) && IncludeFollow)
             {
                 return true;
             }
@@ -85,24 +121,37 @@ namespace TeleportEverything
             return !string.IsNullOrEmpty(name);
         }
 
-        public static bool IsFollow(Character f)
+        public static bool IsFollowing(Character f)
         {
             var mAi = f.GetComponent<MonsterAI>();
 
             if (mAi != null && mAi.GetFollowTarget() != null &&
                 mAi.GetFollowTarget().Equals(Player.m_localPlayer.gameObject))
             {
+
                 return true;
             }
 
             return false;
         }
+        
 
-        public static void SetFollow(Character f)
+        public static List<Character> GetAllies(List<Character> creatures)
         {
-            var mAi = f.GetComponent<MonsterAI>();
+            return creatures.FindAll(IsValidAlly);
+        }
 
-            mAi?.SetFollowTarget(Player.m_localPlayer.gameObject);
+        public static void CreateAllyList(Vector3 pos, Quaternion rot, bool follow)
+        {
+            Vector3 offset = Player.m_localPlayer.transform.forward * SpawnForwardOffset.Value;
+
+            float addDelay = 0f;
+            foreach (Character c in allies)
+            {
+                AlliesSpawn.Add(new DelayedSpawn(c, true, 2f + addDelay, GetDelayTimer(), pos, rot, offset, follow));
+                addDelay += 0.8f;
+            }
+            
         }
     }
 }

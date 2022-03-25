@@ -5,35 +5,42 @@ namespace TeleportEverything
 {
     internal partial class Plugin
     {
-        private static void PopulateEntityLists()
+        public static void GetCreatures()
         {
-            SetIncludeMode();
-
-            allies.Clear();
-            enemies.Clear();
-
-            var characters = new List<Character>();
+            var creatures = new List<Character>();
             Character.GetCharactersInRange(Player.m_localPlayer.transform.position,
-                SearchRadius.Value, characters);
-
-
-            foreach (var c in characters)
+                SearchRadius.Value, creatures);
+            allies = GetAllies(creatures);
+            enemies = GetEnemies(creatures);
+        }
+       public static bool IsValidEnemy(Character c)
+        {
+            if (c.GetComponent<BaseAI>() != null &&
+                c.GetComponent<BaseAI>().IsEnemey(Player.m_localPlayer) && !c.IsTamed())
             {
-                if (IsAllowedAlly(c) && IsAllyTransportable(c) && TransportAllies)
-                {
-                    if (HorizontalDistance(c) <= TransportRadius.Value &&
-                        VerticalDistance(c) <= TransportVerticalTolerance.Value)
-                    {
-                        allies.Add(c);
-                    }
-                }
-
-                if (c.GetComponent<BaseAI>() != null &&
-                    c.GetComponent<BaseAI>().IsEnemey(Player.m_localPlayer) && !c.IsTamed())
-                {
-                    enemies.Add(c);
-                }
+                return true;
             }
+
+            return false;
+        }
+
+        public static List<Character> GetEnemies(List<Character> creatures)
+        {
+            return creatures.FindAll(IsValidEnemy);   
+        }
+
+        public static List<DelayedSpawn> EnemiesSpawn;
+        public static void CreateEnemyList(Vector3 pos,
+            Quaternion rot)
+        {
+            Vector3 offset = Player.m_localPlayer.transform.forward * SpawnForwardOffset.Value;
+            
+            foreach (Character c in enemies)
+            {
+                float distDelay = HorizontalDistance(c) / 10f + 10f;  // assume mobs can run at 10m/s
+                TeleportEverythingLogger.LogInfo($"{GetPrefabName(c)} will charge the gate in {distDelay} seconds");
+                EnemiesSpawn.Add(new DelayedSpawn(c,false, distDelay, GetDelayTimer(), pos, rot, offset, false));
+            }   
         }
 
         public static float CalcDistToEntity(Character e) => VectorToEntity(e).magnitude;
@@ -60,6 +67,40 @@ namespace TeleportEverything
             {
                 MessageHud.instance.ShowMessage(MessageHud.MessageType.Center, msg);
             }
+        }
+        
+        public static void UpdateDelayTimer(float dt)
+        {
+            DelayTimer += dt;
+
+            if (teleportTriggered)
+            {
+                if (AlliesSpawn != null)
+                {
+                    foreach (DelayedSpawn ds in AlliesSpawn)
+                    {
+                        delayedAction.InvokeDelayed(ds.SpawnNow, ds.delay);
+                    }
+                }
+
+                if (EnemiesSpawn != null)
+                {
+                    foreach (DelayedSpawn ds in EnemiesSpawn)
+                    {
+                        delayedAction.InvokeDelayed(ds.SpawnNow, ds.delay);
+                    }
+                }
+                teleportTriggered = false;
+            }
+        }
+
+        public static float GetDelayTimer()
+        {
+            return DelayTimer;
+        }
+        public static void ResetDelayTimer()
+        {
+            // DelayTimer = 0f;
         }
     }
 }
