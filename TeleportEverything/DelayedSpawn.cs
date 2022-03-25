@@ -77,26 +77,23 @@ namespace TeleportEverything
                 return;
 
             spawned = true;
-            GameObject clone = null;
             ZDO zdo = GetZdo();
             
-            if (zdo != null)
+            if(zdo == null || !zdo.IsValid())
             {
-                clone = ZNetScene.instance.CreateObject(zdo);
-                Debug.Log($"Spawning {clone.gameObject.name}");
-            }
-            else
-            {
-                Debug.Log("Warning zdo = null in SpawnNow");
-            }
+                Debug.Log("Warning zdo = null or invalid in SpawnNow");
+                return;
+            } 
 
+            GameObject clone = ZNetScene.instance.CreateObject(zdo);
+            Debug.Log($"Spawning {clone.gameObject.name}");
 
             Tameable tame = clone.gameObject.GetComponent<Tameable>();
             if (tame != null)
             {
                 tame.m_monsterAI.m_follow =
                     Player.m_localPlayer.gameObject;
-            }
+            }       
         }
 
         //spawn now is called by a coroutine
