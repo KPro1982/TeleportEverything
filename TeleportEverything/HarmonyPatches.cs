@@ -212,15 +212,14 @@ namespace TeleportEverything
         }
 
         public static DelayedAction delayedAction;
-        [HarmonyPatch(typeof(Player), nameof(Player.Awake))]
-        public class PlayerAwake_Patch
+        [HarmonyPatch(typeof(Game), nameof(Game.Awake))]
+        public class GameAwake_Patch
         {
-            static void Postfix(Player __instance)
+            static void Postfix(Game __instance)
             {
-                PlayerController controller = __instance.GetComponent<PlayerController>();
                 if (delayedAction == null)
                 {
-                    delayedAction = controller.gameObject.AddComponent<DelayedAction>();
+                    delayedAction = __instance.gameObject.AddComponent<DelayedAction>();
                 }
             }
         }
