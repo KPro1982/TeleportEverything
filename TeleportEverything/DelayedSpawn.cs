@@ -15,7 +15,7 @@ namespace TeleportEverything
         public float delay { get; set; }
         public Vector3 Pos { get; set; }
         public Quaternion Rot { get; set; }
-        public bool Follow { get; set; }
+        public bool Following { get; set; }
 
         public bool Ally { get; set; }
 
@@ -30,20 +30,19 @@ namespace TeleportEverything
         public int Version;
 
         public DelayedSpawn(Character _original, bool _ally, float _delay, float _creationTime,
-            Vector3 _pos, Quaternion _rot, Vector3 _offset, bool _follow)
+            Vector3 _pos, Quaternion _rot, Vector3 _offset, bool _following)
         {
             delay = _delay;
             CreationTime = _creationTime;
             Pos = _pos;
             Rot = _rot;
-            Follow = _follow;
+            Following = _following;
             Ally = _ally;
             Offset = _offset;
             Original = _original;
             saveZDO = Original.m_nview.GetZDO().Clone();
             
-            
-              Destroy(_original);
+            Destroy(_original);
         }
 
         private void Destroy(Character orig)
@@ -89,7 +88,7 @@ namespace TeleportEverything
             Debug.Log($"Spawning {clone.gameObject.name}");
 
             Tameable tame = clone.gameObject.GetComponent<Tameable>();
-            if (tame != null)
+            if (tame != null && Following)
             {
                 tame.m_monsterAI.m_follow =
                     Player.m_localPlayer.gameObject;
