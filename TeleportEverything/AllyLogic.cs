@@ -148,7 +148,7 @@ namespace TeleportEverything
             float addDelay = 0f;
             foreach (Character c in allies)
             {
-                AlliesSpawn.Add(new DelayedSpawn(c, true, DEFAULT_DELAY + addDelay, GetDelayTimer(), pos, rot, offset, IsFollowing(c)));
+                AlliesSpawn.Add(new DelayedSpawn(c, true, ALLIES_SPAWN_DELAY + addDelay, GetDelayTimer(), pos, rot, offset, IsFollowing(c)));
                 addDelay += 0.8f;
             } 
         }

@@ -44,13 +44,13 @@ Teleport Everything will search for allies within a search cylinder. It should n
 * Enable Server/Player Filter Mask (advanced): 
     * If enabled, only the prefabs in the Transport Mask field will be allowed
     * If disabled, all tameable allies can be teleportable
-* Server and Player Transport Masks (advanced): accepts comma delimited list of prefab names. E.g.: wolf,lox,
+* Server and Player Transport Masks (advanced): accepts comma delimited list of prefab names. E.g.: wolf,lox
 
 #### **Teleport Self**
 
 1. Select the teleport mode. Currently you can select "**Standard**" which will give you vanilla behavior.  "**Vikings don't run**" mode will prevent you from teleporting if mobs are within a search sphere. The search radius is configurable in the **F1** configuration menu. "**Take them with you**" will give mobs a small chance of following you through the portal. If this mode is selected, a dash through the portal with a troll in pursuit may end up in troll fight within your base! Its a super fun mode.
 2. At present, enemies will spawn at a random location within 5 meters (default) of the portal. However, this "**Max Enemy Displacement**" can be set in the F1 configuration menu. A smaller number means that the mobs will be on you as soon as you materialize. A larger number may mean that the mobs spawn in other rooms, on the roof, etc.
-3. Creatures spawn delay is 2 seconds, but you can add more seconds to enemies delay (advanced)
+3. Allies spawn delay is by default 2 seconds, but the enemies spawn delay can be configured (advanced)
 
 #### **Transport Items**
 If this mode is toggled on, players may transport **ores, ingots, and eggs**. In order to offset the advantage of transporting ores, players may set a **"transport fee"** that deducts a percentage of the contraband ores, ingots.
@@ -95,6 +95,7 @@ To make it work properly you will need some other mods or tools called dependenc
   - Added ServerSync
   - Separated Server and Player Filter Mask (if mask is not enabled, all allies can be transported)
   - Added delayed spawn to allies and enemies
+  - Added settings to change portal sound volume and activation range
   - Added advanced settings (if you need more options, enable config manager advanced mode)
 - Version 1.4
   - Added transport of ores, ingots, and eggs.

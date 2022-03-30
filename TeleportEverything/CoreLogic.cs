@@ -37,12 +37,12 @@ namespace TeleportEverything
             
             foreach (Character c in enemies)
             {
-                float distDelay = HorizontalDistance(c) / 10f + DEFAULT_DELAY + SpawnEnemiesDelay.Value;  // assume mobs can run at 10m/s
+                float distDelay = HorizontalDistance(c) / 10f + EnemiesSpawnDelay.Value;  // assume mobs can run at 10m/s
                 TeleportEverythingLogger.LogInfo($"{GetPrefabName(c)} will charge the gate in {distDelay} seconds");
                 EnemiesSpawn.Add(new DelayedSpawn(c,false, distDelay, GetDelayTimer(), pos, rot, offset, false));
             }   
         }
-
+        
         public static float CalcDistToEntity(Character e) => VectorToEntity(e).magnitude;
 
         public static Vector3 VectorToEntity(Character e) =>

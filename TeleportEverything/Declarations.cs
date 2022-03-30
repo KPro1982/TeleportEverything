@@ -35,9 +35,13 @@ namespace TeleportEverything
         public static ConfigEntry<bool>? TransportWolves;
         public static ConfigEntry<bool>? TransportBoar;
         public static ConfigEntry<bool>? TransportLox;
-        public static ConfigEntry<int>? SpawnEnemiesDelay;
+        public static ConfigEntry<int>? EnemiesSpawnDelay;
 
-        public const float DEFAULT_DELAY = 2f;
+        public const float ALLIES_SPAWN_DELAY = 2f;
+
+        //Portal
+        public static ConfigEntry<float>? PortalActivationRange;
+        public static ConfigEntry<float>? PortalSoundVolume;
 
         //Teleport Self
         public static ConfigEntry<float>? SearchRadius;
@@ -110,6 +114,16 @@ namespace TeleportEverything
                 new ConfigDescription("Message Mode",
                     new AcceptableValueList<string>("No messages", "top left", "centered")), false);
 
+            //Portal
+            PortalSoundVolume = config("--- Portal ---", "Portal Sound Volume", 0.8f,
+                new ConfigDescription("Portal sound effect volume.",
+                    new AcceptableValueRange<float>(0, 1)), false);
+
+            PortalActivationRange = config("--- Portal ---", "Portal Activation Range", 5f,
+                new ConfigDescription("Portal activation range in meters.",
+                    new AcceptableValueRange<float>(0, 20f),
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 8 }), false);
+
             // Transport
             IncludeMode = config("--- Transport ---", "Ally Mode", "No Allies",
                 new ConfigDescription("Ally Mode",
@@ -117,9 +131,9 @@ namespace TeleportEverything
                         "All tamed except Named", "Only Named"),
                     new ConfigurationManagerAttributes { IsAdvanced = false, Order = 7 }), false);
 
-            SpawnEnemiesDelay = config("--- Transport ---", "Spawn Enemies Delay", 3,
+            EnemiesSpawnDelay = config("--- Transport ---", "Enemies Spawn Delay", 3,
                 new ConfigDescription("Add extra seconds to enemies spawn when teleporting",
-                    new AcceptableValueRange<int>(0, 10),
+                    new AcceptableValueRange<int>(2, 10),
                     new ConfigurationManagerAttributes { IsAdvanced = true, Order = 6 }));
 
             TransportRadius = config("--- Transport ---", "Transport Radius", 10f,

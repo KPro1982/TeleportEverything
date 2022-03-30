@@ -80,12 +80,12 @@ namespace TeleportEverything
             
             if(zdo == null || !zdo.IsValid())
             {
-                Debug.Log("Warning zdo = null or invalid in SpawnNow");
+                Plugin.TeleportEverythingLogger.LogWarning("ZDO is null or invalid in SpawnNow");
                 return;
             } 
 
             GameObject clone = ZNetScene.instance.CreateObject(zdo);
-            Debug.Log($"Spawning {clone.gameObject.name}");
+            Plugin.TeleportEverythingLogger.LogInfo($"Spawning {clone.gameObject.name}");
 
             Tameable tame = clone.gameObject.GetComponent<Tameable>();
             if (tame != null && Following)
@@ -145,7 +145,7 @@ namespace TeleportEverything
             }
             catch
             {
-                ZLog.Log("  failed to load " + text);
+                ZLog.Log(" failed to load " + text);
                 return null;
             }
 
