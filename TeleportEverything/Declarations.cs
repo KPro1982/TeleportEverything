@@ -131,8 +131,8 @@ namespace TeleportEverything
                         "All tamed except Named", "Only Named"),
                     new ConfigurationManagerAttributes { IsAdvanced = false, Order = 7 }), false);
 
-            EnemiesSpawnDelay = config("--- Transport ---", "Enemies Spawn Delay", 3,
-                new ConfigDescription("Add extra seconds to enemies spawn when teleporting",
+            EnemiesSpawnDelay = config("--- Transport ---", "Enemies Spawn Delay", 5,
+                new ConfigDescription("Set enemies spawn delay when teleporting (in seconds)",
                     new AcceptableValueRange<int>(2, 10),
                     new ConfigurationManagerAttributes { IsAdvanced = true, Order = 6 }));
 
