@@ -35,6 +35,13 @@ namespace TeleportEverything
         public static ConfigEntry<bool>? TransportWolves;
         public static ConfigEntry<bool>? TransportBoar;
         public static ConfigEntry<bool>? TransportLox;
+        public static ConfigEntry<int>? EnemiesSpawnDelay;
+
+        public const float ALLIES_SPAWN_DELAY = 2f;
+
+        //Portal
+        public static ConfigEntry<float>? PortalActivationRange;
+        public static ConfigEntry<float>? PortalSoundVolume;
 
         //Teleport Self
         public static ConfigEntry<float>? SearchRadius;
@@ -100,45 +107,61 @@ namespace TeleportEverything
         private void CreateConfigValues()
         {
             //Mod
-            _serverConfigLocked = config("---", "Force Server Config", true, "Force Server Config");
+            _serverConfigLocked = config("--- Mod ---", "Force Server Config", true, "Force Server Config");
             _ = ConfigSync.AddLockingConfigEntry(_serverConfigLocked);
-            EnableMod = config("---", "Enable Mod", true, "Enable/Disable mod");
-            MessageMode = config("---", "Message Mode", "No messages",
+            EnableMod = config("--- Mod ---", "Enable Mod", true, "Enable/Disable mod");
+            MessageMode = config("--- Mod ---", "Message Mode", "No messages",
                 new ConfigDescription("Message Mode",
                     new AcceptableValueList<string>("No messages", "top left", "centered")), false);
 
-            // Transport
+            //Portal
+            PortalSoundVolume = config("--- Portal ---", "Portal Sound Volume", 0.8f,
+                new ConfigDescription("Portal sound effect volume.",
+                    new AcceptableValueRange<float>(0, 1)), false);
 
+            PortalActivationRange = config("--- Portal ---", "Portal Activation Range", 5f,
+                new ConfigDescription("Portal activation range in meters.",
+                    new AcceptableValueRange<float>(0, 20f),
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 8 }), false);
+
+            // Transport
             IncludeMode = config("--- Transport ---", "Ally Mode", "No Allies",
                 new ConfigDescription("Ally Mode",
                     new AcceptableValueList<string>("No Allies", "All tamed", "Only Follow",
                         "All tamed except Named", "Only Named"),
                     new ConfigurationManagerAttributes { IsAdvanced = false, Order = 7 }), false);
-            
-            TransportWolves = config("--- Transport ---", "Transport Wolves", true, "", false);
-            TransportBoar = config("--- Transport ---", "Transport Boar", true, "", false);
-            TransportLox = config("--- Transport ---", "Transport Lox", true, "", false);
+
+            EnemiesSpawnDelay = config("--- Transport ---", "Enemies Spawn Delay", 5,
+                new ConfigDescription("Set enemies spawn delay when teleporting (in seconds)",
+                    new AcceptableValueRange<int>(2, 10),
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 6 }));
 
             TransportRadius = config("--- Transport ---", "Transport Radius", 10f,
                 new ConfigDescription("", null,
                     new ConfigurationManagerAttributes { IsAdvanced = true, Order = 5 }));
-            
+
             TransportVerticalTolerance = config("--- Transport ---", "Vertical Tolerance", 2f,
                 new ConfigDescription("", null,
                     new ConfigurationManagerAttributes { IsAdvanced = true, Order = 4 }));
 
-            SpawnForwardOffset = config("--- Transport ---", "Spawn forward Tolerance", .5f,
-                new ConfigDescription("", null,
-                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 3 }));
+            SpawnForwardOffset = config("--- Transport ---", "Spawn Forward Tolerance", .5f,
+            new ConfigDescription("", null,
+                new ConfigurationManagerAttributes { IsAdvanced = true, Order = 3 }));
 
             PlayerEnableMask = config("--- Transport ---", "Player Filter By Mask", false,
                 new ConfigDescription("Enable to filter which tameable creatures can teleport.", null,
                     new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }), false);
-            PlayerTransportMask = config("--- Transport ---", "Player Transport Mask", "", 
+
+            PlayerTransportMask = config("--- Transport ---", "Player Transport Mask", "",
                 new ConfigDescription("Add the prefab names to filter creatures to transport", null,
                     new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }), false);
 
-            ServerEnableMask = config("--- Server ---", "Filter By Mask", false,
+            TransportBoar = config("--- Transport ---", "Transport Boars", true, "", false);
+            TransportLox = config("--- Transport ---", "Transport Loxes", true, "", false);
+            TransportWolves = config("--- Transport ---", "Transport Wolves", true, "", false);
+
+            //Server
+            ServerEnableMask = config("--- Server ---", "Server Filter By Mask", false,
                 new ConfigDescription(
                     "Enable to filter which tameable creatures can teleport on server.", null,
                     new ConfigurationManagerAttributes { IsAdvanced = true }));
@@ -155,7 +178,7 @@ namespace TeleportEverything
                     "Allows transporting ores, ingots and other restricted items.", null,
                     new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }));
             TransportFee = config("--- Transport Items ---", "Transport fee", 10,
-                new ConfigDescription("Transport fee in (%) ore",
+                new ConfigDescription("Transport Fee in (%) ore",
                     new AcceptableValueRange<int>(0, 100),
                     new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));
 

@@ -223,5 +223,27 @@ namespace TeleportEverything
                 }
             }
         }
+
+        [HarmonyPatch(typeof(TeleportWorld), nameof(TeleportWorld.Awake))]
+        public class TeleportWorld_Awake_Patch
+        {
+            static void Postfix(TeleportWorld __instance)
+            {
+                AudioSource audio = __instance.GetComponentInChildren<AudioSource>();
+                if(audio != null)
+                {
+                    audio.volume = PortalSoundVolume.Value;
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(TeleportWorld), nameof(TeleportWorld.UpdatePortal))]
+        public class UpdatePortal_Patch
+        {
+            static void Prefix(ref float ___m_activationRange)
+            {
+                ___m_activationRange = PortalActivationRange.Value;
+            }
+        }
     }
 }

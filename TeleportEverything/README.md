@@ -1,4 +1,5 @@
-﻿# TeleportEverything
+﻿
+# TeleportEverything
  > Produced by: Kpro and Elg
 
 ![](https://staticdelivery.nexusmods.com/mods/3667/images/1806/1806-1647282849-1161973402.png)
@@ -40,13 +41,19 @@ This mod is intended to add additional excitement and functionality to the porta
 
 Teleport Everything will search for allies within a search cylinder. It should not be necessary but you can configure the radius and height of the search cylinder to meet your needs. For example, you might set the height to 1.5 in order to avoid transporting allies on different levels of your base.
 
+* Enable Server/Player Filter Mask (advanced): 
+    * If enabled, only the prefabs in the Transport Mask field will be allowed
+    * If disabled, all tameable allies can be teleportable
+* Server and Player Transport Masks (advanced): accepts comma delimited list of prefab names. E.g.: wolf,lox
+
 #### **Teleport Self**
 
 1. Select the teleport mode. Currently you can select "**Standard**" which will give you vanilla behavior.  "**Vikings don't run**" mode will prevent you from teleporting if mobs are within a search sphere. The search radius is configurable in the **F1** configuration menu. "**Take them with you**" will give mobs a small chance of following you through the portal. If this mode is selected, a dash through the portal with a troll in pursuit may end up in troll fight within your base! Its a super fun mode.
 2. At present, enemies will spawn at a random location within 5 meters (default) of the portal. However, this "**Max Enemy Displacement**" can be set in the F1 configuration menu. A smaller number means that the mobs will be on you as soon as you materialize. A larger number may mean that the mobs spawn in other rooms, on the roof, etc.
+3. Allies spawn delay is by default 2 seconds, but the enemies spawn delay can be configured (advanced)
 
 #### **Transport Items**
-If this mode is toggled on, players may transport **ores, ingots, and eggs**. In order to offset the advantage of transporting ores, players may set a **"transport fee"** that deducts a percentage of the contraband ores, ingots, and eggs.
+If this mode is toggled on, players may transport **ores, ingots, and eggs**. In order to offset the advantage of transporting ores, players may set a **"transport fee"** that deducts a percentage of the contraband ores, ingots.
 
 ## Install Notes
 
@@ -75,6 +82,7 @@ To make it work properly you will need some other mods or tools called dependenc
   - Make sure to add the prefab names to the mask field, like: "Hatchling,Deer" 
   - (If your vertical tolerance is low, you may not be able to transport a flying dragon)
 - MapTeleport: ![YES]
+- FastTeleport: ![YES]
 
 <p>
   <p align="center"><h2>For Questions or Comments find Elg or KPro in the Odin Plus Team on Discord:</h2></p>
@@ -83,6 +91,12 @@ To make it work properly you will need some other mods or tools called dependenc
 </p>
 
 ## Changelog
+- Version 1.5
+  - Added ServerSync
+  - Separated Server and Player Filter Mask (if mask is not enabled, all allies can be transported)
+  - Added delayed spawn to allies and enemies
+  - Added settings to change portal sound volume and activation range
+  - Added advanced settings (if you need more options, enable config manager advanced mode)
 - Version 1.4
   - Added transport of ores, ingots, and eggs.
   - Added optional "transport fee" that reduces ore, ingots, and eggs as a fee for transport these "contraband" items.
