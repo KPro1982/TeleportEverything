@@ -1,14 +1,11 @@
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace TeleportEverything
 {
     internal partial class Plugin
     {
-        public static List<DelayedSpawn> AlliesSpawn;
         public static bool IsValidAlly(Character c)
         {
             if (!c.IsTamed())
@@ -123,13 +120,12 @@ namespace TeleportEverything
 
         public static bool IsFollowing(Character f)
         {
-            var mAi = f.GetComponent<MonsterAI>();
+            var monsterAI = f.GetComponent<MonsterAI>();
 
-            if (mAi != null && mAi.GetFollowTarget() != null &&
-                mAi.GetFollowTarget().Equals(Player.m_localPlayer.gameObject))
+            if (monsterAI != null && monsterAI.GetFollowTarget() != null)
             {
-
-                return true;
+                var target = monsterAI.GetFollowTarget();
+                return target.Equals(Player.m_localPlayer.gameObject);
             }
 
             return false;
@@ -138,19 +134,15 @@ namespace TeleportEverything
 
         public static List<Character> GetAllies(List<Character> creatures)
         {
-            return creatures.FindAll(IsValidAlly);
-        }
-
-        public static void CreateAllyList(Vector3 pos, Quaternion rot, bool follow)
-        {
-            Vector3 offset = Player.m_localPlayer.transform.forward * SpawnForwardOffset.Value;
-
-            float addDelay = 0f;
-            foreach (Character c in allies)
+            var chars = new List<Character>();
+            foreach (var c in creatures)
             {
-                AlliesSpawn.Add(new DelayedSpawn(c, true, ALLIES_SPAWN_DELAY + addDelay, GetDelayTimer(), pos, rot, offset, IsFollowing(c)));
-                addDelay += 0.8f;
-            } 
+                if (IsValidAlly(c))
+                {
+                    chars.Add(c);
+                }
+            }
+            return chars;
         }
     }
 }

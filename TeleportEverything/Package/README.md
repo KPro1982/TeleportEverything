@@ -49,8 +49,7 @@ Teleport Everything will search for allies within a search cylinder. It should n
 #### **Teleport Self**
 
 1. Select the teleport mode. Currently you can select "**Standard**" which will give you vanilla behavior.  "**Vikings don't run**" mode will prevent you from teleporting if mobs are within a search sphere. The search radius is configurable in the **F1** configuration menu. "**Take them with you**" will give mobs a small chance of following you through the portal. If this mode is selected, a dash through the portal with a troll in pursuit may end up in troll fight within your base! Its a super fun mode.
-2. At present, enemies will spawn at a random location within 5 meters (default) of the portal. However, this "**Max Enemy Displacement**" can be set in the F1 configuration menu. A smaller number means that the mobs will be on you as soon as you materialize. A larger number may mean that the mobs spawn in other rooms, on the roof, etc.
-3. Allies spawn delay is by default 2 seconds, but the enemies spawn delay can be configured (advanced)
+2. At present, enemies will spawn at a random location forward within 6.2 meters (default) of the portal.
 
 #### **Transport Items**
 If this mode is toggled on, players may transport **ores, ingots, and eggs**. In order to offset the advantage of transporting ores, players may set a **"transport fee"** that deducts a percentage of the contraband ores, ingots.
@@ -91,8 +90,14 @@ To make it work properly you will need some other mods or tools called dependenc
 </p>
 
 ## Changelog
+- Version 1.6
+  - Server Sync (Now compatible with servers and clients)
+  - Removed delayed spawn
+  - Removed fee in disconnected portal
+  - Spawn offset fixed
+  - Teleport with enemies fixed
 - Version 1.5
-  - Added ServerSync
+  - Server Sync not working properly
   - Separated Server and Player Filter Mask (if mask is not enabled, all allies can be transported)
   - Added delayed spawn to allies and enemies
   - Added settings to change portal sound volume and activation range
