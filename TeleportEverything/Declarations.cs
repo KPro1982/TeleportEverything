@@ -74,6 +74,8 @@ namespace TeleportEverything
         public static bool IncludeFollow;
         public static bool ExcludeNamed;
 
+        public static bool teleportTriggered;
+
         private void Awake()
         {
             _harmony.PatchAll();
@@ -82,6 +84,8 @@ namespace TeleportEverything
 
             enemies = new List<Character>();
             allies = new List<Character>();
+
+            teleportTriggered = false;
 
             ClearIncludeVars();
             Debug.Log($"{ModName} Loaded...");
