@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Dynamic;
 using HarmonyLib;
 using UnityEngine;
 
@@ -24,8 +22,6 @@ namespace TeleportEverything
                     return false; //skip original method
                 }
 
-                hasOre = false;
-
                 foreach (var item in __instance.GetAllItems())
                 {
                     if (item.m_shared.m_teleportable)
@@ -48,8 +44,6 @@ namespace TeleportEverything
                             __result = false;
                             return false;
                         }
-
-                        hasOre = true;
                     }
                 }
 
@@ -60,11 +54,16 @@ namespace TeleportEverything
 
         [HarmonyPatch(typeof(TeleportWorld))]
         [HarmonyPatch(nameof(TeleportWorld.Teleport))]
-        public class Teleport_Patch
+        public class TeleportWorld_Teleport_Patch
         {
-            private static void Prefix(ref Player player)
+            private static void Prefix(ref Player player, TeleportWorld __instance)
             {
                 if (!EnableMod.Value)
+                {
+                    return;
+                }
+
+                if (!__instance.TargetFound() || !player.IsTeleportable() || ZoneSystem.instance.GetGlobalKey("noportals")) //avoid fee if player is not teleportable
                 {
                     return;
                 }
@@ -100,7 +99,7 @@ namespace TeleportEverything
 
                 if (TransportAllies && allies.Count > 0)
                 {
-                    DisplayMessage($"{allies.Count} allies will teleport with you!");
+                    DisplayMessage($"Transporting {allies.Count} allies!");
                 }
 
                 if (enemies.Count > 0 && TeleportMode.Value.Contains("Take"))
@@ -110,8 +109,7 @@ namespace TeleportEverything
             }
         }
 
-        [HarmonyPatch(typeof(Humanoid))]
-        [HarmonyPatch(nameof(Humanoid.IsTeleportable))]
+        [HarmonyPatch(typeof(Humanoid), nameof(Humanoid.IsTeleportable))]
         public class IsTeleportable_Patch
         {
             private static bool Postfix(bool __result, Humanoid __instance)
@@ -121,12 +119,21 @@ namespace TeleportEverything
                     return __result;
                 }
 
+                if (Game.instance.m_firstSpawn) //if player is still spawning
+                {
+                    return __result;
+                }
+                
+                if (!__result) //if player inventory teleportable is false
+                {
+                    return __result;
+                }
+
                 SetIncludeMode();
                 GetCreatures();
 
                 if (TransportAllies && allies.Count > 0)
                 {
-                    ResetDelayTimer();
                     DisplayMessage($"Transporting {allies.Count} allies!");
                 }
 
@@ -151,8 +158,8 @@ namespace TeleportEverything
             }
         }
 
-        [HarmonyPatch(typeof(Player))]
-        [HarmonyPatch(nameof(Player.TeleportTo))]
+
+        [HarmonyPatch(typeof(Player), nameof(Player.TeleportTo))]
         public class TeleportTo_Patch
         {
             private static bool Postfix(bool __result, Player __instance, Vector3 pos,
@@ -170,8 +177,7 @@ namespace TeleportEverything
 
                 SetIncludeMode();
                 GetCreatures();
-                EnemiesSpawn = new List<DelayedSpawn>();
-                AlliesSpawn = new List<DelayedSpawn>();
+
                 teleportTriggered = true;
                 
                 if (enemies.Count > 0 && TeleportMode.Value.Contains("Take"))
@@ -179,47 +185,55 @@ namespace TeleportEverything
                     DisplayMessage(
                         $"Taking Enemies With You! {enemies.Count} enemies charge the portal!!!");
 
-                    CreateEnemyList(pos, rot);
-                   
+                    TeleportCreatures(__instance, enemies, true);
                 }
 
                 TeleportEverythingLogger.LogInfo(
                     $"Allies: {allies.Count} and flag {TransportAllies}");
                 if (allies.Count > 0 && TransportAllies)
                 {
-                   CreateAllyList(pos, rot, IncludeFollow);
-
+                    TeleportCreatures(__instance, allies);
                 }
-
                 return __result;
             }
         }
 
-        [HarmonyPatch(typeof(Player))]
-        [HarmonyPatch("UpdateTeleport")]
-        public class UpdateTeleport_Patch
+        [HarmonyPatch(typeof(Tameable), nameof(Tameable.RPC_Command))]
+        public class Tameable_RPC_Command_Patch
         {
-            static void  Postfix( Player __instance, ref bool ___m_teleporting, float dt)
+            private static void Postfix(Tameable __instance, ZDOID characterID)
             {
-                if (!ZNetScene.instance.IsAreaReady(__instance.m_teleportTargetPos))
-                    return;
-
-                if (!___m_teleporting && teleportTriggered)
+                if (__instance.m_character.GetComponent<ZNetView>() is { } netView)
                 {
-                    UpdateDelayTimer(dt);
+                    TakeOwnership(__instance.m_character, characterID.m_userID);                   
                 }
             }
         }
 
-        public static DelayedAction delayedAction;
-        [HarmonyPatch(typeof(Game), nameof(Game.Awake))]
-        public class GameAwake_Patch
+        [HarmonyPatch(typeof(Player), nameof(Player.UpdateTeleport))]
+        public class UpdateTeleport_Patch
         {
-            static void Postfix(Game __instance)
+            static void Postfix(Player __instance, ref bool ___m_teleporting, float dt)
             {
-                if (delayedAction == null)
+                if (!ZNetScene.instance.IsAreaReady(__instance.m_teleportTargetPos))
+                    return;
+
+                //set enemies unalerted while teleporting?
+                //if(___m_teleporting && teleportTriggered)
+                //{
+                //    if (TeleportMode.Value.Contains("Take"))
+                //    {
+                //        foreach (Character c in enemies)
+                //        {
+                //            c.GetComponent<MonsterAI>()?.SetAlerted(false);
+                //        }
+                //    }
+                //}
+
+                if (!___m_teleporting && teleportTriggered)
                 {
-                    delayedAction = __instance.gameObject.AddComponent<DelayedAction>();
+                    teleportTriggered = false;
+                    //TeleportEverythingLogger.LogInfo("Teleport ended");
                 }
             }
         }

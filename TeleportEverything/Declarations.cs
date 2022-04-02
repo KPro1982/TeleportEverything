@@ -10,17 +10,23 @@ using UnityEngine;
 #nullable enable
 namespace TeleportEverything
 {
-    [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
+    [BepInPlugin(ModGUID, ModName, ModVersion)]
     internal partial class Plugin : BaseUnityPlugin
     {
-        public const string PluginGUID = "com.kpro.TeleportEverything";
-        public const string PluginName = "TeleportEverything";
-        public const string PluginVersion = "1.5.0";
-        private static string ConfigFileName = PluginGUID + ".cfg";
+        internal const string ModName = "TeleportEverything";
+        internal const string ModVersion = "1.6.0";
+        internal const string Author = "kpro";
+        private const string ModGUID = "com."+ Author + "." + ModName;
 
-        private static string ConfigFileFullPath =
-            Paths.ConfigPath + Path.DirectorySeparatorChar + ConfigFileName;
+        private static string ConfigFileName = ModGUID + ".cfg";
+        private static string ConfigFileFullPath = Paths.ConfigPath + Path.DirectorySeparatorChar + ConfigFileName;
 
+        private readonly Harmony _harmony = new(ModGUID);
+
+        public static readonly ManualLogSource TeleportEverythingLogger =
+            BepInEx.Logging.Logger.CreateLogSource(ModName);
+
+        private static readonly ConfigSync ConfigSync = new(ModGUID) { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = ModVersion };
         // Mod
         private static ConfigEntry<bool>? _serverConfigLocked;
         public static ConfigEntry<bool>? EnableMod;
@@ -35,9 +41,10 @@ namespace TeleportEverything
         public static ConfigEntry<bool>? TransportWolves;
         public static ConfigEntry<bool>? TransportBoar;
         public static ConfigEntry<bool>? TransportLox;
-        public static ConfigEntry<int>? EnemiesSpawnDelay;
 
-        public const float ALLIES_SPAWN_DELAY = 2f;
+        //Enemies
+        public static ConfigEntry<float>? SpawnEnemiesForwardOffset;
+        public static ConfigEntry<float>? MaximumDisplacement;
 
         //Portal
         public static ConfigEntry<float>? PortalActivationRange;
@@ -52,7 +59,6 @@ namespace TeleportEverything
         public static ConfigEntry<bool>? TransportDragonEggs;
         public static ConfigEntry<bool>? TransportOres;
         public static ConfigEntry<int>? TransportFee;
-        public static bool hasOre;
 
         //User Settings
         public static ConfigEntry<string>? IncludeMode;
@@ -68,25 +74,9 @@ namespace TeleportEverything
         public static bool IncludeFollow;
         public static bool ExcludeNamed;
 
-        private readonly Harmony harmony = new(PluginGUID);
-        
-        //Teleport Timer
-        public static float DelayTimer;
-
-
-        public static readonly ManualLogSource TeleportEverythingLogger =
-            BepInEx.Logging.Logger.CreateLogSource(PluginName);
-
-        private static readonly ConfigSync ConfigSync = new(PluginGUID)
-        {
-            DisplayName = PluginName, CurrentVersion = PluginVersion,
-            MinimumRequiredVersion = PluginVersion
-        };
-
-
         private void Awake()
         {
-            harmony.PatchAll();
+            _harmony.PatchAll();
             CreateConfigValues();
             SetupWatcher();
 
@@ -94,13 +84,12 @@ namespace TeleportEverything
             allies = new List<Character>();
 
             ClearIncludeVars();
-            DelayTimer = 0;
-            Debug.Log($"{PluginName} Loaded...");
+            Debug.Log($"{ModName} Loaded...");
         }
 
         private void OnDestroy()
         {
-            harmony.UnpatchSelf();
+            _harmony.UnpatchSelf();
         }
 
         #region CreateConfigValues
@@ -131,22 +120,18 @@ namespace TeleportEverything
                         "All tamed except Named", "Only Named"),
                     new ConfigurationManagerAttributes { IsAdvanced = false, Order = 7 }), false);
 
-            EnemiesSpawnDelay = config("--- Transport ---", "Enemies Spawn Delay", 5,
-                new ConfigDescription("Set enemies spawn delay when teleporting (in seconds)",
-                    new AcceptableValueRange<int>(2, 10),
-                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 6 }));
-
             TransportRadius = config("--- Transport ---", "Transport Radius", 10f,
                 new ConfigDescription("", null,
-                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 5 }));
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 6 }));
 
             TransportVerticalTolerance = config("--- Transport ---", "Vertical Tolerance", 2f,
                 new ConfigDescription("", null,
-                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 4 }));
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 5 }));
 
             SpawnForwardOffset = config("--- Transport ---", "Spawn Forward Tolerance", .5f,
-            new ConfigDescription("", null,
-                new ConfigurationManagerAttributes { IsAdvanced = true, Order = 3 }));
+            new ConfigDescription("Allies spawn forward offset",
+                null,
+                new ConfigurationManagerAttributes { IsAdvanced = true, Order = 4 }));
 
             PlayerEnableMask = config("--- Transport ---", "Player Filter By Mask", false,
                 new ConfigDescription("Enable to filter which tameable creatures can teleport.", null,
@@ -160,6 +145,18 @@ namespace TeleportEverything
             TransportLox = config("--- Transport ---", "Transport Loxes", true, "", false);
             TransportWolves = config("--- Transport ---", "Transport Wolves", true, "", false);
 
+            //Enemies
+            SpawnEnemiesForwardOffset = config("--- Transport Enemies ---", "Spawn Enemies Forward Tolerance", 6.2f,
+            new ConfigDescription("Spawn forward in meters if Take Enemies With you is enabled.",
+                null,
+                new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }));
+
+            MaximumDisplacement = config("--- Transport Enemies ---", "Max Enemy Displacement", .5f,
+            new ConfigDescription("Max Enemy Displacement if Take Enemies With you is enabled.",
+                null,
+                new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));
+
+
             //Server
             ServerEnableMask = config("--- Server ---", "Server Filter By Mask", false,
                 new ConfigDescription(
@@ -171,12 +168,10 @@ namespace TeleportEverything
 
             // Transport Items
             TransportDragonEggs = config("--- Transport Items ---", "Transport Dragon Eggs", false,
-                new ConfigDescription("", null,
-                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 3 }));
+                new ConfigDescription("Allows transporting dragon eggs."));
             TransportOres = config("--- Transport Items ---", "Transport Ores", false,
                 new ConfigDescription(
-                    "Allows transporting ores, ingots and other restricted items.", null,
-                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }));
+                    "Allows transporting ores, ingots and other restricted items."));
             TransportFee = config("--- Transport Items ---", "Transport fee", 10,
                 new ConfigDescription("Transport Fee in (%) ore",
                     new AcceptableValueRange<int>(0, 100),
@@ -237,6 +232,7 @@ namespace TeleportEverything
             }
         }
 
+        #region ConfigWatcher
         private void SetupWatcher()
         {
             FileSystemWatcher watcher = new(Paths.ConfigPath, ConfigFileName);
@@ -268,6 +264,7 @@ namespace TeleportEverything
                     "Please check your config entries for spelling and format!");
             }
         }
+        #endregion
 
         #region ConfigOptions
 

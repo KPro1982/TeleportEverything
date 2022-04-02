@@ -13,6 +13,7 @@ namespace TeleportEverything
             allies = GetAllies(creatures);
             enemies = GetEnemies(creatures);
         }
+
        public static bool IsValidEnemy(Character c)
         {
             if (c.GetComponent<BaseAI>() != null &&
@@ -26,21 +27,15 @@ namespace TeleportEverything
 
         public static List<Character> GetEnemies(List<Character> creatures)
         {
-            return creatures.FindAll(IsValidEnemy);   
-        }
-
-        public static List<DelayedSpawn> EnemiesSpawn;
-        public static void CreateEnemyList(Vector3 pos,
-            Quaternion rot)
-        {
-            Vector3 offset = Player.m_localPlayer.transform.forward * SpawnForwardOffset.Value;
-            
-            foreach (Character c in enemies)
+            var chars = new List<Character>();
+            foreach (var c in creatures)
             {
-                float distDelay = HorizontalDistance(c) / 10f + EnemiesSpawnDelay.Value;  // assume mobs can run at 10m/s
-                TeleportEverythingLogger.LogInfo($"{GetPrefabName(c)} will charge the gate in {distDelay} seconds");
-                EnemiesSpawn.Add(new DelayedSpawn(c,false, distDelay, GetDelayTimer(), pos, rot, offset, false));
-            }   
+                if (IsValidEnemy(c))
+                {
+                    chars.Add(c);
+                }
+            }
+            return chars;
         }
         
         public static float CalcDistToEntity(Character e) => VectorToEntity(e).magnitude;
@@ -68,39 +63,43 @@ namespace TeleportEverything
                 MessageHud.instance.ShowMessage(MessageHud.MessageType.Center, msg);
             }
         }
-        
-        public static void UpdateDelayTimer(float dt)
+
+        public static void TeleportCreatures(Player player, List<Character> creatures, bool hasEnemies=false)
         {
-            DelayTimer += dt;
-
-            if (teleportTriggered)
+            foreach (Character c in creatures)
             {
-                if (AlliesSpawn != null)
-                {
-                    foreach (DelayedSpawn ds in AlliesSpawn)
-                    {
-                        delayedAction.InvokeDelayed(ds.SpawnNow, ds.delay);
-                    }
-                }
+                TakeOwnership(c, ZDOMan.instance.GetMyID());
 
-                if (EnemiesSpawn != null)
-                {
-                    foreach (DelayedSpawn ds in EnemiesSpawn)
-                    {
-                        delayedAction.InvokeDelayed(ds.SpawnNow, ds.delay);
-                    }
-                }
-                teleportTriggered = false;
+                Vector3 forward = player.m_teleportTargetRot * Vector3.forward;
+                SetPosition(c, player.m_teleportTargetPos, player.m_teleportTargetRot, forward, hasEnemies);
             }
         }
 
-        public static float GetDelayTimer()
+        public static void TakeOwnership(Character c, long userId)
         {
-            return DelayTimer;
+            if (c.GetComponent<ZNetView>() is { } netView)
+            {
+                if (c.GetOwner() != userId)
+                {
+                    netView.GetZDO()?.SetOwner(userId);
+                }
+            }
         }
-        public static void ResetDelayTimer()
+
+        static void SetPosition(Character c, Vector3 destination, Quaternion rotation, Vector3 forward, bool hasEnemies)
         {
-            // DelayTimer = 0f;
+            Vector3 offset = forward * SpawnForwardOffset.Value;
+
+            if (hasEnemies)
+            {
+                offset = forward * SpawnEnemiesForwardOffset.Value;
+                Vector2 circle = Random.insideUnitCircle * (enemies.Count * MaximumDisplacement.Value);
+                destination += new Vector3(circle.x, 0, circle.y); ;
+            }
+
+            c.transform.position = destination + offset;
+            c.transform.rotation = rotation;
+            c.SetLookDir(c.transform.position);
         }
     }
 }

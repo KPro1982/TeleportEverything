@@ -87,8 +87,6 @@
     <Compile Include="ConfigSync.cs" />
     <Compile Include="ConfigurationManagerAttributes.cs" />
     <Compile Include="CoreLogic.cs" />
-    <Compile Include="DelayedAction.cs" />
-    <Compile Include="DelayedSpawn.cs" />
     <Compile Include="HarmonyPatches.cs" />
     <Compile Include="ItemLogic.cs" />
     <Compile Include="Properties\IgnoreAccessModifiers.cs" />
