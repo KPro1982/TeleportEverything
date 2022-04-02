@@ -77,6 +77,7 @@ namespace TeleportEverything
         public static List<DelayedSpawn>? AlliesSpawn;
         public static List<DelayedSpawn>? EnemiesSpawn;
         public const float ALLIES_SPAWN_DELAY = 2f;
+        public static bool teleportTriggered;
 
         private void Awake()
         {
@@ -86,6 +87,8 @@ namespace TeleportEverything
 
             enemies = new List<Character>();
             allies = new List<Character>();
+
+            teleportTriggered = false;
 
             ClearIncludeVars();
             Debug.Log($"{ModName} Loaded...");

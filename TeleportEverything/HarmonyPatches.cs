@@ -5,7 +5,6 @@ namespace TeleportEverything
 {
     internal partial class Plugin
     {
-        public static bool teleportTriggered = false;
         [HarmonyPatch(typeof(Inventory), nameof(Inventory.IsTeleportable))]
         public static class Inventory_IsTeleportable_Patch
         {
@@ -203,6 +202,11 @@ namespace TeleportEverything
         {
             private static void Postfix(Tameable __instance, ZDOID characterID)
             {
+                if (!EnableMod.Value)
+                {
+                    return;
+                }
+
                 if (__instance.m_character.GetComponent<ZNetView>() is { } netView)
                 {
                     TakeOwnership(__instance.m_character, characterID.m_userID);                   
@@ -215,6 +219,11 @@ namespace TeleportEverything
         {
             static void Postfix(Player __instance, ref bool ___m_teleporting, float dt)
             {
+                if (!EnableMod.Value)
+                {
+                    return;
+                }
+
                 if (!ZNetScene.instance.IsAreaReady(__instance.m_teleportTargetPos))
                     return;
 
@@ -243,6 +252,11 @@ namespace TeleportEverything
         {
             static void Postfix(TeleportWorld __instance)
             {
+                if (!EnableMod.Value)
+                {
+                    return;
+                }
+
                 AudioSource audio = __instance.GetComponentInChildren<AudioSource>();
                 if(audio != null)
                 {
@@ -256,6 +270,11 @@ namespace TeleportEverything
         {
             static void Prefix(ref float ___m_activationRange)
             {
+                if (!EnableMod.Value)
+                {
+                    return;
+                }
+
                 ___m_activationRange = PortalActivationRange.Value;
             }
         }

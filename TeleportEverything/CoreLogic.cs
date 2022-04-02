@@ -115,7 +115,7 @@ namespace TeleportEverything
             {
                 offset = forward * SpawnEnemiesForwardOffset.Value;
                 Vector2 circle = Random.insideUnitCircle * (enemies.Count * MaximumDisplacement.Value);
-                destination += new Vector3(circle.x, 0, circle.y); ;
+                destination += new Vector3(circle.x, 0, circle.y);
             }
 
             c.transform.position = destination + offset;
