@@ -5,9 +5,17 @@ namespace TeleportEverything
 {
     internal partial class Plugin
     {
+        public static void GetCreatures()
+        {
+            var creatures = new List<Character>();
+            Character.GetCharactersInRange(Player.m_localPlayer.transform.position,
+                SearchRadius.Value, creatures);
+            allies = GetAllies(creatures);
+            enemies = GetEnemies(creatures);
+        }
+
        public static bool IsValidEnemy(Character c)
         {
-
             if (c.GetComponent<BaseAI>() != null &&
                 c.GetComponent<BaseAI>().IsEnemey(Player.m_localPlayer) && !c.IsTamed())
             {
@@ -17,42 +25,19 @@ namespace TeleportEverything
             return false;
         }
 
-        public static int CountEnemies()
+        public static List<Character> GetEnemies(List<Character> creatures)
         {
-            var characters = new List<Character>();
-            Character.GetCharactersInRange(Player.m_localPlayer.transform.position,
-                SearchRadius.Value, characters);
-
-            return characters.FindAll(c => IsValidEnemy(c) == true).Count;
-           
-            
-        }
-
-
-        public static List<DelayedSpawn> Enemies;
-        public static void CreateEnemyList(Vector3 pos,
-            Quaternion rot)
-        {
-            var characters = new List<Character>();
-            Enemies = new List<DelayedSpawn>();
-
-            Character.GetCharactersInRange(Player.m_localPlayer.transform.position,
-                SearchRadius.Value, characters);
-
-            var characterList = characters.FindAll(c => IsValidEnemy(c) == true);
-            Vector3 offset = Player.m_localPlayer.transform.forward * SpawnForwardOffset.Value;
-            
-            foreach (Character c in characterList)
+            var chars = new List<Character>();
+            foreach (var c in creatures)
             {
-                float distDelay = HorizontalDistance(c) / 10f + 10f;  // assume mobs can run at 10m/s
-                Debug.Log($"{c.m_name} will charge the gate in {distDelay} seconds");
-                Enemies.Add(new DelayedSpawn(c,false, 10f + distDelay, GetDelayTimer(), pos, rot, offset, false));
+                if (IsValidEnemy(c))
+                {
+                    chars.Add(c);
+                }
             }
-
-            
+            return chars;
         }
-
-
+        
         public static float CalcDistToEntity(Character e) => VectorToEntity(e).magnitude;
 
         public static Vector3 VectorToEntity(Character e) =>
@@ -78,38 +63,43 @@ namespace TeleportEverything
                 MessageHud.instance.ShowMessage(MessageHud.MessageType.Center, msg);
             }
         }
-        
-        public static void UpdateDelayTimer(float dt)
+
+        public static void TeleportCreatures(Player player, List<Character> creatures, bool hasEnemies=false)
         {
-            DelayTimer += dt;
-        
-            if (Allies != null)
+            foreach (Character c in creatures)
             {
-                foreach (DelayedSpawn ds in Allies)
-                {
-                    ds.TrySpawn(DelayTimer);
-                }
-                
-                
-            }
+                TakeOwnership(c, ZDOMan.instance.GetMyID());
 
-            if (Enemies != null)
-            {
-                foreach (DelayedSpawn ds in Enemies)
-                {
-                    ds.TrySpawn(DelayTimer);
-                }
+                Vector3 forward = player.m_teleportTargetRot * Vector3.forward;
+                SetPosition(c, player.m_teleportTargetPos, player.m_teleportTargetRot, forward, hasEnemies);
             }
-
         }
 
-        public static float GetDelayTimer()
+        public static void TakeOwnership(Character c, long userId)
         {
-            return DelayTimer;
+            if (c.GetComponent<ZNetView>() is { } netView)
+            {
+                if (c.GetOwner() != userId)
+                {
+                    netView.GetZDO()?.SetOwner(userId);
+                }
+            }
         }
-        public static void ResetDelayTimer()
+
+        static void SetPosition(Character c, Vector3 destination, Quaternion rotation, Vector3 forward, bool hasEnemies)
         {
-            // DelayTimer = 0f;
+            Vector3 offset = forward * SpawnForwardOffset.Value;
+
+            if (hasEnemies)
+            {
+                offset = forward * SpawnEnemiesForwardOffset.Value;
+                Vector2 circle = Random.insideUnitCircle * (enemies.Count * MaximumDisplacement.Value);
+                destination += new Vector3(circle.x, 0, circle.y);
+            }
+
+            c.transform.position = destination + offset;
+            c.transform.rotation = rotation;
+            c.SetLookDir(c.transform.position);
         }
     }
 }

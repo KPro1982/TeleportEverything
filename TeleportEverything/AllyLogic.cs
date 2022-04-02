@@ -1,19 +1,19 @@
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
-
 
 namespace TeleportEverything
 {
     internal partial class Plugin
     {
-        public static List<DelayedSpawn> Allies;
-       
         public static bool IsValidAlly(Character c)
         {
-            if (IsEligibleCreature(c) && IsTransportable(c))
+            if (!c.IsTamed())
+            {
+                return false;
+            }
+
+            if (IsAllowedAlly(c) && IsTransportable(c))
             {
                 if (HorizontalDistance(c) <= TransportRadius.Value &&
                     VerticalDistance(c) <= TransportVerticalTolerance.Value)
@@ -25,26 +25,29 @@ namespace TeleportEverything
             return false;
         }
 
+        public static string GetPrefabName(Character c) => c?.name.Replace("(Clone)", "").ToLower();
 
-
-        public static string GetName(Character c)
-
+        public static bool IsAllowedAlly(Character c)
         {
-            string r = c?.name.Replace("(Clone)", "").ToLower();
-            
-            return r;
-        }
-
-
-        public static bool IsEligibleCreature(Character c)
-        {
-            if (GetName(c).Contains("wolf") && TransportWolves.Value)
+            if (GetPrefabName(c).Equals("wolf") && !TransportWolves.Value)
             {
-
+                return false;
+            }
+            if (GetPrefabName(c).Equals("boar") && !TransportBoar.Value)
+            {
+                return false;
+            }
+            if (GetPrefabName(c).Equals("lox") && !TransportLox.Value)
+            {
+                return false;
+            }
+            if (!ServerEnableMask.Value && !PlayerEnableMask.Value)
+            {
                 return true;
+            }
 
-            if (IsAllowedInMask(c, ServerEnableMask.Value, ServerTransportMask.Value) && 
-                IsAllowedInMask(c, UserEnableMask.Value, UserTransportMask.Value))
+            if (IsAllowedInMask(c, ServerEnableMask.Value, ServerTransportMask.Value) &&
+                IsAllowedInMask(c, PlayerEnableMask.Value, PlayerTransportMask.Value))
             {
                 return true;
             }
@@ -55,14 +58,19 @@ namespace TeleportEverything
         private static bool IsAllowedInMask(Character c, bool enableMask, string transportMask)
         {
             if (!enableMask)
+            {
                 return true;
+            }
 
-
-            if (String.IsNullOrWhiteSpace(transportMask))
+            if (string.IsNullOrWhiteSpace(transportMask))
+            {
                 return false;
+            }
 
             if (IsInFilterMask(c, transportMask))
+            {
                 return true;
+            }
 
             return false;
         }
@@ -72,7 +80,7 @@ namespace TeleportEverything
 
         {
             List<string> maskList = mask.Split(',').Select(p => p.Trim().ToLower()).ToList();
-            string isInMask = maskList.FirstOrDefault(s => s.Contains(GetName(c)));
+            var isInMask = maskList.FirstOrDefault(s => s.Contains(GetPrefabName(c)));
 
             return isInMask != null;
         }
@@ -81,14 +89,11 @@ namespace TeleportEverything
         {
             if (IsNamed(ally) && ExcludeNamed)
             {
-
                 return false;
             }
 
-
             if (IsFollowing(ally) && IncludeFollow)
             {
-
                 return true;
             }
 
@@ -115,57 +120,29 @@ namespace TeleportEverything
 
         public static bool IsFollowing(Character f)
         {
-            var mAi = f.GetComponent<MonsterAI>();
+            var monsterAI = f.GetComponent<MonsterAI>();
 
-            if (mAi != null && mAi.GetFollowTarget() != null &&
-                mAi.GetFollowTarget().Equals(Player.m_localPlayer.gameObject))
+            if (monsterAI != null && monsterAI.GetFollowTarget() != null)
             {
-
-                return true;
+                var target = monsterAI.GetFollowTarget();
+                return target.Equals(Player.m_localPlayer.gameObject);
             }
-
 
             return false;
         }
         
 
-        public static int CountAllies()
+        public static List<Character> GetAllies(List<Character> creatures)
         {
-            var characters = new List<Character>();
-            Character.GetCharactersInRange(Player.m_localPlayer.transform.position,
-                SearchRadius.Value, characters);
-            
-
-
-            List<Character> lAlly = characters.FindAll(IsValidAlly);
-
-            return lAlly.Count;
-        }
-
-        public static void CreateAllyList(Vector3 pos, Quaternion rot, bool follow)
-        {
-            var characters = new List<Character>();
-            Allies = new List<DelayedSpawn>();
-
-            Character.GetCharactersInRange(Player.m_localPlayer.transform.position,
-                SearchRadius.Value, characters);
-
-            var characterList = characters.FindAll(c => IsValidAlly(c) == true);
-
-            Vector3 offset = Player.m_localPlayer.transform.forward * SpawnForwardOffset.Value;
-
-            float addDelay = 0f;
-            foreach (Character c in characterList)
+            var chars = new List<Character>();
+            foreach (var c in creatures)
             {
-                Allies.Add(new DelayedSpawn(c, true, 10f + addDelay, GetDelayTimer(), pos, rot, offset, follow));
-                addDelay += 0.5f;
+                if (IsValidAlly(c))
+                {
+                    chars.Add(c);
+                }
             }
-            
-        }
-
-        public static List<DelayedSpawn> GetAllyList()
-        {
-            return Allies;
+            return chars;
         }
     }
 }
