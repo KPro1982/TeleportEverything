@@ -74,6 +74,10 @@ namespace TeleportEverything
         public static bool IncludeFollow;
         public static bool ExcludeNamed;
 
+        public static List<DelayedSpawn>? AlliesSpawn;
+        public static List<DelayedSpawn>? EnemiesSpawn;
+        public const float ALLIES_SPAWN_DELAY = 2f;
+
         private void Awake()
         {
             _harmony.PatchAll();

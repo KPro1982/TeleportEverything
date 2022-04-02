@@ -37,7 +37,7 @@ namespace TeleportEverything
             }
             return chars;
         }
-        
+
         public static float CalcDistToEntity(Character e) => VectorToEntity(e).magnitude;
 
         public static Vector3 VectorToEntity(Character e) =>
@@ -66,12 +66,33 @@ namespace TeleportEverything
 
         public static void TeleportCreatures(Player player, List<Character> creatures, bool hasEnemies=false)
         {
+            AlliesSpawn = new();
+            EnemiesSpawn = new();
+
+            float addDelay = 0f;
             foreach (Character c in creatures)
             {
                 TakeOwnership(c, ZDOMan.instance.GetMyID());
 
+                var destination = player.m_teleportTargetPos;
+                var rotation = player.m_teleportTargetRot;
                 Vector3 forward = player.m_teleportTargetRot * Vector3.forward;
-                SetPosition(c, player.m_teleportTargetPos, player.m_teleportTargetRot, forward, hasEnemies);
+                Vector3 offset = forward * SpawnForwardOffset.Value;
+
+                if (hasEnemies)
+                {
+                    offset = forward * SpawnEnemiesForwardOffset.Value;
+                    Vector2 circle = Random.insideUnitCircle * (enemies.Count * MaximumDisplacement.Value);
+                    destination += new Vector3(circle.x, 0, circle.y); ;
+
+                    float distDelay = HorizontalDistance(c) / 10f + 10;  // assume mobs can run at 10m/s
+                    TeleportEverythingLogger.LogInfo($"{GetPrefabName(c)} will charge the gate in {distDelay} seconds");
+                    EnemiesSpawn.Add(new DelayedSpawn(c, false, distDelay, destination + offset, rotation, false));
+                }
+                else {
+                    AlliesSpawn.Add(new DelayedSpawn(c, true, ALLIES_SPAWN_DELAY + addDelay, destination + offset, rotation, IsFollowing(c)));
+                    addDelay += 0.8f;
+                }              
             }
         }
 
@@ -100,6 +121,25 @@ namespace TeleportEverything
             c.transform.position = destination + offset;
             c.transform.rotation = rotation;
             c.SetLookDir(c.transform.position);
+        }
+
+        public static void CreateDelayedSpawn()
+        {
+            if (AlliesSpawn != null)
+            {
+                foreach (DelayedSpawn ds in AlliesSpawn)
+                {
+                    delayedAction.InvokeDelayed(ds.SpawnNow, ds.delay);
+                }
+            }
+
+            if (EnemiesSpawn != null)
+            {
+                foreach (DelayedSpawn ds in EnemiesSpawn)
+                {
+                    delayedAction.InvokeDelayed(ds.SpawnNow, ds.delay);
+                }
+            }
         }
     }
 }

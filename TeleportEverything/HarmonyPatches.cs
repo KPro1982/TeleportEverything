@@ -233,7 +233,7 @@ namespace TeleportEverything
                 if (!___m_teleporting && teleportTriggered)
                 {
                     teleportTriggered = false;
-                    //TeleportEverythingLogger.LogInfo("Teleport ended");
+                    CreateDelayedSpawn();
                 }
             }
         }
@@ -257,6 +257,19 @@ namespace TeleportEverything
             static void Prefix(ref float ___m_activationRange)
             {
                 ___m_activationRange = PortalActivationRange.Value;
+            }
+        }
+
+        public static DelayedAction delayedAction;
+        [HarmonyPatch(typeof(Game), nameof(Game.Awake))]
+        public class GameAwake_Patch
+        {
+            static void Postfix(Game __instance)
+            {
+                if (delayedAction == null)
+                {
+                    delayedAction = __instance.gameObject.AddComponent<DelayedAction>();
+                }
             }
         }
     }
