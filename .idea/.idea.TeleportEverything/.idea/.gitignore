@@ -5,7 +5,9 @@
 /modules.xml
 /contentModel.xml
 /projectSettingsUpdater.xml
-/.idea.TeleportEverything.iml
+**/.idea/**/*.iml
+**/.idea/**/contentModel.xml
+**/.idea/**/modules.xml
 # Editor-based HTTP Client requests
 /httpRequests/
 # Datasource local storage ignored files
