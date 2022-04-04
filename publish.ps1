@@ -72,7 +72,8 @@ if($Target.Equals("Release")) {
     Write-Host "$PackagePath\$TargetAssembly"
     Copy-Item -Path "$TargetPath\$TargetAssembly" -Destination "$PackagePath\plugins\$TargetAssembly" -Force
     Copy-Item -Path "$ProjectPath\README.md" -Destination "$PackagePath\README.md" -Force
-    Compress-Archive -Path "$PackagePath\*" -DestinationPath "$TargetPath\$TargetAssembly.zip" -Force
+    Write-Host "Compressing..."
+    Compress-Archive -Path "$PackagePath\*" -DestinationPath "$PackagePath\$name.zip" -Force
 }
 
 # Pop Location
