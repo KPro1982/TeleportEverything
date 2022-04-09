@@ -14,7 +14,7 @@ namespace TeleportEverything
     internal partial class Plugin : BaseUnityPlugin
     {
         internal const string ModName = "TeleportEverything";
-        internal const string ModVersion = "1.6.0";
+        internal const string ModVersion = "1.6.1";
         internal const string Author = "kpro";
         private const string ModGUID = "com."+ Author + "." + ModName;
 
@@ -43,8 +43,9 @@ namespace TeleportEverything
         public static ConfigEntry<bool>? TransportLox;
 
         //Enemies
-        public static ConfigEntry<float>? SpawnEnemiesForwardOffset;
-        public static ConfigEntry<float>? MaximumDisplacement;
+        public static ConfigEntry<int>? SpawnEnemiesForwardOffset;
+        public static ConfigEntry<int>? EnemySpawnRadius;
+        public const float UP_OFFSET = .5f;
 
         //Portal
         public static ConfigEntry<float>? PortalActivationRange;
@@ -52,8 +53,8 @@ namespace TeleportEverything
 
         //Teleport Self
         public static ConfigEntry<float>? SearchRadius;
-        public static List<Character>? enemies;
-        public static List<Character>? allies;
+        public static List<Character>? Enemies;
+        public static List<Character>? Allies;
 
         //Items
         public static ConfigEntry<bool>? TransportDragonEggs;
@@ -74,7 +75,7 @@ namespace TeleportEverything
         public static bool IncludeFollow;
         public static bool ExcludeNamed;
 
-        public static bool teleportTriggered;
+        public static bool TeleportTriggered;
 
         private void Awake()
         {
@@ -82,10 +83,10 @@ namespace TeleportEverything
             CreateConfigValues();
             SetupWatcher();
 
-            enemies = new List<Character>();
-            allies = new List<Character>();
+            Enemies = new List<Character>();
+            Allies = new List<Character>();
 
-            teleportTriggered = false;
+            TeleportTriggered = false;
 
             ClearIncludeVars();
             Debug.Log($"{ModName} Loaded...");
@@ -132,17 +133,17 @@ namespace TeleportEverything
                 new ConfigDescription("", null,
                     new ConfigurationManagerAttributes { IsAdvanced = true, Order = 5 }));
 
-            SpawnForwardOffset = config("--- Transport ---", "Spawn Forward Tolerance", .5f,
+            SpawnForwardOffset = config("--- Transport ---", "Spawn Forward Tolerance", 1f,
             new ConfigDescription("Allies spawn forward offset",
-                null,
+                new AcceptableValueRange<float>(0, 12f),
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 4 }));
 
             PlayerEnableMask = config("--- Transport ---", "Player Filter By Mask", false,
-                new ConfigDescription("Enable to filter which tameable creatures can teleport.", null,
+                new ConfigDescription("Enable to filter and restrict which tameable creatures can teleport.", null,
                     new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }), false);
 
             PlayerTransportMask = config("--- Transport ---", "Player Transport Mask", "",
-                new ConfigDescription("Add the prefab names to filter creatures to transport", null,
+                new ConfigDescription("Add the prefab names to filter and restrict which creatures can be teleportable", null,
                     new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }), false);
 
             TransportBoar = config("--- Transport ---", "Transport Boars", true, "", false);
@@ -150,24 +151,24 @@ namespace TeleportEverything
             TransportWolves = config("--- Transport ---", "Transport Wolves", true, "", false);
 
             //Enemies
-            SpawnEnemiesForwardOffset = config("--- Transport Enemies ---", "Spawn Enemies Forward Tolerance", 6.2f,
-            new ConfigDescription("Spawn forward in meters if Take Enemies With you is enabled.",
-                null,
+            SpawnEnemiesForwardOffset = config("--- Transport Enemies ---", "Spawn Enemies Forward Tolerance", 6,
+            new ConfigDescription("Min Spawn forward in meters if Take Enemies With you is enabled.",
+                new AcceptableValueRange<int>(0, 12),
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }));
 
-            MaximumDisplacement = config("--- Transport Enemies ---", "Max Enemy Displacement", .5f,
-            new ConfigDescription("Max Enemy Displacement if Take Enemies With you is enabled.",
-                null,
+            EnemySpawnRadius = config("--- Transport Enemies ---", "Max Enemy Spawn Radius", 3,
+            new ConfigDescription("Max Enemy Spawn Radius if Take Enemies With you is enabled.",
+                new AcceptableValueRange<int>(0, 15),
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));
 
-
+ 
             //Server
             ServerEnableMask = config("--- Server ---", "Server Filter By Mask", false,
                 new ConfigDescription(
-                    "Enable to filter which tameable creatures can teleport on server.", null,
+                    "Enable to filter and restrict which tameable creatures can teleport on server.", null,
                     new ConfigurationManagerAttributes { IsAdvanced = true }));
             ServerTransportMask = config("--- Server ---", "Server Transport Mask", "",
-                new ConfigDescription("", null,
+                new ConfigDescription("Add the prefab names to filter and restrict which creatures can be teleportable on the server", null,
                     new ConfigurationManagerAttributes { IsAdvanced = true }));
 
             // Transport Items
@@ -205,7 +206,7 @@ namespace TeleportEverything
         public static void SetIncludeMode()
         {
             ClearIncludeVars();
-
+           
             if (!IncludeMode.Value.Contains("No Allies"))
             {
                 TransportAllies = true;
