@@ -29,9 +29,12 @@ This mod is intended to add additional excitement and functionality to the porta
 
 ## Usage:
 
-#### **Transport Allies**
+### **Message Mode**
+You can change the display message mode between: top left, center, or none.
 
-1. Define the ally type that you want to transport using the **F1** configuration menu. There are check boxes to select wolves, boar, or lox. If you want to transport something else use the transport mask by typing in the spawn name of the creature that you want to take with you. An example would be "**Greydwarf**" without the quote marks. You can obtain the list spawn names easily on the web. 
+### **Transport Allies**
+
+1. Define the ally type that you want to transport using the **F1** configuration menu. There quick check boxes to select wolves, boar, or lox. If you want to filter which animals can be teleportable, enable the filter mask and use the transport mask by typing in the spawn name of the creatures. An example would be "**Greydwarf**" without the quote marks. (In this case, only Greydwarfs would be allowed) You can obtain the list spawn names easily on the web.
 2. Define the Ally Mode from the dropdown list. At present, you can select either: 
    * "No Allies",
    * "All Tamed", 
@@ -42,17 +45,21 @@ This mod is intended to add additional excitement and functionality to the porta
 Teleport Everything will search for allies within a search cylinder. It should not be necessary but you can configure the radius and height of the search cylinder to meet your needs. For example, you might set the height to 1.5 in order to avoid transporting allies on different levels of your base.
 
 * Enable Server/Player Filter Mask (advanced): 
-    * If enabled, only the prefabs in the Transport Mask field will be allowed
+    * If enabled, only the allies in the Transport Mask field will be allowed
     * If disabled, all tameable allies can be teleportable
 * Server and Player Transport Masks (advanced): accepts comma delimited list of prefab names. E.g.: wolf,lox
 
-#### **Teleport Self**
+### **Teleport Self**
 
-1. Select the teleport mode. Currently you can select "**Standard**" which will give you vanilla behavior.  "**Vikings don't run**" mode will prevent you from teleporting if mobs are within a search sphere. The search radius is configurable in the **F1** configuration menu. "**Take them with you**" will give mobs a small chance of following you through the portal. If this mode is selected, a dash through the portal with a troll in pursuit may end up in troll fight within your base! Its a super fun mode.
+1. Select the teleport mode. Currently you can select "**Standard**" which will give you vanilla behavior.  "**Vikings don't run**" mode will prevent you from teleporting if mobs are within a search sphere. The search radius is configurable in the **F1** configuration menu. "**Take them with you**" will give mobs a chance of following you through the portal. If this mode is selected, a dash through the portal with a troll in pursuit may end up in troll fight within your base! Its a super fun mode.
 2. At present, enemies will spawn at a random location forward within 6.2 meters (default) of the portal.
 
-#### **Transport Items**
+### **Transport Items**
 If this mode is toggled on, players may transport **ores, ingots, and eggs**. In order to offset the advantage of transporting ores, players may set a **"transport fee"** that deducts a percentage of the contraband ores, ingots.
+
+### **Portal Behavior**
+* Portal Activation Range: You can increase or reduce the activation range, 5 meters is the default game value.
+* Portal Sound Volume: You can change it between 0 and 100%. 80% is the default game value.
 
 ## Install Notes
 
@@ -70,16 +77,15 @@ You can also define the configuration settings directly in the cfg file which is
 
 To make it work properly you will need some other mods or tools called dependencies so make sure that everything is installed as it should. To make it work properly you need these dependencies:
 
-* BepInEx Valheim
-* BepInEx Configuration Manager (Not mandatory, but recommended)
+* BepInEx Valheim (Mandatory)
+* BepInEx Configuration Manager (Recommended)
 
 ## Mod Compatibility
 
 - OdinsUndercroft: ![YES]
 - Basement or BasementJVLedition: ![YES]
 - AllTameableHandH: ![YES]
-  - Make sure to add the prefab names to the mask field, like: "Hatchling,Deer" 
-  - (If your vertical tolerance is low, you may not be able to transport a flying dragon)
+  - (If your vertical tolerance is low, you may not be able to transport a flying drake)
 - MapTeleport: ![YES]
 - FastTeleport: ![YES]
 
@@ -90,10 +96,12 @@ To make it work properly you will need some other mods or tools called dependenc
 </p>
 
 ## Changelog
+- Version 1.6.1
+  - Add height check to prevent creatures from getting stuck in crypts
 - Version 1.6
   - Server Sync (Now compatible with servers and clients)
   - Removed delayed spawn
-  - Removed fee in disconnected portal
+  - Removed fee on disconnected portals
   - Spawn offset fixed
   - Teleport with enemies fixed
 - Version 1.5

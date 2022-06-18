@@ -10,8 +10,8 @@ namespace TeleportEverything
             var creatures = new List<Character>();
             Character.GetCharactersInRange(Player.m_localPlayer.transform.position,
                 SearchRadius.Value, creatures);
-            allies = GetAllies(creatures);
-            enemies = GetEnemies(creatures);
+            Allies = GetAllies(creatures);
+            Enemies = GetEnemies(creatures);
         }
 
        public static bool IsValidEnemy(Character c)
@@ -64,14 +64,37 @@ namespace TeleportEverything
             }
         }
 
+        public static void DisplayAlliesMessage()
+        {
+            if (TransportAllies && Allies.Count > 0)
+            {
+                DisplayMessage($"Transporting {Allies.Count} allies!");
+            }
+        }
+
+        public static void DisplayEnemiesMessage()
+        {
+            if (Enemies.Count > 0 && TeleportMode.Value.Contains("Take"))
+            {
+                DisplayMessage($"Beware: {Enemies.Count} enemies may charge the portal!");
+            }
+        }
+
+        private static int placedEnemies;
         public static void TeleportCreatures(Player player, List<Character> creatures, bool hasEnemies=false)
         {
+            placedEnemies = 0;
             foreach (Character c in creatures)
             {
                 TakeOwnership(c, ZDOMan.instance.GetMyID());
 
-                Vector3 forward = player.m_teleportTargetRot * Vector3.forward;
-                SetPosition(c, player.m_teleportTargetPos, player.m_teleportTargetRot, forward, hasEnemies);
+                var forward = player.m_teleportTargetRot * Vector3.forward;
+                SetPositionAttempt(c, player.m_teleportTargetPos, player.m_teleportTargetRot, forward, hasEnemies, creatures.Count);
+            }
+
+            if (placedEnemies > 0)
+            {
+                DisplayMessage($"Taking Enemies With You! {placedEnemies} enemies charge the portal!!!");
             }
         }
 
@@ -86,20 +109,130 @@ namespace TeleportEverything
             }
         }
 
-        static void SetPosition(Character c, Vector3 destination, Quaternion rotation, Vector3 forward, bool hasEnemies)
+        private static void SetPositionAttempt(Character c, Vector3 destination, Quaternion rotation, Vector3 forward, bool hasEnemies, int creaturesCount)
         {
-            Vector3 offset = forward * SpawnForwardOffset.Value;
-
-            if (hasEnemies)
+            var radius = EnemySpawnRadius.Value;
+            var tries = 1;
+            var offset = GetSpawnOffset(forward, radius, hasEnemies);
+            while (tries <= 5)
             {
-                offset = forward * SpawnEnemiesForwardOffset.Value;
-                Vector2 circle = Random.insideUnitCircle * (enemies.Count * MaximumDisplacement.Value);
-                destination += new Vector3(circle.x, 0, circle.y);
+                var newPosition = destination;
+                newPosition += offset;
+                newPosition += GetRandomLocation(radius, hasEnemies);
+                if (!CharacterFits(newPosition, c, hasEnemies, out var placeAt))
+                {
+                    tries++;
+                    continue;
+                }
+
+                newPosition.y = placeAt + UP_OFFSET;
+                SetPosition(c, newPosition, rotation);
+                c.SetLookDir(c.transform.position);
+                if (hasEnemies)
+                {
+                    placedEnemies++;
+                }
+
+                break;
+            }
+        }
+
+        private static Vector3 GetRandomLocation(int radius, bool hasEnemies)
+        {
+            var random = (hasEnemies) ? Random.insideUnitCircle * radius : Random.insideUnitCircle * 0.5f;
+            return new Vector3(random.x, 0, random.y);
+        }
+
+        private static Vector3 GetSpawnOffset(Vector3 forward, int radius, bool hasEnemies)
+        {
+            var spawnForward = (hasEnemies) ? SpawnEnemiesForwardOffset.Value + radius / 2 : SpawnForwardOffset.Value;
+            return forward * spawnForward;
+        }
+
+        //private static Vector3 RandomInsideSpace(Vector3 newPosition, Vector3 offset, Quaternion rotation)
+        //{
+        //    var wall = FindBlocker(newPosition, Vector3.forward, rotation, 20f);
+        //    var center = Vector3.Lerp(newPosition, wall, 0.5f);
+        //    var radius = Vector3.Distance(center, wall);
+        //    var randomPoint = Random.insideUnitCircle * radius;
+        //    return randomPoint;
+        //}
+
+        private static void SetPosition(Component c, Vector3 position, Quaternion rotation)
+        {
+            var transform = c.transform;
+            transform.position = position;
+            transform.rotation = rotation;
+        }
+
+        private static bool FoundFloor(Vector3 position, out float floorHeight)
+        {
+            if (ZoneSystem.instance.FindFloor(position, out var height))
+            {
+                floorHeight = height;
+                return true;
             }
 
-            c.transform.position = destination + offset;
-            c.transform.rotation = rotation;
-            c.SetLookDir(c.transform.position);
+            floorHeight = 0f;
+            return false;
+        }
+
+        private static bool FoundRoof(Vector3 p, out float height)
+        {
+            if (Physics.Raycast(p, Vector3.up, out var hitInfo, 1000f, ZoneSystem.instance.m_blockRayMask))
+            {
+                height = hitInfo.point.y;
+                return true;
+            }
+
+            height = 0f;
+            return false;
+        }
+
+        private static bool CharacterFits(Vector3 position, Character c, bool hasEnemies, out float placeAt)
+        {
+            placeAt = 0f;
+
+            if (!FoundFloor(position, out var floorHeight))
+            {
+                if(!ZoneSystem.instance.GetGroundHeight(new Vector3(position.x, position.y, position.z), out floorHeight))
+                {
+                    if (hasEnemies)
+                    {
+                        return false;
+                    }
+
+                    floorHeight = position.y;
+                }
+            }
+
+            if (floorHeight - position.y > 20) return false;
+
+            placeAt = floorHeight;
+            if (!FoundRoof(new Vector3(position.x, floorHeight, position.z), out var height))
+            {
+                return true; 
+            }
+            var availableHeight = height - floorHeight;
+            var characterHeight = GetCharacterHeight(c);
+
+            return (characterHeight < availableHeight);
+        }
+        
+        
+        private static Vector3 FindBlocker(Vector3 p, Vector3 direction, Quaternion rotation, float maxDistance)
+        {
+            var point = p + rotation * Vector3.forward * maxDistance;
+            if (!Physics.Raycast(p, direction, out var hitInfo, maxDistance, ZoneSystem.instance.m_blockRayMask))
+                return point;
+            
+            point = hitInfo.point;
+            return point;
+        }
+
+        private static float GetCharacterHeight(Character c)
+        {
+            return c.GetCollider().bounds.size.y;
         }
     }
 }

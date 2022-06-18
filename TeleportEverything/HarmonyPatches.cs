@@ -6,7 +6,7 @@ namespace TeleportEverything
     internal partial class Plugin
     {
         [HarmonyPatch(typeof(Inventory), nameof(Inventory.IsTeleportable))]
-        public static class Inventory_IsTeleportable_Patch
+        public static class InventoryIsTeleportablePatch
         {
             private static bool Prefix(ref bool __result, ref Inventory __instance)
             {
@@ -53,7 +53,7 @@ namespace TeleportEverything
 
         [HarmonyPatch(typeof(TeleportWorld))]
         [HarmonyPatch(nameof(TeleportWorld.Teleport))]
-        public class TeleportWorld_Teleport_Patch
+        public class TeleportWorldTeleportPatch
         {
             private static void Prefix(ref Player player, TeleportWorld __instance)
             {
@@ -78,13 +78,12 @@ namespace TeleportEverything
                 }
 
                 ReduceStacks(player);
-
                 RemoveEmptyItems(player);
             }
         }
 
         [HarmonyPatch(typeof(Teleport), nameof(Teleport.GetHoverText))]
-        public static class Teleport_GetHoverText_Patch
+        public static class TeleportGetHoverTextPatch
         {
             private static void Postfix()
             {
@@ -96,20 +95,13 @@ namespace TeleportEverything
                 SetIncludeMode();
                 GetCreatures();
 
-                if (TransportAllies && allies.Count > 0)
-                {
-                    DisplayMessage($"Transporting {allies.Count} allies!");
-                }
-
-                if (enemies.Count > 0 && TeleportMode.Value.Contains("Take"))
-                {
-                    DisplayMessage($"Beware: {enemies.Count} enemies may charge the portal!");
-                }
+                DisplayAlliesMessage();
+                DisplayEnemiesMessage();
             }
         }
 
         [HarmonyPatch(typeof(Humanoid), nameof(Humanoid.IsTeleportable))]
-        public class IsTeleportable_Patch
+        public class IsTeleportablePatch
         {
             private static bool Postfix(bool __result, Humanoid __instance)
             {
@@ -131,26 +123,19 @@ namespace TeleportEverything
                 SetIncludeMode();
                 GetCreatures();
 
-                if (TransportAllies && allies.Count > 0)
-                {
-                    DisplayMessage($"Transporting {allies.Count} allies!");
-                }
+                DisplayAlliesMessage();
 
-                if (enemies.Count > 0)
+                if (Enemies.Count > 0)
                 {
                     if (TeleportMode.Value.Contains("Run"))
                     {
                         DisplayMessage(
-                            $"Vikings Don't run from a fight: {enemies.Count} enemies with in {SearchRadius.Value} meters.");
+                            $"Vikings Don't run from a fight: {Enemies.Count} enemies with in {SearchRadius.Value} meters.");
 
                         return false;
                     }
 
-                    if (TeleportMode.Value.Contains("Take"))
-
-                    {
-                        DisplayMessage($"Beware: {enemies.Count} enemies may charge the portal!");
-                    }
+                    DisplayEnemiesMessage();
                 }
 
                 return __result;
@@ -159,7 +144,7 @@ namespace TeleportEverything
 
 
         [HarmonyPatch(typeof(Player), nameof(Player.TeleportTo))]
-        public class TeleportTo_Patch
+        public class TeleportToPatch
         {
             private static bool Postfix(bool __result, Player __instance, Vector3 pos,
                 Quaternion rot, bool distantTeleport)
@@ -177,28 +162,24 @@ namespace TeleportEverything
                 SetIncludeMode();
                 GetCreatures();
 
-                teleportTriggered = true;
+                TeleportTriggered = true;
                 
-                if (enemies.Count > 0 && TeleportMode.Value.Contains("Take"))
+                if (Enemies.Count > 0 && TeleportMode.Value.Contains("Take"))
                 {
-                    DisplayMessage(
-                        $"Taking Enemies With You! {enemies.Count} enemies charge the portal!!!");
-
-                    TeleportCreatures(__instance, enemies, true);
+                    TeleportCreatures(__instance, Enemies, true);
                 }
 
-                TeleportEverythingLogger.LogInfo(
-                    $"Allies: {allies.Count} and flag {TransportAllies}");
-                if (allies.Count > 0 && TransportAllies)
+                TeleportEverythingLogger.LogInfo($"Allies: {Allies.Count} and Transport: {TransportAllies}");
+                if (Allies.Count > 0 && TransportAllies)
                 {
-                    TeleportCreatures(__instance, allies);
+                    TeleportCreatures(__instance, Allies);
                 }
                 return __result;
             }
         }
 
         [HarmonyPatch(typeof(Tameable), nameof(Tameable.RPC_Command))]
-        public class Tameable_RPC_Command_Patch
+        public class TameableRPCCommandPatch
         {
             private static void Postfix(Tameable __instance, ZDOID characterID)
             {
@@ -215,7 +196,7 @@ namespace TeleportEverything
         }
 
         [HarmonyPatch(typeof(Player), nameof(Player.UpdateTeleport))]
-        public class UpdateTeleport_Patch
+        public class UpdateTeleportPatch
         {
             static void Postfix(Player __instance, ref bool ___m_teleporting, float dt)
             {
@@ -239,16 +220,16 @@ namespace TeleportEverything
                 //    }
                 //}
 
-                if (!___m_teleporting && teleportTriggered)
+                if (!___m_teleporting && TeleportTriggered)
                 {
-                    teleportTriggered = false;
+                    TeleportTriggered = false;
                     //TeleportEverythingLogger.LogInfo("Teleport ended");
                 }
             }
         }
 
         [HarmonyPatch(typeof(TeleportWorld), nameof(TeleportWorld.Awake))]
-        public class TeleportWorld_Awake_Patch
+        public class TeleportWorldAwakePatch
         {
             static void Postfix(TeleportWorld __instance)
             {
@@ -266,7 +247,7 @@ namespace TeleportEverything
         }
 
         [HarmonyPatch(typeof(TeleportWorld), nameof(TeleportWorld.UpdatePortal))]
-        public class UpdatePortal_Patch
+        public class UpdatePortalPatch
         {
             static void Prefix(ref float ___m_activationRange)
             {
