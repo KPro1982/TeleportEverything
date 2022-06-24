@@ -96,18 +96,20 @@ To make it work properly you will need some other mods or tools called dependenc
 </p>
 
 ## Changelog
+- Version 1.6.2
+  - fix tax to deduct from total number of ores instead of each stack
+  - fix tax to apply also to quantities less than the tax
 - Version 1.6.1
   - Add height check to prevent creatures from getting stuck in crypts
 - Version 1.6
-  - Server Sync (Now compatible with servers and clients)
+  - Added Server Sync (Now compatible with servers and clients)
+  - Separated Server and Player Filter Mask (if mask is not enabled, all allies can be transported)
   - Removed delayed spawn
   - Removed fee on disconnected portals
   - Spawn offset fixed
   - Teleport with enemies fixed
 - Version 1.5
-  - Server Sync not working properly
-  - Separated Server and Player Filter Mask (if mask is not enabled, all allies can be transported)
-  - Added delayed spawn to allies and enemies
+  - Added delayed spawn to allies and enemies (single player)
   - Added settings to change portal sound volume and activation range
   - Added advanced settings (if you need more options, enable config manager advanced mode)
 - Version 1.4

@@ -14,7 +14,7 @@ namespace TeleportEverything
     internal partial class Plugin : BaseUnityPlugin
     {
         internal const string ModName = "TeleportEverything";
-        internal const string ModVersion = "1.6.1";
+        internal const string ModVersion = "1.6.2";
         internal const string Author = "kpro";
         private const string ModGUID = "com."+ Author + "." + ModName;
 
