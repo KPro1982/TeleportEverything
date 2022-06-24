@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace TeleportEverything
 {
@@ -10,7 +11,9 @@ namespace TeleportEverything
         internal static void ReduceStacks(Player player)
         {
             int deductedCount = 0, totalCount = 0;
+            var ores = new Dictionary<string, int>();
 
+            //register ore quantities in a dictionary
             foreach (var item in player.GetInventory().GetAllItems())
             {
                 if (item.m_shared.m_teleportable || IsDragonEgg(item))
@@ -18,14 +21,42 @@ namespace TeleportEverything
                     continue;
                 }
 
-                var totalStack = item.m_stack;
-                item.m_stack = Convert.ToInt32(totalStack * (1-(float)TransportFee.Value / 100));
+                AddOrCreateKey(ores, item.m_dropPrefab.name, item.m_stack);
 
+                totalCount += item.m_stack;
+            }
+
+            //deduct from inventory
+            foreach (var ore in ores)
+            {
+                int valueToDeduct = Convert.ToInt32(ore.Value * (float)TransportFee.Value / 100);
+                valueToDeduct = valueToDeduct > 0 ? valueToDeduct : 1;
+                
+                int deducted = 0;
+                while (valueToDeduct > 0)
+                {
+                    foreach (var item in player.GetInventory().GetAllItems())
+                    {
+                        if (item.m_shared.m_teleportable || IsDragonEgg(item)) continue;
+                        if (ore.Key != item.m_dropPrefab.name || item.m_stack == 0 || valueToDeduct == 0) continue;
+
+                        if (item.m_stack >= valueToDeduct)
+                        {
+                            deducted += valueToDeduct;
+                            item.m_stack -= valueToDeduct;  
+                            valueToDeduct = 0;
+                        }
+                        else
+                        {
+                            deducted += item.m_stack;
+                            valueToDeduct -= item.m_stack;
+                            item.m_stack = 0;
+                        }
+                    }
+                }
+                deductedCount += deducted;
                 TeleportEverythingLogger.LogInfo(
-                    $"{totalStack - item.m_stack} out of {totalStack} {item.m_dropPrefab.name} deducted as a fee for transporting contraband.");
-                //counts
-                deductedCount += totalStack - item.m_stack;
-                totalCount += totalStack;
+                    $"{deducted} out of {ore.Value} {ore.Key} deducted as a fee for transporting contraband.");
             }
 
             if (totalCount > 0)
@@ -35,14 +66,22 @@ namespace TeleportEverything
             }
         }
 
+        internal static void AddOrCreateKey(Dictionary<string, int> dict, string key, int value)
+        {
+            if (dict.ContainsKey(key))
+            {
+                dict[key] += value;
+            }
+            else
+            {
+                dict.Add(key, value);
+            }
+        }
+
         internal static void RemoveEmptyItems(Player player)
         {
             var items = player.GetInventory().GetAllItems();
-            for (var i = 0; i < items.Count; i++)
-                if (items[i].m_stack == 0)
-                {
-                    items.RemoveAt(i);
-                }
+            items.RemoveAll(item => item.m_stack == 0);
         }
     }
 }
