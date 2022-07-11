@@ -43,13 +43,6 @@ if (Test-Path -Path "$pdb") {
 Write-Host "Publishing for $Target from $TargetPath"
 
 if ($Target.Equals("Debug")) {
-    $mono = "$ValheimPath\MonoBleedingEdge\EmbedRuntime";
-    Write-Host "Copy mono-2.0-bdwgc.dll to $mono"
-    if (!(Test-Path -Path "$mono\mono-2.0-bdwgc.dll.orig")) {
-        Copy-Item -Path "$mono\mono-2.0-bdwgc.dll" -Destination "$mono\mono-2.0-bdwgc.dll.orig" -Force
-    }
-    Copy-Item -Path "$(Get-Location)\libraries\Debug\mono-2.0-bdwgc.dll" -Destination "$mono" -Force
-    
     if ($DeployPath.Equals("")){
       $DeployPath = "$ValheimPath\BepInEx\plugins"
     }
@@ -58,24 +51,40 @@ if ($Target.Equals("Debug")) {
     Copy-Item -Path "$TargetPath\$name.dll" -Destination "$plug" -Force
     Copy-Item -Path "$TargetPath\$name.pdb" -Destination "$plug" -Force
     Copy-Item -Path "$TargetPath\$name.dll.mdb" -Destination "$plug" -Force
-    
-    # set dnspy debugger env
-    #$dnspy = '--debugger-agent=transport=dt_socket,server=y,address=127.0.0.1:56000,suspend=y,no-hide-debugger'
-    #[Environment]::SetEnvironmentVariable('DNSPY_UNITY_DBG2','','User')
 }
 
 if($Target.Equals("Release")) {
-    Write-Host "Packaging for ThunderStore..."
-    $Package="Package"
+    $Package = "Package"
     $PackagePath="$ProjectPath\$Package"
 
-    Write-Host "$PackagePath\$TargetAssembly"
-    Copy-Item -Path "$TargetPath\$TargetAssembly" -Destination "$PackagePath\plugins\$TargetAssembly" -Force
-    Copy-Item -Path "$ProjectPath\README.md" -Destination "$PackagePath\README.md" -Force
+    $TSPackagePath="$PackagePath\ThunderStore"
+    ("$TSPackagePath/plugins"
+    ) | % {
+        if (!(Test-Path "$_")) {
+            New-Item -Path "$TSPackagePath" -Name "plugins" -ItemType "directory"
+        }
+    }
 
+    Write-Host "Packaging for ThunderStore..."
+    Copy-Item -Path "$TargetPath\$TargetAssembly" -Destination "$TSPackagePath\plugins\$TargetAssembly" -Force
+    Copy-Item -Path "$ProjectPath\README.md" -Destination "$TSPackagePath\README.md" -Force
     Write-Host "Compressing..."
-    $ZipPath="$PackagePath\$name.zip"
-    Compress-Archive -Path "$PackagePath\*" -DestinationPath "$ZipPath" -Force
+    $ZipPath="$TSPackagePath\$name.zip"
+    Compress-Archive -Path "$TSPackagePath\*" -DestinationPath "$ZipPath" -Force
+    Write-Host "$ZipPath"
+
+    $NexusPackagePath="$PackagePath\Nexus"
+    ("$NexusPackagePath"
+    ) | % {
+        if (!(Test-Path "$_")) {
+            New-Item -Path "$PackagePath" -Name "Nexus" -ItemType "directory"
+        }
+    }
+    Write-Host "Packaging for Nexus..."
+    Copy-Item -Path "$TargetPath\$TargetAssembly" -Destination "$NexusPackagePath\$TargetAssembly" -Force
+    Write-Host "Compressing..."
+    $ZipPath="$NexusPackagePath\$name.zip"
+    Compress-Archive -Path "$NexusPackagePath\*" -DestinationPath "$ZipPath" -Force
     Write-Host "$ZipPath"
 }
 

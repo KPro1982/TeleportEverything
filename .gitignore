@@ -3,7 +3,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
-TeleportEverything/Package/*.zip
+TeleportEverything/Package/**/*.zip
+TeleportEverything/Package/**/*.dll
+TeleportEverything/Package/**/*.md
 
 # User-specific files
 *.rsuser

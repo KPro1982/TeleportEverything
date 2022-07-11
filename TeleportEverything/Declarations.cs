@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using BepInEx;
@@ -90,6 +91,7 @@ namespace TeleportEverything
 
             ClearIncludeVars();
             Debug.Log($"{ModName} Loaded...");
+
         }
 
         private void OnDestroy()

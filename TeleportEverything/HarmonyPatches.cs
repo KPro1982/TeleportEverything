@@ -1,4 +1,5 @@
 using HarmonyLib;
+using System;
 using UnityEngine;
 
 namespace TeleportEverything
@@ -82,6 +83,8 @@ namespace TeleportEverything
             }
         }
 
+        //[HarmonyPatch(Type.GetType("TargetPortal.HandlePortalClick"), nameof(Teleport.GetHoverText))]
+
         [HarmonyPatch(typeof(Teleport), nameof(Teleport.GetHoverText))]
         public static class TeleportGetHoverTextPatch
         {
@@ -149,7 +152,8 @@ namespace TeleportEverything
             private static bool Postfix(bool __result, Player __instance, Vector3 pos,
                 Quaternion rot, bool distantTeleport)
             {
-                 if (!EnableMod.Value)
+                Debug.Log(Type.GetType("TargetPortal.Map.HandlePortalClick"));
+                if (!EnableMod.Value)
                 {
                     return __result;
                 }
