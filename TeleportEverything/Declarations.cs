@@ -15,8 +15,9 @@ namespace TeleportEverything
     internal partial class Plugin : BaseUnityPlugin
     {
         internal const string ModName = "TeleportEverything";
-        internal const string ModVersion = "1.6.2";
+        internal const string ModVersion = "1.7.0";
         internal const string Author = "kpro";
+        internal const string ModURL = "https://valheim.thunderstore.io/package/OdinPlus/TeleportEverything/";
         private const string ModGUID = "com."+ Author + "." + ModName;
 
         private static string ConfigFileName = ModGUID + ".cfg";
@@ -77,6 +78,7 @@ namespace TeleportEverything
         public static bool ExcludeNamed;
 
         public static bool TeleportTriggered;
+        public static bool IsDungeonTeleport;
 
         private void Awake()
         {
@@ -88,6 +90,7 @@ namespace TeleportEverything
             Allies = new List<Character>();
 
             TeleportTriggered = false;
+            IsDungeonTeleport = false;
 
             ClearIncludeVars();
             Debug.Log($"{ModName} Loaded...");

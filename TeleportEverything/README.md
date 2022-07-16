@@ -88,6 +88,7 @@ To make it work properly you will need some other mods or tools called dependenc
   - (If your vertical tolerance is low, you may not be able to transport a flying drake)
 - MapTeleport: ![YES]
 - FastTeleport: ![YES]
+- TargetPortal: ![YES]
 
 <p>
   <p align="center"><h2>For Questions or Comments find Elg or KPro in the Odin Plus Team on Discord:</h2></p>
@@ -96,9 +97,11 @@ To make it work properly you will need some other mods or tools called dependenc
 </p>
 
 ## Changelog
+- Version 1.7.0
+  - Added tax compatibility when using TargetPortal mod
 - Version 1.6.2
-  - fix tax to deduct from total number of ores instead of each stack
-  - fix tax to apply also to quantities less than the tax
+  - Fixed tax to deduct from total number of ores instead of each stack
+  - Fixed tax to apply also to quantities less than the tax
 - Version 1.6.1
   - Add height check to prevent creatures from getting stuck in crypts
 - Version 1.6

@@ -52,38 +52,35 @@ namespace TeleportEverything
             }
         }
 
-        [HarmonyPatch(typeof(TeleportWorld))]
-        [HarmonyPatch(nameof(TeleportWorld.Teleport))]
-        public class TeleportWorldTeleportPatch
+        [HarmonyPatch(typeof(Teleport), nameof(Teleport.Interact))]
+        public static class TeleportInteractPatch
         {
-            private static void Prefix(ref Player player, TeleportWorld __instance)
+            private static void Prefix(Humanoid character, bool hold, bool alt, Teleport __instance)
             {
                 if (!EnableMod.Value)
                 {
                     return;
                 }
-
-                if (!__instance.TargetFound() || !player.IsTeleportable() || ZoneSystem.instance.GetGlobalKey("noportals")) //avoid fee if player is not teleportable
+                if (hold)
                 {
                     return;
                 }
-
-                if (!TransportOres.Value)
+                if (__instance.m_targetPoint == null)
                 {
                     return;
                 }
+                IsDungeonTeleport = true;
+            }
 
-                if (TransportFee.Value == 0)
+            private static void Postfix()
+            {
+                if (!EnableMod.Value)
                 {
                     return;
                 }
-
-                ReduceStacks(player);
-                RemoveEmptyItems(player);
+                IsDungeonTeleport = false;
             }
         }
-
-        //[HarmonyPatch(Type.GetType("TargetPortal.HandlePortalClick"), nameof(Teleport.GetHoverText))]
 
         [HarmonyPatch(typeof(Teleport), nameof(Teleport.GetHoverText))]
         public static class TeleportGetHoverTextPatch
@@ -152,7 +149,6 @@ namespace TeleportEverything
             private static bool Postfix(bool __result, Player __instance, Vector3 pos,
                 Quaternion rot, bool distantTeleport)
             {
-                Debug.Log(Type.GetType("TargetPortal.Map.HandlePortalClick"));
                 if (!EnableMod.Value)
                 {
                     return __result;
@@ -167,7 +163,11 @@ namespace TeleportEverything
                 GetCreatures();
 
                 TeleportTriggered = true;
-                
+                if (!IsDungeonTeleport)
+                {
+                    ApplyTax(__instance);
+                }
+
                 if (Enemies.Count > 0 && TeleportMode.Value.Contains("Take"))
                 {
                     TeleportCreatures(__instance, Enemies, true);

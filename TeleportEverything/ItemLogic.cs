@@ -5,6 +5,27 @@ namespace TeleportEverything
 {
     internal partial class Plugin
     {
+        public static void ApplyTax(Player player)
+        {
+            if (!player.IsTeleportable() || ZoneSystem.instance.GetGlobalKey("noportals")) //avoid fee if player is not teleportable
+            {
+                return;
+            }
+
+            if (!TransportOres.Value)
+            {
+                return;
+            }
+
+            if (TransportFee.Value == 0)
+            {
+                return;
+            }
+
+            ReduceStacks(player);
+            RemoveEmptyItems(player);
+        }
+
         internal static bool IsDragonEgg(ItemDrop.ItemData item) =>
             item.m_dropPrefab.name.Equals("DragonEgg");
 

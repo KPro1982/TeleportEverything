@@ -6,7 +6,7 @@ using TeleportEverything;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle(Plugin.ModName)]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription(Plugin.ModURL)]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany(Plugin.Author)]
 [assembly: AssemblyProduct(Plugin.ModName)]
