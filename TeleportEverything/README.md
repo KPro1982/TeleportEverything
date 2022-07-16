@@ -98,10 +98,10 @@ To make it work properly you will need some other mods or tools called dependenc
 
 ## Changelog
 - Version 1.7.0
-  - add tax compatibility when using TargetPortal mod
+  - Added tax compatibility when using TargetPortal mod
 - Version 1.6.2
-  - fix tax to deduct from total number of ores instead of each stack
-  - fix tax to apply also to quantities less than the tax
+  - Fixed tax to deduct from total number of ores instead of each stack
+  - Fixed tax to apply also to quantities less than the tax
 - Version 1.6.1
   - Add height check to prevent creatures from getting stuck in crypts
 - Version 1.6
