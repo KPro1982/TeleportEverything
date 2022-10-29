@@ -20,8 +20,8 @@ namespace TeleportEverything
         internal const string ModURL = "https://valheim.thunderstore.io/package/OdinPlus/TeleportEverything/";
         private const string ModGUID = "com."+ Author + "." + ModName;
 
-        private static string ConfigFileName = ModGUID + ".cfg";
-        private static string ConfigFileFullPath = Paths.ConfigPath + Path.DirectorySeparatorChar + ConfigFileName;
+        private const string ConfigFileName = ModGUID + ".cfg";
+        private static readonly string ConfigFileFullPath = Paths.ConfigPath + Path.DirectorySeparatorChar + ConfigFileName;
 
         private readonly Harmony _harmony = new(ModGUID);
 
@@ -44,7 +44,7 @@ namespace TeleportEverything
         public static ConfigEntry<bool>? TransportBoar;
         public static ConfigEntry<bool>? TransportLox;
 
-        //Enemies
+        // Transport Enemies
         public static ConfigEntry<int>? SpawnEnemiesForwardOffset;
         public static ConfigEntry<int>? EnemySpawnRadius;
         public const float UP_OFFSET = .5f;
@@ -196,7 +196,7 @@ namespace TeleportEverything
                     new AcceptableValueRange<int>(0, 100),
                     new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }));
             RemoveTransportFeeFrom = config("--- Transport Items ---", "Remove Transport fee from", "DragonEgg",
-                new ConfigDescription("Add the prefab names to exclude items from being taxed on the server (you can use regex)", null,
+                new ConfigDescription("Add the prefab names to remove fee from items on the server", null,
                     new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));          
         }
         #endregion
@@ -214,7 +214,8 @@ namespace TeleportEverything
         public static void SetIncludeMode()
         {
             ClearIncludeVars();
-           
+
+            if (IncludeMode is null) return;
             if (!IncludeMode.Value.Contains("No Allies"))
             {
                 TransportAllies = true;

@@ -19,7 +19,7 @@ namespace TeleportEverything
             }
 
             List<Regex> maskList = CommaSeparatedStringToList(mask);
-            var isInMask = maskList.Where(name => name.IsMatch(prefabName)).FirstOrDefault();
+            var isInMask = maskList.FirstOrDefault(name => name.IsMatch(prefabName));
 
             return isInMask != null;
         }
@@ -96,7 +96,7 @@ namespace TeleportEverything
                 TakeOwnership(c, ZDOMan.instance.GetMyID());
 
                 var forward = player.m_teleportTargetRot * Vector3.forward;
-                SetPositionAttempt(c, player.m_teleportTargetPos, player.m_teleportTargetRot, forward, hasEnemies, creatures.Count);
+                SetPositionAttempt(c, player.m_teleportTargetPos, player.m_teleportTargetRot, forward, hasEnemies);
             }
 
             if (placedEnemies > 0)
@@ -116,11 +116,12 @@ namespace TeleportEverything
             }
         }
 
-        private static void SetPositionAttempt(Character c, Vector3 destination, Quaternion rotation, Vector3 forward, bool hasEnemies, int creaturesCount)
+        private static void SetPositionAttempt(Character c, Vector3 destination, Quaternion rotation, Vector3 forward, bool hasEnemies)
         {
             var radius = EnemySpawnRadius.Value;
             var tries = 1;
-            var offset = GetSpawnOffset(forward, radius, hasEnemies);
+            var offset = GetSpawnOffset(c, forward, radius, hasEnemies);
+
             while (tries <= 5)
             {
                 var newPosition = destination;
@@ -150,9 +151,17 @@ namespace TeleportEverything
             return new Vector3(random.x, 0, random.y);
         }
 
-        private static Vector3 GetSpawnOffset(Vector3 forward, int radius, bool hasEnemies)
+        private static Vector3 GetSpawnOffset(Character c, Vector3 forward, int radius, bool hasEnemies)
         {
-            var spawnForward = (hasEnemies) ? SpawnEnemiesForwardOffset.Value + radius / 2 : SpawnForwardOffset.Value;
+            var alliesOffset = SpawnForwardOffset.Value;
+            if (!hasEnemies)
+            {
+                if (GetPrefabName(c).Equals("Lox".ToLower()))
+                {
+                    alliesOffset = alliesOffset < 4 ? 4 : alliesOffset;
+                }
+            }
+            var spawnForward = (hasEnemies) ? SpawnEnemiesForwardOffset.Value + radius / 2 : alliesOffset;
             return forward * spawnForward;
         }
 

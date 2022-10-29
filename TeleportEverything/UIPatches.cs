@@ -7,13 +7,14 @@ namespace TeleportEverything
     {
         public static void DisplayMessage(string msg)
         {
-            if (MessageMode.Value.Equals("top left"))
+            switch (MessageMode.Value)
             {
-                MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft, msg);
-            }
-            else if (MessageMode.Value.Equals("centered"))
-            {
-                MessageHud.instance.ShowMessage(MessageHud.MessageType.Center, msg);
+                case "top left":
+                    MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft, msg);
+                    break;
+                case "centered":
+                    MessageHud.instance.ShowMessage(MessageHud.MessageType.Center, msg);
+                    break;
             }
         }
 
@@ -32,7 +33,7 @@ namespace TeleportEverything
                     return;
                 }
 
-                int width = __instance.GetInventory().GetWidth();
+                var width = __instance.GetInventory().GetWidth();
                 foreach (ItemData item in __instance.GetInventory().GetAllItems())
                 {
                     if (item.m_shared.m_teleportable)
