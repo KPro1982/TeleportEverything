@@ -1,10 +1,29 @@
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace TeleportEverything
 {
     internal partial class Plugin
     {
+        public static List<Regex> CommaSeparatedStringToList(string mask) => 
+            mask.Split(',').Select(p => new Regex("\\b"+p.Trim().ToLower()+"\\b", RegexOptions.IgnoreCase)).ToList();
+
+        private static bool IsInMask(string prefabName, string mask)
+
+        {
+            if (string.IsNullOrWhiteSpace(mask))
+            {
+                return false;
+            }
+
+            List<Regex> maskList = CommaSeparatedStringToList(mask);
+            var isInMask = maskList.Where(name => name.IsMatch(prefabName)).FirstOrDefault();
+
+            return isInMask != null;
+        }
+
         public static void GetCreatures()
         {
             var creatures = new List<Character>();
@@ -51,18 +70,6 @@ namespace TeleportEverything
         }
 
         public static float VerticalDistance(Character e) => Mathf.Abs(VectorToEntity(e).y);
-
-        public static void DisplayMessage(string msg)
-        {
-            if (MessageMode.Value.Equals("top left"))
-            {
-                MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft, msg);
-            }
-            else if (MessageMode.Value.Equals("centered"))
-            {
-                MessageHud.instance.ShowMessage(MessageHud.MessageType.Center, msg);
-            }
-        }
 
         public static void DisplayAlliesMessage()
         {
@@ -148,15 +155,6 @@ namespace TeleportEverything
             var spawnForward = (hasEnemies) ? SpawnEnemiesForwardOffset.Value + radius / 2 : SpawnForwardOffset.Value;
             return forward * spawnForward;
         }
-
-        //private static Vector3 RandomInsideSpace(Vector3 newPosition, Vector3 offset, Quaternion rotation)
-        //{
-        //    var wall = FindBlocker(newPosition, Vector3.forward, rotation, 20f);
-        //    var center = Vector3.Lerp(newPosition, wall, 0.5f);
-        //    var radius = Vector3.Distance(center, wall);
-        //    var randomPoint = Random.insideUnitCircle * radius;
-        //    return randomPoint;
-        //}
 
         private static void SetPosition(Component c, Vector3 position, Quaternion rotation)
         {

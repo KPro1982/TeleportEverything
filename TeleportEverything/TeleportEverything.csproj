@@ -57,7 +57,7 @@
       </PropertyGroup>
     </When>
   </Choose>
-  <ItemGroup>    
+  <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -99,6 +99,7 @@
     <Compile Include="ConfigurationManagerAttributes.cs" />
     <Compile Include="CoreLogic.cs" />
     <Compile Include="HarmonyPatches.cs" />
+    <Compile Include="UIPatches.cs" />
     <Compile Include="ItemLogic.cs" />
     <Compile Include="Properties\IgnoreAccessModifiers.cs" />
     <Compile Include="Declarations.cs" />

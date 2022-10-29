@@ -15,7 +15,7 @@ namespace TeleportEverything
     internal partial class Plugin : BaseUnityPlugin
     {
         internal const string ModName = "TeleportEverything";
-        internal const string ModVersion = "1.7.0";
+        internal const string ModVersion = "1.8.0";
         internal const string Author = "kpro";
         internal const string ModURL = "https://valheim.thunderstore.io/package/OdinPlus/TeleportEverything/";
         private const string ModGUID = "com."+ Author + "." + ModName;
@@ -62,6 +62,7 @@ namespace TeleportEverything
         public static ConfigEntry<bool>? TransportDragonEggs;
         public static ConfigEntry<bool>? TransportOres;
         public static ConfigEntry<int>? TransportFee;
+        public static ConfigEntry<string>? RemoveTransportFeeFrom;
 
         //User Settings
         public static ConfigEntry<string>? IncludeMode;
@@ -106,25 +107,43 @@ namespace TeleportEverything
         private void CreateConfigValues()
         {
             //Mod
+            EnableMod = config("--- Mod ---", "Enable Mod", true, "Enable/Disable mod");
             _serverConfigLocked = config("--- Mod ---", "Force Server Config", true, "Force Server Config");
             _ = ConfigSync.AddLockingConfigEntry(_serverConfigLocked);
-            EnableMod = config("--- Mod ---", "Enable Mod", true, "Enable/Disable mod");
-            MessageMode = config("--- Mod ---", "Message Mode", "No messages",
+            MessageMode = config("--- Mod ---", "Message Mode", "top left",
                 new ConfigDescription("Message Mode",
                     new AcceptableValueList<string>("No messages", "top left", "centered")), false);
 
             //Portal
-            PortalSoundVolume = config("--- Portal ---", "Portal Sound Volume", 0.8f,
-                new ConfigDescription("Portal sound effect volume.",
-                    new AcceptableValueRange<float>(0, 1)), false);
-
             PortalActivationRange = config("--- Portal ---", "Portal Activation Range", 5f,
                 new ConfigDescription("Portal activation range in meters.",
                     new AcceptableValueRange<float>(0, 20f),
                     new ConfigurationManagerAttributes { IsAdvanced = true, Order = 8 }), false);
+            PortalSoundVolume = config("--- Portal ---", "Portal Sound Volume", 0.8f,
+                new ConfigDescription("Portal sound effect volume.",
+                    new AcceptableValueRange<float>(0, 1)), false);
+
+
+            // Portal Behavior
+            TeleportMode = config("--- Portal Behavior ---", "Teleport Mode", "Standard",
+                new ConfigDescription("Teleport Mode",
+                    new AcceptableValueList<string>("Standard", "Vikings Don't Run",
+                        "Take Them With You"), new ConfigurationManagerAttributes { IsAdvanced = false, Order = 2 }));
+            SearchRadius = config("--- Portal Behavior ---", "Search Radius", 10f,
+                new ConfigDescription("Radius to search creatures in meters.", null,
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));
+
+            //Server
+            ServerEnableMask = config("--- Server ---", "Server Filter By Mask", false,
+                new ConfigDescription(
+                    "Enable to filter and restrict which tameable creatures can teleport on server.", null,
+                    new ConfigurationManagerAttributes { IsAdvanced = true }));
+            ServerTransportMask = config("--- Server ---", "Server Transport Mask", "",
+                new ConfigDescription("Add the prefab names to filter and restrict which creatures can be teleportable on the server", null,
+                    new ConfigurationManagerAttributes { IsAdvanced = true }));
 
             // Transport
-            IncludeMode = config("--- Transport ---", "Ally Mode", "No Allies",
+            IncludeMode = config("--- Transport ---", "Ally Mode", "Only Follow",
                 new ConfigDescription("Ally Mode",
                     new AcceptableValueList<string>("No Allies", "All tamed", "Only Follow",
                         "All tamed except Named", "Only Named"),
@@ -166,35 +185,19 @@ namespace TeleportEverything
                 new AcceptableValueRange<int>(0, 15),
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));
 
- 
-            //Server
-            ServerEnableMask = config("--- Server ---", "Server Filter By Mask", false,
-                new ConfigDescription(
-                    "Enable to filter and restrict which tameable creatures can teleport on server.", null,
-                    new ConfigurationManagerAttributes { IsAdvanced = true }));
-            ServerTransportMask = config("--- Server ---", "Server Transport Mask", "",
-                new ConfigDescription("Add the prefab names to filter and restrict which creatures can be teleportable on the server", null,
-                    new ConfigurationManagerAttributes { IsAdvanced = true }));
-
             // Transport Items
-            TransportDragonEggs = config("--- Transport Items ---", "Transport Dragon Eggs", false,
+            TransportDragonEggs = config("--- Transport Items ---", "Transport Dragon Eggs", true,
                 new ConfigDescription("Allows transporting dragon eggs."));
-            TransportOres = config("--- Transport Items ---", "Transport Ores", false,
+            TransportOres = config("--- Transport Items ---", "Transport Ores", true,
                 new ConfigDescription(
                     "Allows transporting ores, ingots and other restricted items."));
-            TransportFee = config("--- Transport Items ---", "Transport fee", 10,
+            TransportFee = config("--- Transport Items ---", "Transport fee", 0,
                 new ConfigDescription("Transport Fee in (%) ore",
                     new AcceptableValueRange<int>(0, 100),
-                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));
-
-            // Teleport Self
-            SearchRadius = config("--- Portal Behavior ---", "Search Radius", 10f,
-                new ConfigDescription("", null,
-                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));
-            TeleportMode = config("--- Portal Behavior ---", "Teleport Mode", "Standard",
-                new ConfigDescription("Teleport Mode",
-                    new AcceptableValueList<string>("Standard", "Vikings Don't Run",
-                        "Take Them With You"), new ConfigurationManagerAttributes { IsAdvanced = false, Order = 2 }));            
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }));
+            RemoveTransportFeeFrom = config("--- Transport Items ---", "Remove Transport fee from", "DragonEgg",
+                new ConfigDescription("Add the prefab names to exclude items from being taxed on the server (you can use regex)", null,
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));          
         }
         #endregion
 
