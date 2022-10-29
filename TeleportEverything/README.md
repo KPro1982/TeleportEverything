@@ -7,6 +7,10 @@
 ## About
 
 This mod is intended to add additional excitement and functionality to the portal system. Use it to brings wolves to the fight or use it to lure trolls into a trap!  These modes also work with dungeons! So its possible to bring a wolf into a swamp crypt and for a wraith to follow you into the crypt!
+
+It's recommended to Install a [BepInEx Configuration Manager](https://valheim.thunderstore.io/package/Azumatt/Official_BepInEx_ConfigurationManager/) to be able to change mod configurations in game.
+
+> Note: There are some settings that only appear when you enable the advanced options in your configuration manager.
 ## Features
 
 ### Modes:
@@ -30,10 +34,25 @@ This mod is intended to add additional excitement and functionality to the porta
 ## Usage:
 
 ### **Message Mode**
-You can change the display message mode between: top left, center, or none.
+* You can change the display message mode between: top left, center, or none.
 
-### **Transport Allies**
+### **--- Portal Settings ---**
+* Portal Activation Range(advanced): You can increase or reduce the activation range, 5 meters is the default game value.
+* Portal Sound Volume: You can change it between 0 and 100%. 80% is the default game value.
 
+### **--- Portal Behavior ---**
+#### Teleport Mode
+1. Select the teleport mode. Currently you can select "**Standard**" which will give you vanilla behavior.  "**Vikings don't run**" mode will prevent you from teleporting if mobs are within a search sphere. "**Take them with you**" will give mobs a chance of following you through the portal. If this mode is selected, a dash through the portal with a troll in pursuit may end up in troll fight within your base! Its a super fun mode.
+2. At present, enemies will spawn at a random location forward within 6 meters (default) of the portal.
+
+ #### Search Radius (advanced)
+ * The search radius to search creatures in meters. It is configurable in the **F1** configuration menu.
+
+___
+
+### **--- Transport Allies ---**
+
+#### Ally Mode
 1. Define the ally type that you want to transport using the **F1** configuration menu. There quick check boxes to select wolves, boar, or lox. If you want to filter which animals can be teleportable, enable the filter mask and use the transport mask by typing in the spawn name of the creatures. An example would be "**Greydwarf**" without the quote marks. (In this case, only Greydwarfs would be allowed) You can obtain the list spawn names easily on the web.
 2. Define the Ally Mode from the dropdown list. At present, you can select either: 
    * "No Allies",
@@ -42,36 +61,59 @@ You can change the display message mode between: top left, center, or none.
    * "All tamed except Named", 
    * "Only Named".
 
-Teleport Everything will search for allies within a search cylinder. It should not be necessary but you can configure the radius and height of the search cylinder to meet your needs. For example, you might set the height to 1.5 in order to avoid transporting allies on different levels of your base.
+#### Transport Radius and Vertical Tolerance (advanced)
+* Teleport Everything will search for allies within a search cylinder. It should not be necessary but you can configure the radius and height of the search cylinder to meet your needs. For example, you might set the height to 1.5 in order to avoid transporting allies on different levels of your base.
 
+#### Spawn Forward Tolerance (advanced)
+* Defines how far your allies will spawn in your front in meters. Default 1 meter.
+
+#### User Filter Mask / Server Filter Mask (advanced)
 * Enable Server/Player Filter Mask (advanced): 
-    * If enabled, only the allies in the Transport Mask field will be allowed
-    * If disabled, all tameable allies can be teleportable
-* Server and Player Transport Masks (advanced): accepts comma delimited list of prefab names. E.g.: wolf,lox
+    * If enabled, **only** the allies in the Transport Mask field will be allowed
+    * If disabled, **all tameable** allies can be teleportable
+* Server and Player Transport Masks (advanced): accepts comma delimited list of [prefab names](https://valheim-modding.github.io/Jotunn/data/prefabs/character-list.html). E.g.: wolf,lox (you can also use regex inside this field, e.g.: `human_\w+` will allow all human_1,human_2,human_anything).
 
-### **Teleport Self**
+#### Transport Boars / Lox / Wolves
+* There are 3 checkboxes that players can quickly enable/disable teleporting each creature. Default: all allowed.
 
-1. Select the teleport mode. Currently you can select "**Standard**" which will give you vanilla behavior.  "**Vikings don't run**" mode will prevent you from teleporting if mobs are within a search sphere. The search radius is configurable in the **F1** configuration menu. "**Take them with you**" will give mobs a chance of following you through the portal. If this mode is selected, a dash through the portal with a troll in pursuit may end up in troll fight within your base! Its a super fun mode.
-2. At present, enemies will spawn at a random location forward within 6.2 meters (default) of the portal.
+___
+### **--- Transport Enemies ---** (advanced)
+* These enemies settings are only appliable if "**Take Enemies With You**" is selected in the **Teleport Mode**.
+#### Spawn Enemies Forward Tolerance
+* The min distance that enemies will spawn in front of you when teleported. Default 6 meters.
 
-### **Transport Items**
-If this mode is toggled on, players may transport **ores, ingots, and eggs**. In order to offset the advantage of transporting ores, players may set a **"transport fee"** that deducts a percentage of the contraband ores, ingots.
+#### Max Enemy Spawn Radius
+* The max radius that enemies will spread in front of you when teleported. Default 3 meters.
 
-### **Portal Behavior**
-* Portal Activation Range: You can increase or reduce the activation range, 5 meters is the default game value.
-* Portal Sound Volume: You can change it between 0 and 100%. 80% is the default game value.
+___
+### **--- Transport Items ---**
+#### Transport Dragon Eggs / Transport Ores
+* If toggled on, players may transport **ores, ingots, and eggs**. 
 
-## Install Notes
+#### Transport fee (advanced)
+* In order to offset the advantage of transporting ores, players may set a **"transport fee"** that deducts a percentage of the contraband ores, ingots. For example: a percentage of 10% would take 3 out of 30 ores. Default: 0%.
+* Dragon eggs are not taxed by default, but you can change it in the Remove Fee field.
 
-It is recommended that you install the BepInEx Configuration Manager mod too. This mod will enable you to access the configuration settings simply by hitting F1 and edit your mods configs in game. 
+#### Remove Transport Fee From Items (advanced)
+* You can use the field to Remove the transport fee from specific items using their [prefab names](https://valheim-modding.github.io/Jotunn/data/prefabs/prefab-list.html). 
+By default the fee from the folowing item is removed: `DragonEgg` but you can change it if needed.
 
-You can also define the configuration settings directly in the cfg file which is generated after the first run. BepInEx/config/com.kpro.TeleportEverything.cfg.
-## Manual Installation
+* Advanced: [Regex expressions](regexr.com/70okv) are allowed, for example `boss_crystal_\w+` will remove the fee from any boss_crystal_1,boss_crystal_2,boss_crystal_999... (we automatically add a `\b` in the beggining and end to delimit the strings separated by comma)
 
->Install *BepinEx* per the author's instructions here:https://valheim.thunderstore.io/package/denikson/BepInExPack_Valheim/
->Install BepInEx Configuration Manager
+## Installation Notes
 
->Place ***TeleportEverything.dll*** into your **Bepinex\plugins** folder in valheim.
+1. Install this mod using your Mod Manager
+2. Install BepInEx Configuration Manager: https://valheim.thunderstore.io/package/Azumatt/Official_BepInEx_ConfigurationManager/ (This mod will enable you to access the configuration settings simply by hitting **F1** and editting your mods configs in game)
+
+> You can also define the configuration settings directly in the cfg file which is generated after the first run. (BepInEx/config/com.kpro.TeleportEverything.cfg)
+
+## Manual Installation (Without Mod Manager)
+
+1. Install *BepinEx* per the author's instructions here: https://valheim.thunderstore.io/package/denikson/BepInExPack_Valheim/
+
+2. Install BepInEx Configuration Manager: https://valheim.thunderstore.io/package/Azumatt/Official_BepInEx_ConfigurationManager/
+
+3. Place ***TeleportEverything.dll*** into your **Bepinex\plugins** folder in valheim.
 
 ## Dependencies
 
@@ -82,13 +124,20 @@ To make it work properly you will need some other mods or tools called dependenc
 
 ## Mod Compatibility
 
-- OdinsUndercroft: ![YES]
-- Basement or BasementJVLedition: ![YES]
-- AllTameableHandH: ![YES]
+- ![YES]: OdinsUndercroft
+- ![YES]: Basement or BasementJVLedition
+- ![YES]: AllTameableHandH
   - (If your vertical tolerance is low, you may not be able to transport a flying drake)
-- MapTeleport: ![YES]
-- FastTeleport: ![YES]
-- TargetPortal: ![YES]
+- ![YES]: MapTeleport
+- ![YES]: FastTeleport
+- ![YES]: TargetPortal 
+- ![YES]: Jewelcrafting
+  - If you don't want to tax boss crystals, you can add to the Remove Transport fee field the  following boss crystal regex: `Boss_Crystal_\w+`
+  - Separate by comma if you want to remove from other items, e.g.: `Boss_Crystal_\w+,DragonEgg`
+- ![YES]: Wayshrine 
+- ![PARTIAL]: UnrestrictedPortals
+  - You can use the ore configs from UnrestrictedPortals if you disable Teleport Ore or Dragon Eggs checkboxes from TeleportEverything config.
+  - Item Fees don't work if you are using UnrestrictedPortals configs.
 
 <p>
   <p align="center"><h2>For Questions or Comments find Elg or KPro in the Odin Plus Team on Discord:</h2></p>
@@ -97,6 +146,13 @@ To make it work properly you will need some other mods or tools called dependenc
 </p>
 
 ## Changelog
+- Version 1.8.0
+  - Items in inventory now show transport fee value. Non-teleportable icon removed accordingly
+  - Added partial compatibility to UnrestrictedPortals
+  - Changed the default values to make the mod setup easier
+  - Fixed Masks and added a field to avoid prohibited items from being taxed
+  - Added Regex match to the masks/remove fee fields
+  - Updated ServerSync
 - Version 1.7.0
   - Added tax compatibility when using TargetPortal mod
 - Version 1.6.2
@@ -132,3 +188,4 @@ To make it work properly you will need some other mods or tools called dependenc
   - This is the alpha-version of the mod. Feedback and bug reports are appreciated.
 
 [YES]: https://img.shields.io/badge/YES-success?style=flat-square
+[PARTIAL]: https://img.shields.io/badge/PARTIAL-yellow?style=flat-square

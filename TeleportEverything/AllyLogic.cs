@@ -1,6 +1,5 @@
 
 using System.Collections.Generic;
-using System.Linq;
 
 namespace TeleportEverything
 {
@@ -62,27 +61,12 @@ namespace TeleportEverything
                 return true;
             }
 
-            if (string.IsNullOrWhiteSpace(transportMask))
-            {
-                return false;
-            }
-
-            if (IsInFilterMask(c, transportMask))
+            if (IsInMask(GetPrefabName(c), transportMask))
             {
                 return true;
             }
 
             return false;
-        }
-
-
-        private static bool IsInFilterMask(Character c, string mask)
-
-        {
-            List<string> maskList = mask.Split(',').Select(p => p.Trim().ToLower()).ToList();
-            var isInMask = maskList.FirstOrDefault(s => s.Contains(GetPrefabName(c)));
-
-            return isInMask != null;
         }
 
         public static bool IsTransportable(Character ally)

@@ -1,5 +1,4 @@
 using HarmonyLib;
-using System;
 using UnityEngine;
 
 namespace TeleportEverything
@@ -33,22 +32,20 @@ namespace TeleportEverything
                     {
                         if (!TransportDragonEggs.Value)
                         {
-                            __result = false;
-                            return false;
+                            return true; //go to original method
                         }
                     }
                     else
                     {
                         if (!TransportOres.Value)
                         {
-                            __result = false;
-                            return false;
+                            return true; //go to original method
                         }
                     }
                 }
 
                 __result = true;
-                return false;
+                return false; //skip original method
             }
         }
 

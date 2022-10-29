@@ -27,7 +27,10 @@ namespace TeleportEverything
         }
 
         internal static bool IsDragonEgg(ItemDrop.ItemData item) =>
-            item.m_dropPrefab.name.Equals("DragonEgg");
+            item.m_dropPrefab.name.Equals("DragonEgg"); 
+
+        internal static bool HasFeeRemoved(ItemDrop.ItemData item) =>
+            IsInMask(item.m_dropPrefab.name.ToLower(), RemoveTransportFeeFrom.Value);
 
         internal static void ReduceStacks(Player player)
         {
@@ -37,7 +40,7 @@ namespace TeleportEverything
             //register ore quantities in a dictionary
             foreach (var item in player.GetInventory().GetAllItems())
             {
-                if (item.m_shared.m_teleportable || IsDragonEgg(item))
+                if (item.m_shared.m_teleportable || HasFeeRemoved(item))
                 {
                     continue;
                 }
@@ -58,7 +61,7 @@ namespace TeleportEverything
                 {
                     foreach (var item in player.GetInventory().GetAllItems())
                     {
-                        if (item.m_shared.m_teleportable || IsDragonEgg(item)) continue;
+                        if (item.m_shared.m_teleportable) continue;
                         if (ore.Key != item.m_dropPrefab.name || item.m_stack == 0 || valueToDeduct == 0) continue;
 
                         if (item.m_stack >= valueToDeduct)
