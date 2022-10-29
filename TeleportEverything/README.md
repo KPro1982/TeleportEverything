@@ -147,11 +147,12 @@ To make it work properly you will need some other mods or tools called dependenc
 
 ## Changelog
 - Version 1.8.0
-  - Items in inventory now show transport fee value, non-teleportable icon removed accordingly
+  - Items in inventory now show transport fee value. Non-teleportable icon removed accordingly
   - Added partial compatibility to UnrestrictedPortals
   - Changed the default values to make the mod setup easier
-  - Masks fixed and added a field to avoid prohibited items from being taxed
-  - Now you can use Regex in the masks/remove fee fields
+  - Fixed Masks and added a field to avoid prohibited items from being taxed
+  - Added Regex match to the masks/remove fee fields
+  - Updated ServerSync
 - Version 1.7.0
   - Added tax compatibility when using TargetPortal mod
 - Version 1.6.2
