@@ -156,10 +156,14 @@ namespace TeleportEverything
                     return __result;
                 }
 
+                if (isSkyheimBlink) {
+                    return __result; //skip if is skyheim blink
+                }
+
                 SetIncludeMode();
                 GetCreatures();
-
                 TeleportTriggered = true;
+
                 if (!IsDungeonTeleport)
                 {
                     ApplyTax(__instance);
@@ -225,6 +229,13 @@ namespace TeleportEverything
                 {
                     TeleportTriggered = false;
                     //TeleportEverythingLogger.LogInfo("Teleport ended");
+                    if (totalContrabandCount > 0)
+                    {
+                        DisplayMessage(
+                            $"{deductedContraband} out of {totalContrabandCount} items deducted as a fee for transporting contraband.");
+                        deductedContraband = 0;
+                        totalContrabandCount = 0;
+                    }
                 }
             }
         }

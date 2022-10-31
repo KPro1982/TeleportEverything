@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using BepInEx;
+using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
@@ -12,10 +14,11 @@ using UnityEngine;
 namespace TeleportEverything
 {
     [BepInPlugin(ModGUID, ModName, ModVersion)]
+    [BepInDependency(skyheimName, BepInDependency.DependencyFlags.SoftDependency)]
     internal partial class Plugin : BaseUnityPlugin
     {
         internal const string ModName = "TeleportEverything";
-        internal const string ModVersion = "1.8.0";
+        internal const string ModVersion = "1.9.0";
         internal const string Author = "kpro";
         internal const string ModURL = "https://valheim.thunderstore.io/package/OdinPlus/TeleportEverything/";
         private const string ModGUID = "com."+ Author + "." + ModName;
@@ -84,6 +87,9 @@ namespace TeleportEverything
         private void Awake()
         {
             _harmony.PatchAll();
+
+            CheckAndPatchSkyheim();
+
             CreateConfigValues();
             SetupWatcher();
 
@@ -95,7 +101,6 @@ namespace TeleportEverything
 
             ClearIncludeVars();
             Debug.Log($"{ModName} Loaded...");
-
         }
 
         private void OnDestroy()
