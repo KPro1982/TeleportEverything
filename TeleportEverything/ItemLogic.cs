@@ -5,14 +5,10 @@ namespace TeleportEverything
 {
     internal partial class Plugin
     {
+        internal static int deductedContraband = 0, totalContrabandCount = 0;
         public static void ApplyTax(Player player)
         {
             if (!player.IsTeleportable() || ZoneSystem.instance.GetGlobalKey("noportals")) //avoid fee if player is not teleportable
-            {
-                return;
-            }
-
-            if (!TransportOres.Value)
             {
                 return;
             }
@@ -26,15 +22,28 @@ namespace TeleportEverything
             RemoveEmptyItems(player);
         }
 
-        internal static bool IsDragonEgg(ItemDrop.ItemData item) =>
-            item.m_dropPrefab.name.Equals("DragonEgg"); 
+        internal static string GetItemPrefabName(ItemDrop.ItemData item) => item.m_dropPrefab.name; //item name, no use of tolower here
 
-        internal static bool HasFeeRemoved(ItemDrop.ItemData item) =>
-            IsInMask(item.m_dropPrefab.name.ToLower(), RemoveTransportFeeFrom.Value);
+        internal static bool IsDragonEgg(ItemDrop.ItemData item)
+        {
+            if (item?.m_dropPrefab == null)
+            {
+                return false;
+            }
+            return GetItemPrefabName(item).Equals("DragonEgg");
+        }
+
+        internal static bool HasFeeRemoved(ItemDrop.ItemData item)
+        {
+            if (item?.m_dropPrefab == null)
+            {
+                return false;
+            }
+            return IsInMask(item.m_dropPrefab.name, RemoveTransportFeeFrom.Value);
+        }
 
         internal static void ReduceStacks(Player player)
         {
-            int deductedCount = 0, totalCount = 0;
             var ores = new Dictionary<string, int>();
 
             //register ore quantities in a dictionary
@@ -45,9 +54,8 @@ namespace TeleportEverything
                     continue;
                 }
 
-                AddOrCreateKey(ores, item.m_dropPrefab.name, item.m_stack);
-
-                totalCount += item.m_stack;
+                AddOrCreateKey(ores, GetItemPrefabName(item), item.m_stack);
+                totalContrabandCount += item.m_stack;
             }
 
             //deduct from inventory
@@ -62,7 +70,7 @@ namespace TeleportEverything
                     foreach (var item in player.GetInventory().GetAllItems())
                     {
                         if (item.m_shared.m_teleportable) continue;
-                        if (ore.Key != item.m_dropPrefab.name || item.m_stack == 0 || valueToDeduct == 0) continue;
+                        if (!GetItemPrefabName(item).Equals(ore.Key) || item.m_stack == 0 || valueToDeduct == 0) continue;
 
                         if (item.m_stack >= valueToDeduct)
                         {
@@ -78,15 +86,9 @@ namespace TeleportEverything
                         }
                     }
                 }
-                deductedCount += deducted;
+                deductedContraband += deducted;
                 TeleportEverythingLogger.LogInfo(
                     $"{deducted} out of {ore.Value} {ore.Key} deducted as a fee for transporting contraband.");
-            }
-
-            if (totalCount > 0)
-            {
-                DisplayMessage(
-                    $"{deductedCount} out of {totalCount} items deducted as a fee for transporting contraband.");
             }
         }
 

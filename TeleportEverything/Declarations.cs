@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using BepInEx;
@@ -12,10 +11,11 @@ using UnityEngine;
 namespace TeleportEverything
 {
     [BepInPlugin(ModGUID, ModName, ModVersion)]
+    [BepInDependency(skyheimGUID, BepInDependency.DependencyFlags.SoftDependency)]
     internal partial class Plugin : BaseUnityPlugin
     {
         internal const string ModName = "TeleportEverything";
-        internal const string ModVersion = "1.8.0";
+        internal const string ModVersion = "1.9.0";
         internal const string Author = "kpro";
         internal const string ModURL = "https://valheim.thunderstore.io/package/OdinPlus/TeleportEverything/";
         private const string ModGUID = "com."+ Author + "." + ModName;
@@ -78,24 +78,24 @@ namespace TeleportEverything
         public static bool IncludeFollow;
         public static bool ExcludeNamed;
 
-        public static bool TeleportTriggered;
-        public static bool IsDungeonTeleport;
+        public static bool TeleportTriggered = false;
+        public static bool IsDungeonTeleport = false;
+        public static bool ShowVikingsDontRun = false;
 
         private void Awake()
         {
             _harmony.PatchAll();
+
+            CheckAndPatchSkyheim();
+
             CreateConfigValues();
             SetupWatcher();
 
             Enemies = new List<Character>();
             Allies = new List<Character>();
 
-            TeleportTriggered = false;
-            IsDungeonTeleport = false;
-
             ClearIncludeVars();
             Debug.Log($"{ModName} Loaded...");
-
         }
 
         private void OnDestroy()

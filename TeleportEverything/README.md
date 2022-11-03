@@ -1,4 +1,4 @@
-﻿
+
 # TeleportEverything
  > Produced by: Kpro and Elg
 
@@ -135,6 +135,7 @@ To make it work properly you will need some other mods or tools called dependenc
   - If you don't want to tax boss crystals, you can add to the Remove Transport fee field the  following boss crystal regex: `Boss_Crystal_\w+`
   - Separate by comma if you want to remove from other items, e.g.: `Boss_Crystal_\w+,DragonEgg`
 - ![YES]: Wayshrine 
+- ![YES]: Skyheim 
 - ![PARTIAL]: UnrestrictedPortals
   - You can use the ore configs from UnrestrictedPortals if you disable Teleport Ore or Dragon Eggs checkboxes from TeleportEverything config.
   - Item Fees don't work if you are using UnrestrictedPortals configs.
@@ -146,6 +147,10 @@ To make it work properly you will need some other mods or tools called dependenc
 </p>
 
 ## Changelog
+- Version 1.9.0
+  - Added compatibility to Skyheim
+  - Fixed allies and enemies messages
+  - Fixed inventory/crafting UI
 - Version 1.8.0
   - Items in inventory now show transport fee value. Non-teleportable icon removed accordingly
   - Added partial compatibility to UnrestrictedPortals

@@ -19,7 +19,7 @@ namespace TeleportEverything
             }
 
             List<Regex> maskList = CommaSeparatedStringToList(mask);
-            var isInMask = maskList.FirstOrDefault(name => name.IsMatch(prefabName));
+            var isInMask = maskList.FirstOrDefault(name => name.IsMatch(prefabName.ToLower()));
 
             return isInMask != null;
         }

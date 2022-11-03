@@ -98,6 +98,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AllyLogic.cs" />
+    <Compile Include="CompatibilitySkyheim.cs" />
     <Compile Include="ConfigurationManagerAttributes.cs" />
     <Compile Include="CoreLogic.cs" />
     <Compile Include="HarmonyPatches.cs" />
