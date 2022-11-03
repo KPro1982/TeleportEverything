@@ -8,34 +8,52 @@ namespace TeleportEverything
     {
         #region SkyheimCompatibility
 
-        internal const string skyheimName = "skyheim";
-        internal static bool isSkyheimBlink = false;
+        internal const string skyheimGUID = "skyheim";
+        internal static bool skyheimAvoidCreatures = false;
 
         private void CheckAndPatchSkyheim()
         {
-            if (!Chainloader.PluginInfos.ContainsKey(skyheimName)) return;
+            if (!Chainloader.PluginInfos.ContainsKey(skyheimGUID)) return;
 
-            var blinkClass = Type.GetType("SkyheimAttackBlink, skyheim");
+            var blinkClass = Type.GetType($"SkyheimAttackBlink, skyheim");
             if (blinkClass != null)
             {
                 try
                 {
                     var method = AccessTools.Method(blinkClass, "OnAttackTrigger");
                     _harmony.Patch(method,
-                        new HarmonyMethod(AccessTools.Method(typeof(Plugin), nameof(SkyheimBlinkPrefix))),
-                        new HarmonyMethod(AccessTools.Method(typeof(Plugin), nameof(SkyheimBlinkPostfix)))
+                        new HarmonyMethod(AccessTools.Method(typeof(Plugin), nameof(SkyheimMethodPrefix))),
+                        new HarmonyMethod(AccessTools.Method(typeof(Plugin), nameof(SkyheimMethodPostfix)))
                     );
-                    TeleportEverythingLogger.LogInfo("Skyheim settings applied");
+                    TeleportEverythingLogger.LogInfo("Skyheim blink settings applied");
                 }
                 catch (Exception ex)
                 {
-                    TeleportEverythingLogger.LogInfo($"Failed to apply settings to skyheim: {ex.Message}");
+                    TeleportEverythingLogger.LogInfo($"Failed to apply blink settings to skyheim: {ex.Message}");
+                }
+            }
+
+            var recallClass = Type.GetType($"SkyheimAttackRecall, skyheim");
+            if (recallClass != null)
+            {
+                try
+                {
+                    var method = AccessTools.Method(recallClass, "OnAttackStart");
+                    _harmony.Patch(method,
+                        new HarmonyMethod(AccessTools.Method(typeof(Plugin), nameof(SkyheimMethodPrefix))),
+                        new HarmonyMethod(AccessTools.Method(typeof(Plugin), nameof(SkyheimMethodPostfix)))
+                    );
+                    TeleportEverythingLogger.LogInfo("Skyheim recall settings applied");
+                }
+                catch (Exception ex)
+                {
+                    TeleportEverythingLogger.LogInfo($"Failed to apply recall settings to skyheim: {ex.Message}");
                 }
             }
         }
 
-        private static void SkyheimBlinkPrefix() => isSkyheimBlink = true;
-        private static void SkyheimBlinkPostfix() => isSkyheimBlink = false;
+        private static void SkyheimMethodPrefix() => skyheimAvoidCreatures = true;
+        private static void SkyheimMethodPostfix() => skyheimAvoidCreatures = false;
 
         [HarmonyPatch(typeof(Game), nameof(Game._RequestRespawn))]
         public class _RequestRespawn_Patch

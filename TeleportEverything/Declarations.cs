@@ -1,9 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using BepInEx;
-using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
@@ -14,7 +11,7 @@ using UnityEngine;
 namespace TeleportEverything
 {
     [BepInPlugin(ModGUID, ModName, ModVersion)]
-    [BepInDependency(skyheimName, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(skyheimGUID, BepInDependency.DependencyFlags.SoftDependency)]
     internal partial class Plugin : BaseUnityPlugin
     {
         internal const string ModName = "TeleportEverything";
@@ -81,8 +78,9 @@ namespace TeleportEverything
         public static bool IncludeFollow;
         public static bool ExcludeNamed;
 
-        public static bool TeleportTriggered;
-        public static bool IsDungeonTeleport;
+        public static bool TeleportTriggered = false;
+        public static bool IsDungeonTeleport = false;
+        public static bool ShowVikingsDontRun = false;
 
         private void Awake()
         {
@@ -95,9 +93,6 @@ namespace TeleportEverything
 
             Enemies = new List<Character>();
             Allies = new List<Character>();
-
-            TeleportTriggered = false;
-            IsDungeonTeleport = false;
 
             ClearIncludeVars();
             Debug.Log($"{ModName} Loaded...");

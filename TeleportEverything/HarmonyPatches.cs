@@ -111,10 +111,20 @@ namespace TeleportEverything
                 {
                     return __result;
                 }
+
+                if (ShowVikingsDontRun)
+                {
+                    ShowVikingsDontRun = false;
+                }
                 
                 if (!__result) //if player inventory teleportable is false
                 {
                     return __result;
+                }
+
+                if (skyheimAvoidCreatures)
+                {
+                    return __result; //skip if it is skyheim blink/recall
                 }
 
                 SetIncludeMode();
@@ -126,9 +136,7 @@ namespace TeleportEverything
                 {
                     if (TeleportMode.Value.Contains("Run"))
                     {
-                        DisplayMessage(
-                            $"Vikings Don't run from a fight: {Enemies.Count} enemies with in {SearchRadius.Value} meters.");
-
+                        ShowVikingsDontRun = true;
                         return false;
                     }
 
@@ -139,6 +147,23 @@ namespace TeleportEverything
             }
         }
 
+        [HarmonyPatch(typeof(TeleportWorld), nameof(TeleportWorld.Teleport))]
+        public class TeleportWorldTeleport_Patch
+        {
+            static void Postfix()
+            {
+                if (!EnableMod.Value)
+                {
+                    return;
+                }
+
+                if(ShowVikingsDontRun)
+                {
+                    DisplayMessage(
+                            $"Vikings Don't run from a fight: {Enemies.Count} enemies with in {SearchRadius.Value} meters.");
+                }
+            }
+        }
 
         [HarmonyPatch(typeof(Player), nameof(Player.TeleportTo))]
         public class TeleportToPatch
@@ -156,8 +181,8 @@ namespace TeleportEverything
                     return __result;
                 }
 
-                if (isSkyheimBlink) {
-                    return __result; //skip if is skyheim blink
+                if (skyheimAvoidCreatures) {
+                    return __result; //skip if it is skyheim blink/recall
                 }
 
                 SetIncludeMode();

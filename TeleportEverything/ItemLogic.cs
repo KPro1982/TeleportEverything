@@ -24,11 +24,23 @@ namespace TeleportEverything
 
         internal static string GetItemPrefabName(ItemDrop.ItemData item) => item.m_dropPrefab.name; //item name, no use of tolower here
 
-        internal static bool IsDragonEgg(ItemDrop.ItemData item) =>
-            GetItemPrefabName(item).Equals("DragonEgg"); 
+        internal static bool IsDragonEgg(ItemDrop.ItemData item)
+        {
+            if (item?.m_dropPrefab == null)
+            {
+                return false;
+            }
+            return GetItemPrefabName(item).Equals("DragonEgg");
+        }
 
-        internal static bool HasFeeRemoved(ItemDrop.ItemData item) =>
-            IsInMask(item.m_dropPrefab.name, RemoveTransportFeeFrom.Value);
+        internal static bool HasFeeRemoved(ItemDrop.ItemData item)
+        {
+            if (item?.m_dropPrefab == null)
+            {
+                return false;
+            }
+            return IsInMask(item.m_dropPrefab.name, RemoveTransportFeeFrom.Value);
+        }
 
         internal static void ReduceStacks(Player player)
         {

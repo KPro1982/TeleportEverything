@@ -36,7 +36,7 @@ namespace TeleportEverything
                 var width = __instance.GetInventory().GetWidth();
                 foreach (ItemData item in __instance.GetInventory().GetAllItems())
                 {
-                    if (item.m_shared.m_teleportable)
+                    if(item?.m_shared == null || item.m_shared.m_teleportable == true)
                     {
                         continue;
                     }
@@ -66,7 +66,15 @@ namespace TeleportEverything
                 {
                     return;
                 }
-                if (item.m_shared.m_teleportable)
+                if (item?.m_dropPrefab == null)
+                {
+                    if (TransportOres.Value)
+                    {
+                        __result = __result.Replace("\n<color=orange>$item_noteleport</color>", "");
+                    }
+                    return;
+                }
+                if (item?.m_shared == null || item.m_shared.m_teleportable == true)
                 {
                     return;
                 }
