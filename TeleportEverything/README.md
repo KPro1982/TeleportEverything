@@ -100,6 +100,14 @@ By default the fee from the folowing item is removed: `DragonEgg` but you can ch
 
 * Advanced: [Regex expressions](regexr.com/70okv) are allowed, for example `boss_crystal_\w+` will remove the fee from any boss_crystal_1,boss_crystal_2,boss_crystal_999... (we automatically add a `\b` in the beggining and end to delimit the strings separated by comma)
 
+## Translations
+If you want to add your own translation locally, you can create a file based on the [English.yml template](https://cdn.discordapp.com/attachments/957320383424503949/1040075435674968094/English.yml) anywhere inside of the Bepinex folder with the name: 
+`TeleportEverything.Language.yml`. For example, the file for a Spanish translation would be: `TeleportEverything.Spanish.yml`
+
+You can find Valheim's Languages list [here](https://valheim-modding.github.io/Jotunn/data/localization/language-list.html).
+
+Currently we have these translations in the mod: `English, French, German, Portuguese_Brazilian and Russian`. You can send me your translation on odin plus discord if you want it added to the mod and available to other players in a later release.
+
 ## Installation Notes
 
 1. Install this mod using your Mod Manager
@@ -147,6 +155,8 @@ To make it work properly you will need some other mods or tools called dependenc
 </p>
 
 ## Changelog
+- Version 2.0.0
+  - Added translations
 - Version 1.9.0
   - Added compatibility to Skyheim
   - Fixed allies and enemies messages

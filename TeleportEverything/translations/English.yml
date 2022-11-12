@@ -1,0 +1,8 @@
+te_transporting_allies_message: "Transporting $1 allies!"
+te_transported_allies_message: "Transported $1 allies. Transport allies enabled: $2."
+te_transporting_enemies_message: "Beware: $1 enemies may charge the portal!"
+te_transported_enemies_message: "Taking Enemies With You! $1 enemies charge the portal!!!"
+te_vikings_dont_run: "Vikings Don't run from a fight: $1 enemies with in $2 meters."
+te_deducted_items_message: "$1 out of $2 items deducted as a fee for transporting contraband."
+te_deducted_items_detailed_message: "$1 out of $2 $3 deducted as a fee for transporting contraband."
+te_item_transport_fee: "Transport Fee: <color=orange>$1%</color>"

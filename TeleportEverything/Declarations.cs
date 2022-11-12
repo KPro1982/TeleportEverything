@@ -4,6 +4,7 @@ using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
+using LocalizationManager;
 using ServerSync;
 using UnityEngine;
 
@@ -15,7 +16,7 @@ namespace TeleportEverything
     internal partial class Plugin : BaseUnityPlugin
     {
         internal const string ModName = "TeleportEverything";
-        internal const string ModVersion = "1.9.0";
+        internal const string ModVersion = "2.0.0";
         internal const string Author = "kpro";
         internal const string ModURL = "https://valheim.thunderstore.io/package/OdinPlus/TeleportEverything/";
         private const string ModGUID = "com."+ Author + "." + ModName;
@@ -84,6 +85,8 @@ namespace TeleportEverything
 
         private void Awake()
         {
+            Localizer.Load();
+
             _harmony.PatchAll();
 
             CheckAndPatchSkyheim();

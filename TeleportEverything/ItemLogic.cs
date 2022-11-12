@@ -23,6 +23,7 @@ namespace TeleportEverything
         }
 
         internal static string GetItemPrefabName(ItemDrop.ItemData item) => item.m_dropPrefab.name; //item name, no use of tolower here
+        internal static string GetItemTranslatedName(ItemDrop.ItemData item) => Localization.instance.Localize(item.m_shared.m_name);
 
         internal static bool IsDragonEgg(ItemDrop.ItemData item)
         {
@@ -54,7 +55,7 @@ namespace TeleportEverything
                     continue;
                 }
 
-                AddOrCreateKey(ores, GetItemPrefabName(item), item.m_stack);
+                AddOrCreateKey(ores, GetItemTranslatedName(item), item.m_stack);
                 totalContrabandCount += item.m_stack;
             }
 
@@ -70,7 +71,7 @@ namespace TeleportEverything
                     foreach (var item in player.GetInventory().GetAllItems())
                     {
                         if (item.m_shared.m_teleportable) continue;
-                        if (!GetItemPrefabName(item).Equals(ore.Key) || item.m_stack == 0 || valueToDeduct == 0) continue;
+                        if (!GetItemTranslatedName(item).Equals(ore.Key) || item.m_stack == 0 || valueToDeduct == 0) continue;
 
                         if (item.m_stack >= valueToDeduct)
                         {
@@ -88,7 +89,9 @@ namespace TeleportEverything
                 }
                 deductedContraband += deducted;
                 TeleportEverythingLogger.LogInfo(
-                    $"{deducted} out of {ore.Value} {ore.Key} deducted as a fee for transporting contraband.");
+                    Localization.instance.Localize("$te_deducted_items_detailed_message",
+                    deducted.ToString(), ore.Value.ToString(), ore.Key)
+                );
             }
         }
 

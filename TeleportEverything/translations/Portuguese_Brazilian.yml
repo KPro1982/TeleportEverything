@@ -1,0 +1,8 @@
+te_transporting_allies_message: "Teletransportando $1 aliados!"
+te_transported_allies_message: "$1 aliados teletransportados. Teletransporte de aliados ativo: $2."
+te_transporting_enemies_message: "Cuidado: $1 inimigos podem te seguir pelo portal!"
+te_transported_enemies_message: "Levando inimigos com você! $1 inimigos te seguiram pelo portal!!!"
+te_vikings_dont_run: "Vikings não fogem de briga: $1 inimigos dentro de $2 metros."
+te_deducted_items_message: "$1 de $2 itens deduzidos como taxa de transporte de contrabando."
+te_deducted_items_detailed_message: "$1 de $2 $3 deduzidos como taxa de transporte de contrabando."
+te_item_transport_fee: "Taxa de transporte: <color=orange>$1%</color>"

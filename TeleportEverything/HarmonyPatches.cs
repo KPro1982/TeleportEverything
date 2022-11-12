@@ -159,8 +159,7 @@ namespace TeleportEverything
 
                 if(ShowVikingsDontRun)
                 {
-                    DisplayMessage(
-                            $"Vikings Don't run from a fight: {Enemies.Count} enemies with in {SearchRadius.Value} meters.");
+                    DisplayMessage(Localization.instance.Localize("$te_vikings_dont_run", Enemies.Count.ToString(), SearchRadius.Value.ToString()));
                 }
             }
         }
@@ -199,7 +198,7 @@ namespace TeleportEverything
                     TeleportCreatures(__instance, Enemies, true);
                 }
 
-                TeleportEverythingLogger.LogInfo($"Allies: {Allies.Count} and Transport: {TransportAllies}");
+                TeleportEverythingLogger.LogInfo(Localization.instance.Localize("$te_transported_allies_message", Allies.Count.ToString(), TransportAllies.ToString()));
                 if (Allies.Count > 0 && TransportAllies)
                 {
                     TeleportCreatures(__instance, Allies);
@@ -256,8 +255,7 @@ namespace TeleportEverything
                     //TeleportEverythingLogger.LogInfo("Teleport ended");
                     if (totalContrabandCount > 0)
                     {
-                        DisplayMessage(
-                            $"{deductedContraband} out of {totalContrabandCount} items deducted as a fee for transporting contraband.");
+                        DisplayMessage(Localization.instance.Localize("$te_deducted_items_message", deductedContraband.ToString(), totalContrabandCount.ToString()));
                         deductedContraband = 0;
                         totalContrabandCount = 0;
                     }

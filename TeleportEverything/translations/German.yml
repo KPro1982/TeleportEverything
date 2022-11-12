@@ -1,0 +1,8 @@
+te_transporting_allies_message: "Transportiere $1 verbündete/n!"
+te_transported_allies_message: "$1 verbündete/n transportiert. Transportieren von verbündeten aktiviert: $2."
+te_transporting_enemies_message: "Achtung: $1 gegner ist in der nähe des Portals!"
+te_transported_enemies_message: "Achtung $1 gegner folgen dir duchs Portal!!!"
+te_vikings_dont_run: "Wikinger stellt euch den feinden: $1 gegner in $2 metern reichweite des Portals."
+te_deducted_items_message: "$1 von $2 items bezahlt als transportkosten."
+te_deducted_items_detailed_message: "$1 von $2 $3 items bezahlt als transportkosten."
+te_item_transport_fee: "Trasportgebür in form von: <color=orange>$1%</color> bezahlt"
