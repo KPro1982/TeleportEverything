@@ -136,6 +136,7 @@
     <EmbeddedResource Include="translations\Russian.yml" />
     <EmbeddedResource Include="translations\French.yml" />
     <EmbeddedResource Include="translations\German.yml" />
+    <EmbeddedResource Include="translations\Spanish.yml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ServerSync.dll">

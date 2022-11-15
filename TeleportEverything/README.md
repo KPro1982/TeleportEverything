@@ -106,7 +106,7 @@ If you want to add your own translation locally, you can create a file based on 
 
 You can find Valheim's Languages list [here](https://valheim-modding.github.io/Jotunn/data/localization/language-list.html).
 
-Currently we have these translations in the mod: `English, French, German, Portuguese_Brazilian and Russian`. You can send me your translation on odin plus discord if you want it added to the mod and available to other players in a later release.
+Currently we have these translations in the mod: `English, French, German, Portuguese_Brazilian, Russian and Spanish`. You can send me your translation on odin plus discord if you want it added to the mod and available to other players in a later version.
 
 ## Installation Notes
 
@@ -132,18 +132,18 @@ To make it work properly you will need some other mods or tools called dependenc
 
 ## Mod Compatibility
 
-- ![YES]: OdinsUndercroft
-- ![YES]: Basement or BasementJVLedition
 - ![YES]: AllTameableHandH
   - (If your vertical tolerance is low, you may not be able to transport a flying drake)
-- ![YES]: MapTeleport
+- ![YES]: Basement or BasementJVLedition
 - ![YES]: FastTeleport
-- ![YES]: TargetPortal 
 - ![YES]: Jewelcrafting
   - If you don't want to tax boss crystals, you can add to the Remove Transport fee field the  following boss crystal regex: `Boss_Crystal_\w+`
   - Separate by comma if you want to remove from other items, e.g.: `Boss_Crystal_\w+,DragonEgg`
-- ![YES]: Wayshrine 
-- ![YES]: Skyheim 
+- ![YES]: MapTeleport
+- ![YES]: OdinsUndercroft
+- ![YES]: Skyheim
+- ![YES]: TargetPortal
+- ![YES]: Wayshrine
 - ![PARTIAL]: UnrestrictedPortals
   - You can use the ore configs from UnrestrictedPortals if you disable Teleport Ore or Dragon Eggs checkboxes from TeleportEverything config.
   - Item Fees don't work if you are using UnrestrictedPortals configs.
@@ -156,7 +156,7 @@ To make it work properly you will need some other mods or tools called dependenc
 
 ## Changelog
 - Version 2.0.0
-  - Added translations
+  - Added translations (French, German, Portuguese_Brazilian, Russian and Spanish)
 - Version 1.9.0
   - Added compatibility to Skyheim
   - Fixed allies and enemies messages
