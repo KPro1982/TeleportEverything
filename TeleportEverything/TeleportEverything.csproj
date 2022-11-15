@@ -58,8 +58,20 @@
     </When>
   </Choose>
   <ItemGroup>
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Extensions, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.Extensions.4.1.0\lib\net462\System.Runtime.Extensions.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Runtime.Serialization.Primitives, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.Serialization.Primitives.4.1.1\lib\net46\System.Runtime.Serialization.Primitives.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -68,32 +80,41 @@
     <Reference Include="0Harmony, Version=2.9.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(GamePath)\BepInEx\core\0Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="assembly_utils, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="assembly_guiutils">
+      <HintPath>$(GamePath)\valheim_Data\Managed\publicized_assemblies\assembly_guiutils_publicized.dll</HintPath>
+    </Reference>
+    <Reference Include="assembly_utils">
       <HintPath>$(GamePath)\valheim_Data\Managed\publicized_assemblies\assembly_utils_publicized.dll</HintPath>
     </Reference>
-    <Reference Include="assembly_valheim, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="assembly_valheim">
       <HintPath>$(GamePath)\valheim_Data\Managed\publicized_assemblies\assembly_valheim_publicized.dll</HintPath>
     </Reference>
     <Reference Include="BepInEx, Version=5.4.19.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(GamePath)\BepInEx\core\BepInEx.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="LocalizationManager">
+      <HintPath>LocalizationManager.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
       <HintPath>$(GamePath)\unstripped_corlib\UnityEngine.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="UnityEngine.AudioModule">
       <HintPath>$(GamePath)\unstripped_corlib\UnityEngine.AudioModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="UnityEngine.CoreModule">
       <HintPath>$(GamePath)\unstripped_corlib\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="UnityEngine.PhysicsModule">
       <HintPath>$(GamePath)\unstripped_corlib\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="UnityEngine.UI">
       <HintPath>$(GamePath)\unstripped_corlib\UnityEngine.UI.dll</HintPath>
     </Reference>
-    <Reference Include="ServerSync, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="ServerSync">
       <HintPath>ServerSync.dll</HintPath>
+    </Reference>
+    <Reference Include="YamlDotNet, Version=12.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
+      <HintPath>..\packages\YamlDotNet.12.0.2\lib\net45\YamlDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -110,6 +131,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <EmbeddedResource Include="translations\English.yml" />
+    <EmbeddedResource Include="translations\Portuguese_Brazilian.yml" />
+    <EmbeddedResource Include="translations\Russian.yml" />
+    <EmbeddedResource Include="translations\French.yml" />
+    <EmbeddedResource Include="translations\German.yml" />
+    <EmbeddedResource Include="translations\Spanish.yml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ServerSync.dll">

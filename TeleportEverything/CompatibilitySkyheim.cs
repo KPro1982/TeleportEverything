@@ -74,8 +74,7 @@ namespace TeleportEverything
 
                 if (totalContrabandCount > 0)
                 {
-                    DisplayMessage(
-                        $"{deductedContraband} out of {totalContrabandCount} items deducted as a fee for transporting contraband.");
+                    DisplayMessage(Localization.instance.Localize("$te_deducted_items_message", deductedContraband.ToString(), totalContrabandCount.ToString()));
                     deductedContraband = 0;
                     totalContrabandCount = 0;
                 }

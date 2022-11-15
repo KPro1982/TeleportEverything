@@ -92,7 +92,10 @@ namespace TeleportEverything
                         return;
                     }
                 }
-                __result = __result.Replace("\n<color=orange>$item_noteleport</color>", string.Format("\nTransport Fee: <color=orange>{0}%</color>", HasFeeRemoved(item)?0:TransportFee.Value));
+                __result = __result.Replace("\n<color=orange>$item_noteleport</color>", 
+                    string.Concat("\n", Localization.instance.Localize("$te_item_transport_fee",
+                    HasFeeRemoved(item)?"0":TransportFee.Value.ToString()))
+                );
             }
         }
     }

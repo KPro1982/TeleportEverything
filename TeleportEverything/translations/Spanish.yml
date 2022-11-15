@@ -1,0 +1,8 @@
+te_transporting_allies_message: "Transportando $1 aliados!"
+te_transported_allies_message: "Transportado $1 aliados. Transporte de aliados habilitado: $2."
+te_transporting_enemies_message: "Cuidado: $1 ¡Los enemigos pueden entrar en el portal!"
+te_transported_enemies_message: "Te siguen los enemigos! $1, han entrado en el portal!!!"
+te_vikings_dont_run: "Los vikingos no huyen de una pelea: $1 enemigos en $2 metros."
+te_deducted_items_message: "$1 de $2 artículos deducidos como una tasa para el transporte de contrabando."
+te_deducted_items_detailed_message: "$1 de $2 $3 deducidos como tasa por transporte de contrabando."
+te_item_transport_fee: "Tasa de transporte: <color=orange>$1%</color>"

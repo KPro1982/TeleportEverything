@@ -1,0 +1,8 @@
+te_transporting_allies_message: "Перевозка $1 союзников!"
+te_transported_allies_message: "Перенос союзников: $1. Перенесено союзников: $2."
+te_transporting_enemies_message: "Осторожно: $1 врагов могут атаковать портал!"
+te_transported_enemies_message: "Взять врагов с собой! 1$ врагов атакуют портал!!!"
+te_vikings_dont_run: "Викинги Не бегут от боя: 1$ врагов в $2 м."
+te_deducted_items_message: "$1 из $2 вычитается в качестве платы за перевозку контрабанды."
+te_deducted_items_detailed_message: "1$ из 2$ 3$ вычитается в качестве платы за перевозку контрабанды."
+te_item_transport_fee: "Комиссия за перенос: <color=orange>$1%</color>"

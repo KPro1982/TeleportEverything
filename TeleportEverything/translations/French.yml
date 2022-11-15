@@ -1,0 +1,8 @@
+te_transporting_allies_message: "Vous transportez $1 allié/s!"
+te_transported_allies_message: "$1 allié/s vous ont suivis. Transport d'allié activé : $2."
+te_transporting_enemies_message: "Attention: $1 ennemis pourraient emprunter le portail!"
+te_transported_enemies_message: "Ils vous suivent! $1 ennemi/s charge/nt le portail!!!"
+te_vikings_dont_run: "Un viking ne fuit pas le combat: $1 ennemi/s dans les $2 mètres."
+te_deducted_items_message: "$1 sur $2 déduit comme taxe pour le transport de contrebande."
+te_deducted_items_detailed_message: "$1 sur $2 $3 déduit comme taxe pour le transport de contrebande."
+te_item_transport_fee: "Taxe de transport: <color=orange>$1%</color>"

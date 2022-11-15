@@ -75,7 +75,7 @@ namespace TeleportEverything
         {
             if (TransportAllies && Allies.Count > 0)
             {
-                DisplayMessage($"Transporting {Allies.Count} allies!");
+                DisplayMessage(Localization.instance.Localize("$te_transporting_allies_message", Allies.Count.ToString()));
             }
         }
 
@@ -83,7 +83,7 @@ namespace TeleportEverything
         {
             if (Enemies.Count > 0 && TeleportMode.Value.Contains("Take"))
             {
-                DisplayMessage($"Beware: {Enemies.Count} enemies may charge the portal!");
+                DisplayMessage(Localization.instance.Localize("$te_transporting_enemies_message", Enemies.Count.ToString()));
             }
         }
 
@@ -101,7 +101,7 @@ namespace TeleportEverything
 
             if (placedEnemies > 0)
             {
-                DisplayMessage($"Taking Enemies With You! {placedEnemies} enemies charge the portal!!!");
+                DisplayMessage(Localization.instance.Localize("$te_transported_enemies_message", placedEnemies.ToString()));
             }
         }
 
