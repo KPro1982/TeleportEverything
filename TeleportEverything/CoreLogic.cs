@@ -35,10 +35,12 @@ namespace TeleportEverything
 
        public static bool IsValidEnemy(Character c)
         {
-            if (c.GetComponent<BaseAI>() != null &&
-                c.GetComponent<BaseAI>().IsEnemey(Player.m_localPlayer) && !c.IsTamed())
+            if (BaseAI.IsEnemy(Player.m_localPlayer, c))
             {
-                return true;
+                if (!c.IsTamed())
+                {
+                    return true;
+                }
             }
 
             return false;
@@ -49,9 +51,12 @@ namespace TeleportEverything
             var chars = new List<Character>();
             foreach (var c in creatures)
             {
-                if (IsValidEnemy(c))
+                if (c.GetBaseAI() != null)
                 {
-                    chars.Add(c);
+                    if (IsValidEnemy(c))
+                    {
+                        chars.Add(c);
+                    }
                 }
             }
             return chars;
