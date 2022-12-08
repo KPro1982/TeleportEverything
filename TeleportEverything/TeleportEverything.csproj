@@ -139,6 +139,9 @@
     <EmbeddedResource Include="translations\Spanish.yml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="LocalizationManager.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="ServerSync.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

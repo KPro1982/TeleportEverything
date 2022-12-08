@@ -155,6 +155,8 @@ To make it work properly you will need some other mods or tools called dependenc
 </p>
 
 ## Changelog
+- Version 2.1.0
+  - Mistlands update
 - Version 2.0.0
   - Added translations (French, German, Portuguese_Brazilian, Russian and Spanish)
 - Version 1.9.0

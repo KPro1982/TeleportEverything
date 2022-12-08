@@ -4,6 +4,6 @@
     <!-- Needs to be your path to the base Valheim folder -->
     <GamePath>C:\Program Files (x86)\Steam\steamapps\common\Valheim</GamePath>
     <!-- This is the folder where your build gets copied to when using the post-build automations -->
-    <MOD_DEPLOYPATH>C:\Users\elgdev\AppData\Roaming\Thunderstore Mod Manager\DataFolder\Valheim\profiles\debug\BepInEx\plugins</MOD_DEPLOYPATH>
+    <MOD_DEPLOYPATH>C:\Users\elgdev\AppData\Roaming\r2modmanPlus-local\Valheim\profiles\debug\BepInEx\plugins</MOD_DEPLOYPATH>
   </PropertyGroup>
 </Project>
