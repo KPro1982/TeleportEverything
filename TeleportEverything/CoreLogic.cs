@@ -1,12 +1,15 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace TeleportEverything
 {
     internal partial class Plugin
     {
+        public static string GetPrefabName(Character c) => c.name.Replace("(Clone)", "").ToLower();
         public static List<Regex> CommaSeparatedStringToList(string mask) => 
             mask.Split(',').Select(p => new Regex("\\b"+p.Trim().ToLower()+"\\b", RegexOptions.IgnoreCase)).ToList();
 
@@ -27,23 +30,16 @@ namespace TeleportEverything
         public static void GetCreatures()
         {
             var creatures = new List<Character>();
-            Character.GetCharactersInRange(Player.m_localPlayer.transform.position,
-                SearchRadius.Value, creatures);
+            if (SearchRadius != null)
+                Character.GetCharactersInRange(Player.m_localPlayer.transform.position, SearchRadius.Value, creatures);
             Allies = GetAllies(creatures);
             Enemies = GetEnemies(creatures);
         }
 
        public static bool IsValidEnemy(Character c)
         {
-            if (BaseAI.IsEnemy(Player.m_localPlayer, c))
-            {
-                if (!c.IsTamed())
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            if (c.GetComponent<MonsterAI>()?.IsAlerted() == false) return false;
+            return BaseAI.IsEnemy(Player.m_localPlayer, c) && !c.IsTamed();
         }
 
         public static List<Character> GetEnemies(List<Character> creatures)
@@ -53,13 +49,31 @@ namespace TeleportEverything
             {
                 if (c.GetBaseAI() != null)
                 {
-                    if (IsValidEnemy(c))
+                    if (IsValidEnemy(c) && IsEnemyAllowedInMask(c))
                     {
                         chars.Add(c);
                     }
                 }
             }
             return chars;
+        }
+
+        public static bool IsEnemyAllowedInMask(Character c)
+        {
+            if (EnemiesMaskMode is null || string.IsNullOrEmpty(EnemiesMaskMode.Value)) return true;
+            if (EnemiesTransportMask is null || string.IsNullOrEmpty(EnemiesTransportMask.Value)) return true;
+
+            switch (EnemiesMaskMode.Value.ToLower())
+            {
+                case "block":
+                    if (IsInMask(GetPrefabName(c), EnemiesTransportMask.Value)) return false;
+                    break;
+                case "allow only":
+                    if (!IsInMask(GetPrefabName(c), EnemiesTransportMask.Value)) return false;
+                    break;
+            }
+
+            return true;
         }
         
         public static float CalcDistToEntity(Character e) => VectorToEntity(e).magnitude;
@@ -78,7 +92,7 @@ namespace TeleportEverything
 
         public static void DisplayAlliesMessage()
         {
-            if (TransportAllies && Allies.Count > 0)
+            if (TransportAllies && Allies?.Count > 0)
             {
                 DisplayMessage(Localization.instance.Localize("$te_transporting_allies_message", Allies.Count.ToString()));
             }
@@ -86,7 +100,7 @@ namespace TeleportEverything
 
         public static void DisplayEnemiesMessage()
         {
-            if (Enemies.Count > 0 && TeleportMode.Value.Contains("Take"))
+            if (TeleportMode != null && Enemies?.Count > 0 && TeleportMode.Value.Contains("Take"))
             {
                 DisplayMessage(Localization.instance.Localize("$te_transporting_enemies_message", Enemies.Count.ToString()));
             }
@@ -99,9 +113,7 @@ namespace TeleportEverything
             foreach (Character c in creatures)
             {
                 TakeOwnership(c, ZDOMan.instance.GetMyID());
-
-                var forward = player.m_teleportTargetRot * Vector3.forward;
-                SetPositionAttempt(c, player.m_teleportTargetPos, player.m_teleportTargetRot, forward, hasEnemies);
+                SetPositionAttempt(c, player.m_teleportTargetPos, player.m_teleportTargetRot, hasEnemies);
             }
 
             if (placedEnemies > 0)
@@ -121,11 +133,16 @@ namespace TeleportEverything
             }
         }
 
-        private static void SetPositionAttempt(Character c, Vector3 destination, Quaternion rotation, Vector3 forward, bool hasEnemies)
+        public static bool IsModEnabled()
         {
-            var radius = EnemySpawnRadius.Value;
+            return EnableMod?.Value == true;
+        }
+
+        private static void SetPositionAttempt(Character c, Vector3 destination, Quaternion playerRotation, bool hasEnemies)
+        {
+            var radius = EnemySpawnRadius?.Value ?? 3;
             var tries = 1;
-            var offset = GetSpawnOffset(c, forward, radius, hasEnemies);
+            var offset = GetSpawnOffset(c, playerRotation, radius, hasEnemies);
 
             while (tries <= 5)
             {
@@ -139,7 +156,7 @@ namespace TeleportEverything
                 }
 
                 newPosition.y = placeAt + UP_OFFSET;
-                SetPosition(c, newPosition, rotation);
+                SetPosition(c, newPosition, playerRotation);
                 c.SetLookDir(c.transform.position);
                 if (hasEnemies)
                 {
@@ -156,8 +173,14 @@ namespace TeleportEverything
             return new Vector3(random.x, 0, random.y);
         }
 
-        private static Vector3 GetSpawnOffset(Character c, Vector3 forward, int radius, bool hasEnemies)
+        internal static Vector3 SetForwardOffset(Quaternion rot, float offsetValue)
         {
+            return rot * Vector3.forward * offsetValue;
+        }
+
+        private static Vector3 GetSpawnOffset(Character c, Quaternion playerRotation, int radius, bool hasEnemies)
+        {
+            if (SpawnForwardOffset == null) return SetForwardOffset(playerRotation, 0f);
             var alliesOffset = SpawnForwardOffset.Value;
             if (!hasEnemies)
             {
@@ -166,8 +189,10 @@ namespace TeleportEverything
                     alliesOffset = alliesOffset < 4 ? 4 : alliesOffset;
                 }
             }
+
+            if (SpawnEnemiesForwardOffset == null) return SetForwardOffset(playerRotation, 0f);
             var spawnForward = (hasEnemies) ? SpawnEnemiesForwardOffset.Value + radius / 2 : alliesOffset;
-            return forward * spawnForward;
+            return SetForwardOffset(playerRotation, spawnForward);
         }
 
         private static void SetPosition(Component c, Vector3 position, Quaternion rotation)
@@ -245,6 +270,11 @@ namespace TeleportEverything
         private static float GetCharacterHeight(Character c)
         {
             return c.GetCollider().bounds.size.y;
+        }
+
+        private static bool IsFloatEqual(float first, float second)
+        {
+            return Math.Abs(first - second) < 0.01f;
         }
     }
 }

@@ -24,7 +24,7 @@
 /// You can read more and see examples in the readme at https://github.com/BepInEx/BepInEx.ConfigurationManager
 /// You can optionally remove fields that you won't use from this class, it's the same as leaving them null.
 /// </remarks>
-#pragma warning disable 0169, 0414, 0649, CS8602
+#pragma warning disable 0169, 0414, 0649, CS8602, CS8618
 internal sealed class ConfigurationManagerAttributes
 {
     /// <summary>

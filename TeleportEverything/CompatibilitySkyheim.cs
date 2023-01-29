@@ -8,12 +8,12 @@ namespace TeleportEverything
     {
         #region SkyheimCompatibility
 
-        internal const string skyheimGUID = "skyheim";
-        internal static bool skyheimAvoidCreatures = false;
+        internal const string SkyheimGuid = "skyheim";
+        internal static bool SkyheimAvoidCreatures;
 
         private void CheckAndPatchSkyheim()
         {
-            if (!Chainloader.PluginInfos.ContainsKey(skyheimGUID)) return;
+            if (!Chainloader.PluginInfos.ContainsKey(SkyheimGuid)) return;
 
             var blinkClass = Type.GetType($"SkyheimAttackBlink, skyheim");
             if (blinkClass != null)
@@ -52,15 +52,15 @@ namespace TeleportEverything
             }
         }
 
-        private static void SkyheimMethodPrefix() => skyheimAvoidCreatures = true;
-        private static void SkyheimMethodPostfix() => skyheimAvoidCreatures = false;
+        private static void SkyheimMethodPrefix() => SkyheimAvoidCreatures = true;
+        private static void SkyheimMethodPostfix() => SkyheimAvoidCreatures = false;
 
         [HarmonyPatch(typeof(Game), nameof(Game._RequestRespawn))]
         public class _RequestRespawn_Patch
         {
             static void Prefix()
             {
-                if (!EnableMod.Value) return;
+                if (!IsModEnabled()) return;
 
                 var player = Player.m_localPlayer;
                 if (player is not null && !player.IsDead())
@@ -70,7 +70,7 @@ namespace TeleportEverything
             }
             static void Postfix()
             {
-                if (!EnableMod.Value) return;
+                if (!IsModEnabled()) return;
 
                 if (totalContrabandCount > 0)
                 {

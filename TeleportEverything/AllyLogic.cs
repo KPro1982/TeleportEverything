@@ -14,8 +14,8 @@ namespace TeleportEverything
 
             if (IsAllowedAlly(c) && IsTransportable(c))
             {
-                if (HorizontalDistance(c) <= TransportRadius.Value &&
-                    VerticalDistance(c) <= TransportVerticalTolerance.Value)
+                if (HorizontalDistance(c) <= TransportRadius?.Value &&
+                    VerticalDistance(c) <= TransportVerticalTolerance?.Value)
                 {
                     return true;
                 }
@@ -24,28 +24,17 @@ namespace TeleportEverything
             return false;
         }
 
-        public static string GetPrefabName(Character c) => c?.name.Replace("(Clone)", "").ToLower();
-
         public static bool IsAllowedAlly(Character c)
         {
-            if (GetPrefabName(c).Equals("wolf") && !TransportWolves.Value)
-            {
-                return false;
-            }
-            if (GetPrefabName(c).Equals("boar") && !TransportBoar.Value)
-            {
-                return false;
-            }
-            if (GetPrefabName(c).Equals("lox") && !TransportLox.Value)
-            {
-                return false;
-            }
-            if (!ServerEnableMask.Value && !PlayerEnableMask.Value)
-            {
-                return true;
-            }
-
-            if (IsAllowedInMask(c, ServerEnableMask.Value, ServerTransportMask.Value) &&
+            if (GetPrefabName(c).Equals(WOLF) && TransportWolves?.Value == false) return false;
+            if (GetPrefabName(c).Equals(BOAR) && TransportBoar?.Value == false) return false;
+            if (GetPrefabName(c).Equals(LOX) && TransportLox?.Value == false) return false;
+            
+            if (ServerEnableMask != null &&
+                PlayerTransportMask != null &&
+                PlayerEnableMask != null &&
+                ServerTransportMask != null &&
+                IsAllowedInMask(c, ServerEnableMask.Value, ServerTransportMask.Value) &&
                 IsAllowedInMask(c, PlayerEnableMask.Value, PlayerTransportMask.Value))
             {
                 return true;
@@ -61,12 +50,7 @@ namespace TeleportEverything
                 return true;
             }
 
-            if (IsInMask(GetPrefabName(c), transportMask))
-            {
-                return true;
-            }
-
-            return false;
+            return IsInMask(GetPrefabName(c), transportMask);
         }
 
         public static bool IsTransportable(Character ally)

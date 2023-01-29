@@ -12,11 +12,11 @@ using UnityEngine;
 namespace TeleportEverything
 {
     [BepInPlugin(ModGUID, ModName, ModVersion)]
-    [BepInDependency(skyheimGUID, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(SkyheimGuid, BepInDependency.DependencyFlags.SoftDependency)]
     internal partial class Plugin : BaseUnityPlugin
     {
         internal const string ModName = "TeleportEverything";
-        internal const string ModVersion = "2.1.0";
+        internal const string ModVersion = "2.2.0";
         internal const string Author = "kpro";
         internal const string ModURL = "https://valheim.thunderstore.io/package/OdinPlus/TeleportEverything/";
         private const string ModGUID = "com."+ Author + "." + ModName;
@@ -48,11 +48,14 @@ namespace TeleportEverything
         // Transport Enemies
         public static ConfigEntry<int>? SpawnEnemiesForwardOffset;
         public static ConfigEntry<int>? EnemySpawnRadius;
-        public const float UP_OFFSET = .5f;
+        private const float UP_OFFSET = .5f;
+        public static ConfigEntry<string>? EnemiesMaskMode;
+        public static ConfigEntry<string>? EnemiesTransportMask;
 
         //Portal
         public static ConfigEntry<float>? PortalActivationRange;
         public static ConfigEntry<float>? PortalSoundVolume;
+        public static ConfigEntry<bool>? ShowTransportAnimationScreen;
 
         //Teleport Self
         public static ConfigEntry<float>? SearchRadius;
@@ -71,11 +74,17 @@ namespace TeleportEverything
         public static ConfigEntry<bool>? PlayerEnableMask;
         public static ConfigEntry<string>? PlayerTransportMask;
 
+        //Trasport carts
+        public static ConfigEntry<string>? TransportCartsMode;
+        public static ConfigEntry<bool>? ShouldTaxCarts;
+        public static Vagon? currentAttachedCart = null;
+        internal static bool currrentCartBeingTaxed = false;
+        private const float CART_SIZE = 3f;
+
         // Include vars
         public static bool TransportAllies;
         public static bool IncludeTamed;
         public static bool IncludeNamed;
-        public static bool IncludeWild;
         public static bool IncludeFollow;
         public static bool ExcludeNamed;
 
@@ -83,15 +92,21 @@ namespace TeleportEverything
         public static bool IsDungeonTeleport = false;
         public static bool ShowVikingsDontRun = false;
 
+        // constants
+        private const string LOX = "lox";
+        private const string BOAR = "boar";
+        private const string WOLF = "wolf";
+        private const string DRAGON_EGG = "DragonEgg";
+
         private void Awake()
         {
             Localizer.Load();
 
-            _harmony.PatchAll();
+            CreateConfigValues();
 
             CheckAndPatchSkyheim();
 
-            CreateConfigValues();
+            _harmony.PatchAll();
             SetupWatcher();
 
             Enemies = new List<Character>();
@@ -121,10 +136,11 @@ namespace TeleportEverything
             PortalActivationRange = config("--- Portal ---", "Portal Activation Range", 5f,
                 new ConfigDescription("Portal activation range in meters.",
                     new AcceptableValueRange<float>(0, 20f),
-                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 8 }), false);
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 4 }), false);
             PortalSoundVolume = config("--- Portal ---", "Portal Sound Volume", 0.8f,
-                new ConfigDescription("Portal sound effect volume.",
-                    new AcceptableValueRange<float>(0, 1)), false);
+                new ConfigDescription("Portal sound effect volume (rejoin the session or teleport to a farther portal for the new value to take effect).",
+                    new AcceptableValueRange<float>(0, 1),
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 3 }), false);
 
 
             // Portal Behavior
@@ -181,12 +197,21 @@ namespace TeleportEverything
             SpawnEnemiesForwardOffset = config("--- Transport Enemies ---", "Spawn Enemies Forward Tolerance", 6,
             new ConfigDescription("Min Spawn forward in meters if Take Enemies With you is enabled.",
                 new AcceptableValueRange<int>(0, 12),
-                new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }));
+                new ConfigurationManagerAttributes { IsAdvanced = true, Order = 4 }));
 
             EnemySpawnRadius = config("--- Transport Enemies ---", "Max Enemy Spawn Radius", 3,
             new ConfigDescription("Max Enemy Spawn Radius if Take Enemies With you is enabled.",
                 new AcceptableValueRange<int>(0, 15),
-                new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));
+                new ConfigurationManagerAttributes { IsAdvanced = true, Order = 3 }));
+
+            EnemiesMaskMode = config("--- Transport Enemies ---", "Enemies Mask Mode", "Disabled",
+                new ConfigDescription("This option changes the behavior of the Enemies Mask field.",
+                    new AcceptableValueList<string>("Disabled","Block", "Allow Only"),
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }));
+
+            EnemiesTransportMask = config("--- Transport Enemies ---", "Enemies Mask", "",
+                new ConfigDescription("This mask is to block or allow only specific enemies to follow the player. If Take Enemies With you is enabled.", null,
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));
 
             // Transport Items
             TransportDragonEggs = config("--- Transport Items ---", "Transport Dragon Eggs", true,
@@ -200,7 +225,7 @@ namespace TeleportEverything
                     new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }));
             RemoveTransportFeeFrom = config("--- Transport Items ---", "Remove Transport fee from", "DragonEgg",
                 new ConfigDescription("Add the prefab names to remove fee from items on the server", null,
-                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));          
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));
         }
         #endregion
 
@@ -209,7 +234,6 @@ namespace TeleportEverything
             TransportAllies = false;
             IncludeTamed = false;
             IncludeNamed = false;
-            IncludeWild = false;
             IncludeFollow = false;
             ExcludeNamed = false;
         }

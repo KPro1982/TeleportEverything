@@ -7,7 +7,7 @@ namespace TeleportEverything
     {
         public static void DisplayMessage(string msg)
         {
-            switch (MessageMode.Value)
+            switch (MessageMode?.Value)
             {
                 case "top left":
                     MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft, msg);
@@ -23,18 +23,12 @@ namespace TeleportEverything
         {
             private static void Postfix(InventoryGrid __instance)
             {
-                if (!EnableMod.Value)
-                {
-                    return;
-                }
+                if (!IsModEnabled()) return;
 
-                if (!TransportOres.Value && !TransportDragonEggs.Value)
-                {
-                    return;
-                }
+                if (!OresEnabled() && !DragonEggsEnabled()) return;
 
                 var width = __instance.GetInventory().GetWidth();
-                foreach (ItemData item in __instance.GetInventory().GetAllItems())
+                foreach (var item in __instance.GetInventory().GetAllItems())
                 {
                     if(item?.m_shared == null || item.m_shared.m_teleportable == true)
                     {
@@ -44,11 +38,11 @@ namespace TeleportEverything
                     InventoryGrid.Element element = __instance.GetElement(item.m_gridPos.x, item.m_gridPos.y, width);
                     if (IsDragonEgg(item))
                     {
-                        element.m_noteleport.enabled = !TransportDragonEggs.Value;
+                        element.m_noteleport.enabled = !DragonEggsEnabled();
                     }
                     else
                     {
-                        element.m_noteleport.enabled = !TransportOres.Value;
+                        element.m_noteleport.enabled = !OresEnabled();
                     }
                 }
             }
@@ -56,45 +50,30 @@ namespace TeleportEverything
         [HarmonyPatch(typeof(ItemData), nameof(ItemData.GetTooltip), typeof(ItemData), typeof(int), typeof(bool))]
         public class GetTooltip_Patch
         {
-            private static void Postfix(ItemData item, int qualityLevel, bool crafting, ref string __result)
+            private static void Postfix(ItemData item, ref string __result)
             {
-                if (!EnableMod.Value)
-                {
-                    return;
-                }
-                if (!TransportOres.Value && !TransportDragonEggs.Value)
-                {
-                    return;
-                }
+                if (!IsModEnabled()) return;
+
+                if (!OresEnabled() && !DragonEggsEnabled()) return;
+
                 if (item?.m_dropPrefab == null)
                 {
-                    if (TransportOres.Value)
+                    if (OresEnabled())
                     {
                         __result = __result.Replace("\n<color=orange>$item_noteleport</color>", "");
                     }
                     return;
                 }
-                if (item?.m_shared == null || item.m_shared.m_teleportable == true)
+                if (item?.m_shared == null || item.m_shared.m_teleportable)
                 {
                     return;
                 }
-                if (IsDragonEgg(item))
-                {
-                    if (!TransportDragonEggs.Value)
-                    {
-                        return;
-                    }
-                }
-                else
-                {
-                    if (!TransportOres.Value)
-                    {
-                        return;
-                    }
-                }
+
+                if (!ItemPermitted(item)) return;
+                
                 __result = __result.Replace("\n<color=orange>$item_noteleport</color>", 
                     string.Concat("\n", Localization.instance.Localize("$te_item_transport_fee",
-                    HasFeeRemoved(item)?"0":TransportFee.Value.ToString()))
+                    HasFeeRemoved(item)?"0":TransportFee?.Value.ToString()))
                 );
             }
         }

@@ -1,4 +1,8 @@
 using HarmonyLib;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace TeleportEverything
@@ -10,38 +14,17 @@ namespace TeleportEverything
         {
             private static bool Prefix(ref bool __result, ref Inventory __instance)
             {
-                if (!EnableMod.Value)
-                {
-                    return true; //go to original method
-                }
+                if (!IsModEnabled()) return true; //go to original method
 
-                if (TransportDragonEggs.Value && TransportOres.Value)
+                if (DragonEggsEnabled() && OresEnabled())
                 {
                     __result = true;
                     return false; //skip original method
                 }
 
-                foreach (var item in __instance.GetAllItems())
+                if (__instance.GetAllItems().Any(item => !ItemPermitted(item)))
                 {
-                    if (item.m_shared.m_teleportable)
-                    {
-                        continue;
-                    }
-
-                    if (IsDragonEgg(item))
-                    {
-                        if (!TransportDragonEggs.Value)
-                        {
-                            return true; //go to original method
-                        }
-                    }
-                    else
-                    {
-                        if (!TransportOres.Value)
-                        {
-                            return true; //go to original method
-                        }
-                    }
+                    return true; //go to original method
                 }
 
                 __result = true;
@@ -52,16 +35,15 @@ namespace TeleportEverything
         [HarmonyPatch(typeof(Teleport), nameof(Teleport.Interact))]
         public static class TeleportInteractPatch
         {
-            private static void Prefix(Humanoid character, bool hold, bool alt, Teleport __instance)
+            private static void Prefix(Humanoid character, bool hold, Teleport __instance)
             {
-                if (!EnableMod.Value)
-                {
-                    return;
-                }
+                if (!IsModEnabled()) return;
+ 
                 if (hold)
                 {
                     return;
                 }
+
                 if (__instance.m_targetPoint == null)
                 {
                     return;
@@ -71,10 +53,7 @@ namespace TeleportEverything
 
             private static void Postfix()
             {
-                if (!EnableMod.Value)
-                {
-                    return;
-                }
+                if (!IsModEnabled()) return;
                 IsDungeonTeleport = false;
             }
         }
@@ -84,10 +63,7 @@ namespace TeleportEverything
         {
             private static void Postfix()
             {
-                if (!EnableMod.Value)
-                {
-                    return;
-                }
+                if (!IsModEnabled()) return;
 
                 SetIncludeMode();
                 GetCreatures();
@@ -102,10 +78,7 @@ namespace TeleportEverything
         {
             private static bool Postfix(bool __result, Humanoid __instance)
             {
-                if (!EnableMod.Value)
-                {
-                    return __result;
-                }
+                if (!IsModEnabled()) return __result;
 
                 if (Game.instance.m_firstSpawn) //if player is still spawning
                 {
@@ -122,7 +95,7 @@ namespace TeleportEverything
                     return __result;
                 }
 
-                if (skyheimAvoidCreatures)
+                if (SkyheimAvoidCreatures)
                 {
                     return __result; //skip if it is skyheim blink/recall
                 }
@@ -132,15 +105,24 @@ namespace TeleportEverything
 
                 DisplayAlliesMessage();
 
-                if (Enemies.Count > 0)
+                if (Enemies?.Count > 0)
                 {
-                    if (TeleportMode.Value.Contains("Run"))
+                    if (TeleportMode != null && TeleportMode.Value.Contains("Run"))
                     {
                         ShowVikingsDontRun = true;
                         return false;
                     }
 
                     DisplayEnemiesMessage();
+                }
+
+                if (!IsTransportCartsDisabled())
+                {
+                    var cart = GetAttachedCart();
+                    if (cart != null)
+                    {
+                        if (!CartIsTeleportable(cart)) return false;
+                    }
                 }
 
                 return __result;
@@ -150,16 +132,13 @@ namespace TeleportEverything
         [HarmonyPatch(typeof(TeleportWorld), nameof(TeleportWorld.Teleport))]
         public class TeleportWorldTeleport_Patch
         {
-            static void Postfix()
+            private static void Postfix()
             {
-                if (!EnableMod.Value)
-                {
-                    return;
-                }
+                if (!IsModEnabled()) return;
 
                 if(ShowVikingsDontRun)
                 {
-                    DisplayMessage(Localization.instance.Localize("$te_vikings_dont_run", Enemies.Count.ToString(), SearchRadius.Value.ToString()));
+                    DisplayMessage(Localization.instance.Localize("$te_vikings_dont_run", Enemies?.Count.ToString(), SearchRadius?.Value.ToString()));
                 }
             }
         }
@@ -170,17 +149,14 @@ namespace TeleportEverything
             private static bool Postfix(bool __result, Player __instance, Vector3 pos,
                 Quaternion rot, bool distantTeleport)
             {
-                if (!EnableMod.Value)
-                {
-                    return __result;
-                }
+                if (!IsModEnabled()) return __result;
 
                 if (!__instance.IsTeleporting())
                 {
                     return __result;
                 }
 
-                if (skyheimAvoidCreatures) {
+                if (SkyheimAvoidCreatures) {
                     return __result; //skip if it is skyheim blink/recall
                 }
 
@@ -188,18 +164,34 @@ namespace TeleportEverything
                 GetCreatures();
                 TeleportTriggered = true;
 
+                currentAttachedCart = GetAttachedCart();
+                if (currentAttachedCart != null)
+                {
+                    if (CanTransportCarts())
+                    {
+                        TransportCart(currentAttachedCart, pos, rot);
+
+                        __instance.m_teleportTargetPos += SetForwardOffset(rot, (CART_SIZE + 0.5f));
+                        __instance.m_teleportTargetRot = rot;
+                    }
+                    else
+                    {
+                        currentAttachedCart.Detach();
+                    }
+                }
+
                 if (!IsDungeonTeleport)
                 {
                     ApplyTax(__instance);
                 }
 
-                if (Enemies.Count > 0 && TeleportMode.Value.Contains("Take"))
+                if (TeleportMode != null && Enemies?.Count > 0 && TeleportMode.Value.Contains("Take"))
                 {
                     TeleportCreatures(__instance, Enemies, true);
                 }
 
-                TeleportEverythingLogger.LogInfo(Localization.instance.Localize("$te_transported_allies_message", Allies.Count.ToString(), TransportAllies.ToString()));
-                if (Allies.Count > 0 && TransportAllies)
+                TeleportEverythingLogger.LogInfo(Localization.instance.Localize("$te_transported_allies_message", Allies?.Count.ToString(), TransportAllies.ToString()));
+                if (Allies?.Count > 0 && TransportAllies)
                 {
                     TeleportCreatures(__instance, Allies);
                 }
@@ -212,10 +204,7 @@ namespace TeleportEverything
         {
             private static void Postfix(Tameable __instance, ZDOID characterID)
             {
-                if (!EnableMod.Value)
-                {
-                    return;
-                }
+                if (!IsModEnabled()) return;
 
                 if (__instance.m_character.GetComponent<ZNetView>() is { } netView)
                 {
@@ -227,32 +216,28 @@ namespace TeleportEverything
         [HarmonyPatch(typeof(Player), nameof(Player.UpdateTeleport))]
         public class UpdateTeleportPatch
         {
-            static void Postfix(Player __instance, ref bool ___m_teleporting, float dt)
+            static void Prefix(ref bool ___m_distantTeleport)
             {
-                if (!EnableMod.Value)
+                if (IsModEnabled() && ShowTransportAnimationScreen?.Value == false && ___m_distantTeleport)
                 {
-                    return;
+                    ___m_distantTeleport = false;
                 }
+            }
 
-                if (!ZNetScene.instance.IsAreaReady(__instance.m_teleportTargetPos))
-                    return;
+            static void Postfix(Player __instance, ref bool ___m_teleporting)
+            {
+                if (!IsModEnabled()) return;
 
-                //set enemies unalerted while teleporting?
-                //if(___m_teleporting && teleportTriggered)
-                //{
-                //    if (TeleportMode.Value.Contains("Take"))
-                //    {
-                //        foreach (Character c in enemies)
-                //        {
-                //            c.GetComponent<MonsterAI>()?.SetAlerted(false);
-                //        }
-                //    }
-                //}
+                if (!ZNetScene.instance.IsAreaReady(__instance.m_teleportTargetPos)) return;
 
                 if (!___m_teleporting && TeleportTriggered)
                 {
                     TeleportTriggered = false;
                     //TeleportEverythingLogger.LogInfo("Teleport ended");
+                    if (CanTransportCarts())
+                    {
+                        if (currentAttachedCart != null) currentAttachedCart.AttachTo(Player.m_localPlayer.gameObject);
+                    }
                     if (totalContrabandCount > 0)
                     {
                         DisplayMessage(Localization.instance.Localize("$te_deducted_items_message", deductedContraband.ToString(), totalContrabandCount.ToString()));
@@ -263,35 +248,38 @@ namespace TeleportEverything
             }
         }
 
-        [HarmonyPatch(typeof(TeleportWorld), nameof(TeleportWorld.Awake))]
-        public class TeleportWorldAwakePatch
+        [HarmonyPatch]
+        public class TeleportWorldPatch
         {
-            static void Postfix(TeleportWorld __instance)
+            [HarmonyPostfix]
+            [HarmonyPatch(typeof(TeleportWorld), nameof(TeleportWorld.Awake))]
+            private static void Postfix(TeleportWorld __instance)
             {
-                if (!EnableMod.Value)
-                {
-                    return;
-                }
+                if (!IsModEnabled()) return;
 
-                AudioSource audio = __instance.GetComponentInChildren<AudioSource>();
-                if(audio != null)
+                ChangePortalVolume(__instance);
+            }
+
+            [HarmonyPrefix]
+            [HarmonyPatch(typeof(TeleportWorld), nameof(TeleportWorld.UpdatePortal))]
+            private static void Prefix(TeleportWorld __instance, ref float ___m_activationRange)
+            {
+                if (!IsModEnabled()) return;
+                
+                if (PortalActivationRange != null && !IsFloatEqual(___m_activationRange, PortalActivationRange.Value))
+                {
+                    ___m_activationRange = PortalActivationRange.Value;
+                }
+            }
+
+            private static void ChangePortalVolume(TeleportWorld portal)
+            {
+                var audio = portal.GetComponentInChildren<AudioSource>();
+
+                if (audio != null && PortalSoundVolume != null && !IsFloatEqual(audio.volume, PortalSoundVolume.Value))
                 {
                     audio.volume = PortalSoundVolume.Value;
                 }
-            }
-        }
-
-        [HarmonyPatch(typeof(TeleportWorld), nameof(TeleportWorld.UpdatePortal))]
-        public class UpdatePortalPatch
-        {
-            static void Prefix(ref float ___m_activationRange)
-            {
-                if (!EnableMod.Value)
-                {
-                    return;
-                }
-
-                ___m_activationRange = PortalActivationRange.Value;
             }
         }
     }
