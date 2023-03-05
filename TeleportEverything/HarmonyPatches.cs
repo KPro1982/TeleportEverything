@@ -228,9 +228,7 @@ namespace TeleportEverything
             {
                 if (!IsModEnabled()) return;
 
-                if (!ZNetScene.instance.IsAreaReady(__instance.m_teleportTargetPos)) return;
-
-                if (!___m_teleporting && TeleportTriggered)
+                if (!___m_teleporting && TeleportTriggered && ZNetScene.instance.IsAreaReady(__instance.m_teleportTargetPos))
                 {
                     TeleportTriggered = false;
                     //TeleportEverythingLogger.LogInfo("Teleport ended");
