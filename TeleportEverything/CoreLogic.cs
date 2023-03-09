@@ -118,7 +118,9 @@ namespace TeleportEverything
 
             if (placedEnemies > 0)
             {
-                DisplayMessage(Localization.instance.Localize("$te_transported_enemies_message", placedEnemies.ToString()));
+                var placedEnemiesMessage = Localization.instance.Localize("$te_transported_enemies_message", placedEnemies.ToString());
+                TeleportEverythingLogger.LogInfo(placedEnemiesMessage);
+                DisplayMessage(placedEnemiesMessage);
             }
         }
 

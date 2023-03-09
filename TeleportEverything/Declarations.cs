@@ -16,7 +16,7 @@ namespace TeleportEverything
     internal partial class Plugin : BaseUnityPlugin
     {
         internal const string ModName = "TeleportEverything";
-        internal const string ModVersion = "2.3.0";
+        internal const string ModVersion = "2.3.1";
         internal const string Author = "kpro";
         internal const string ModURL = "https://valheim.thunderstore.io/package/OdinPlus/TeleportEverything/";
         private const string ModGUID = "com."+ Author + "." + ModName;
@@ -178,7 +178,7 @@ namespace TeleportEverything
                 new ConfigDescription("", null,
                     new ConfigurationManagerAttributes { IsAdvanced = true, Order = 5 }));
 
-            SpawnForwardOffset = config("--- Transport ---", "Spawn Forward Tolerance", 1f,
+            SpawnForwardOffset = config("--- Transport ---", "Spawn Forward Tolerance", 1.5f,
             new ConfigDescription("Allies spawn forward offset",
                 new AcceptableValueRange<float>(0, 12f),
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 4 }));
