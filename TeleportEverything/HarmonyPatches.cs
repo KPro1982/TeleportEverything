@@ -1,8 +1,5 @@
 using HarmonyLib;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Emit;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace TeleportEverything
@@ -164,6 +161,11 @@ namespace TeleportEverything
                 GetCreatures();
                 TeleportTriggered = true;
 
+                if (!IsDungeonTeleport)
+                {
+                    ApplyTax(__instance);
+                }
+
                 currentAttachedCart = GetAttachedCart();
                 if (currentAttachedCart != null)
                 {
@@ -178,11 +180,6 @@ namespace TeleportEverything
                     {
                         currentAttachedCart.Detach();
                     }
-                }
-
-                if (!IsDungeonTeleport)
-                {
-                    ApplyTax(__instance);
                 }
 
                 if (TeleportMode != null && Enemies?.Count > 0 && TeleportMode.Value.Contains("Take"))
@@ -228,9 +225,7 @@ namespace TeleportEverything
             {
                 if (!IsModEnabled()) return;
 
-                if (!ZNetScene.instance.IsAreaReady(__instance.m_teleportTargetPos)) return;
-
-                if (!___m_teleporting && TeleportTriggered)
+                if (!___m_teleporting && TeleportTriggered && ZNetScene.instance.IsAreaReady(__instance.m_teleportTargetPos))
                 {
                     TeleportTriggered = false;
                     //TeleportEverythingLogger.LogInfo("Teleport ended");

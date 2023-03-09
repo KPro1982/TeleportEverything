@@ -16,6 +16,9 @@ It's recommended to Install a [BepInEx Configuration Manager](https://valheim.th
 
 > Note: There are some settings that only appear when you enable the advanced options in your configuration manager.
 
+## Want to teleport faster?
+Try using also the [QuickTeleport mod](https://valheim.thunderstore.io/package/OdinPlus/QuickTeleport/). It works perfectly with teleport everything and several other mods.
+
 ## Did you like the mod?
 Check out what's being developed or buy me a coffee to support the development:
 <p align="center">
@@ -83,7 +86,7 @@ ___
 * Teleport Everything searches for allies within a search cylinder. It should not be necessary but you can configure the radius and height of the search cylinder to meet your needs. For example, you might set the height to 1.5 meters in order to avoid transporting allies on different levels of your base.
 
 #### Spawn Forward Tolerance (advanced)
-* Define how far your allies will spawn in front of you in meters. The default is 1 meter.
+* Define how far your allies will spawn in front of you in meters. The default is 1.5 meters.
 
 #### User Filter Mask / Server Filter Mask (advanced)
 * Enable Server/Player Filter Mask (advanced): 
@@ -93,6 +96,17 @@ ___
 
 #### Transport Boars / Lox / Wolves
 * Three checkboxes that players can quickly enable/disable teleporting each creature. Default: all allowed.
+
+___
+### **--- Transport Carts ---** (advanced)
+
+![transport-carts-gif](https://user-images.githubusercontent.com/101152506/220641406-59b27b02-25e9-4737-8b40-ce802c4b1a39.gif)
+
+#### Transport Cart Mode
+Choose between `Enabled`, `Disabled` and `Only Dungeons`. Synched with the server. Your player needs to be attached to the cart to transport it.
+
+#### Transport Cart Tax Items
+If Trasport Cart is enabled, switch on/off taking fee from prohibited cart items. It uses the Transport Fee configured on the server.
 
 ___
 ### **--- Transport Enemies ---** (advanced)
@@ -168,7 +182,7 @@ The mod is compatible with several other mods and we are always improving it.
 - ![YES]: AllTameableHandH
   - (If your vertical tolerance is low, you may not be able to transport a flying drake)
 - ![YES]: Basement or BasementJVLedition
-- ![YES]: FastTeleport
+- ![YES]: QuickTeleport
 - ![YES]: Jewelcrafting
   - If you don't want to tax boss crystals, you can add to the Remove Transport fee field the  following boss crystal regex: `Boss_Crystal_\w+`
   - Separate by comma if you want to remove from other items, e.g.: `Boss_Crystal_\w+,DragonEgg`
@@ -188,6 +202,12 @@ The mod is compatible with several other mods and we are always improving it.
 </p>
 
 ## Changelog
+- Version 2.3.1
+  - Performance improvement (Thanks to @CW-Jesse)
+  - Increased default ally spawn forward value to 1.5 meters
+- Version 2.3.0
+  - Transport carts and charge an optional fee
+  - Toggle teleport animation screen on/off
 - Version 2.2.0
   - Added a mask to block/allow only specific enemies to be teleported
   - Fixed bug that allowed unalerted enemies to be teleported

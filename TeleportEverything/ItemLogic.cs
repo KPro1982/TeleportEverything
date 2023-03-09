@@ -57,9 +57,11 @@ namespace TeleportEverything
             var ores = new Dictionary<string, int>();
             ores = RegisterOreQuantities(player.GetInventory(), ores);
 
-            if (CanTransportCarts() && ShouldTaxCarts?.Value == true && currentAttachedCart != null)
+            var cart = GetAttachedCart();
+
+            if (CanTransportCarts() && ShouldTaxCarts?.Value == true && cart != null)
             {
-                var cartInventory = GetCartInventory(currentAttachedCart);
+                var cartInventory = GetCartInventory(cart);
                 ores = RegisterOreQuantities(cartInventory, ores, true);
             }
 
@@ -71,9 +73,9 @@ namespace TeleportEverything
                 valueToDeduct = valueToDeduct > 0 ? valueToDeduct : 1;
                 
                 var deducted = 0;
-                if (ShouldTaxCarts?.Value == true && currrentCartBeingTaxed && currentAttachedCart != null)
+                if (ShouldTaxCarts?.Value == true && currrentCartBeingTaxed && cart != null)
                 {
-                    var container = currentAttachedCart.gameObject.GetComponentInChildren<Container>();
+                    var container = cart.gameObject.GetComponentInChildren<Container>();
                     if (container != null)
                         ReduceFromInventory(container.m_inventory, ore.Key, ref valueToDeduct, ref deducted);
                 }
@@ -88,9 +90,9 @@ namespace TeleportEverything
                 );
             }
             RemoveEmptyItems(player);
-            if (ShouldTaxCarts?.Value == true && currrentCartBeingTaxed && currentAttachedCart != null)
+            if (ShouldTaxCarts?.Value == true && currrentCartBeingTaxed && cart != null)
             {
-                RemoveEmptyItems(currentAttachedCart);
+                RemoveEmptyItems(cart);
                 currrentCartBeingTaxed = false;
             }
         }

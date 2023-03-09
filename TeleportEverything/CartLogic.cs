@@ -7,7 +7,6 @@ namespace TeleportEverything
     {
         internal static Vagon? GetAttachedCart()
         {
-            currentAttachedCart = null;
             if (SearchRadius == null) return null;
             var carts = GetNearbyCarts(Player.m_localPlayer.transform.position, SearchRadius.Value);
             foreach (var cart in carts)
@@ -61,6 +60,7 @@ namespace TeleportEverything
 
         internal static void RemoveEmptyItems(Vagon cart)
         {
+            TeleportEverythingLogger.LogInfo("Taking fee from cart");
             RemoveEmptyItemsFromInventory(GetCartInventory(cart));
         }
 
@@ -90,16 +90,16 @@ namespace TeleportEverything
         internal static bool CanTransportCarts()
         {
             if (IsTransportCartsDisabled()) return false;
-            if (TransportCartsMode != null && TransportCartsMode.Value.Equals("Enabled", System.StringComparison.OrdinalIgnoreCase)) return true;
-            if (TransportCartsMode != null && TransportCartsMode.Value.Equals("Only Dungeons", System.StringComparison.OrdinalIgnoreCase) && IsDungeonTeleport) return true;
+            if (TransportCartsMode.Value.Equals("Enabled", System.StringComparison.OrdinalIgnoreCase)) return true;
+            if (TransportCartsMode.Value.Equals("Only Dungeons", System.StringComparison.OrdinalIgnoreCase) && IsDungeonTeleport) return true;
 
             return false;
         }
 
         internal static bool IsTransportCartsDisabled()
         {
-            if (string.IsNullOrEmpty(TransportCartsMode?.Value)) return true;
-            return TransportCartsMode != null && TransportCartsMode.Value.Equals("Disabled", System.StringComparison.OrdinalIgnoreCase);
+            if (TransportCartsMode == null || string.IsNullOrEmpty(TransportCartsMode?.Value) || TransportCartsMode.Value.Equals("Disabled", System.StringComparison.OrdinalIgnoreCase)) return true;
+            return false;
         }
     }
 }

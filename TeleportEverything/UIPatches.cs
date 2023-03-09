@@ -47,6 +47,7 @@ namespace TeleportEverything
                 }
             }
         }
+         
         [HarmonyPatch(typeof(ItemData), nameof(ItemData.GetTooltip), typeof(ItemData), typeof(int), typeof(bool))]
         public class GetTooltip_Patch
         {
