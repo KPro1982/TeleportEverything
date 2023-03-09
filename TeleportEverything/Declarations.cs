@@ -16,7 +16,7 @@ namespace TeleportEverything
     internal partial class Plugin : BaseUnityPlugin
     {
         internal const string ModName = "TeleportEverything";
-        internal const string ModVersion = "2.2.0";
+        internal const string ModVersion = "2.3.0";
         internal const string Author = "kpro";
         internal const string ModURL = "https://valheim.thunderstore.io/package/OdinPlus/TeleportEverything/";
         private const string ModGUID = "com."+ Author + "." + ModName;
@@ -141,7 +141,9 @@ namespace TeleportEverything
                 new ConfigDescription("Portal sound effect volume (rejoin the session or teleport to a farther portal for the new value to take effect).",
                     new AcceptableValueRange<float>(0, 1),
                     new ConfigurationManagerAttributes { IsAdvanced = true, Order = 3 }), false);
-
+            ShowTransportAnimationScreen = config("--- Portal ---", "Show Transport Animation", true,
+                new ConfigDescription("Toggle transport animation screen on/off.", null,
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }), false);
 
             // Portal Behavior
             TeleportMode = config("--- Portal Behavior ---", "Teleport Mode", "Standard",
@@ -186,13 +188,23 @@ namespace TeleportEverything
                     new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }), false);
 
             PlayerTransportMask = config("--- Transport ---", "Player Transport Mask", "",
-                new ConfigDescription("Add the prefab names to filter and restrict which creatures can be teleportable", null,
+                new ConfigDescription("Add the prefab names to filter and restrict which creatures can be teleportable.", null,
                     new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }), false);
 
             TransportBoar = config("--- Transport ---", "Transport Boars", true, "", false);
             TransportLox = config("--- Transport ---", "Transport Loxes", true, "", false);
             TransportWolves = config("--- Transport ---", "Transport Wolves", true, "", false);
 
+            //Transport Carts
+            TransportCartsMode = config("--- Transport Carts ---", "Transport Carts Mode", "Disabled",
+                new ConfigDescription("Allows transporting carts. (beta)",
+                    new AcceptableValueList<string>("Disabled", "Enabled", "Only Dungeons"),
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }));
+
+            ShouldTaxCarts = config("--- Transport Carts ---", "Transport Carts Tax Items", true,
+                new ConfigDescription("Take fee from cart prohibited items.", null,
+                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));
+            
             //Enemies
             SpawnEnemiesForwardOffset = config("--- Transport Enemies ---", "Spawn Enemies Forward Tolerance", 6,
             new ConfigDescription("Min Spawn forward in meters if Take Enemies With you is enabled.",

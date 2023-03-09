@@ -95,6 +95,17 @@ ___
 * Three checkboxes that players can quickly enable/disable teleporting each creature. Default: all allowed.
 
 ___
+### **--- Transport Carts ---** (advanced)
+
+![transport-carts-gif](https://user-images.githubusercontent.com/101152506/220641406-59b27b02-25e9-4737-8b40-ce802c4b1a39.gif)
+
+#### Transport Cart Mode
+Choose between `Enabled`, `Disabled` and `Only Dungeons`. Synched with the server. Your player needs to be attached to the cart to transport it.
+
+#### Transport Cart Tax Items
+If Trasport Cart is enabled, switch on/off taking fee from prohibited cart items. It uses the Transport Fee configured on the server.
+
+___
 ### **--- Transport Enemies ---** (advanced)
 * These enemies settings are only appliable if "**Take Enemies With You**" is selected in the **Teleport Mode**.
 
@@ -188,6 +199,9 @@ The mod is compatible with several other mods and we are always improving it.
 </p>
 
 ## Changelog
+- Version 2.3.0
+  - Transport carts and charge an optional fee
+  - Toggle teleport animation screen on/off
 - Version 2.2.0
   - Added a mask to block/allow only specific enemies to be teleported
   - Fixed bug that allowed unalerted enemies to be teleported
