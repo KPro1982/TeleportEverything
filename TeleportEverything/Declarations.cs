@@ -16,7 +16,7 @@ namespace TeleportEverything
     internal partial class Plugin : BaseUnityPlugin
     {
         internal const string ModName = "TeleportEverything";
-        internal const string ModVersion = "2.3.1";
+        internal const string ModVersion = "2.4.0";
         internal const string Author = "kpro";
         internal const string ModURL = "https://valheim.thunderstore.io/package/OdinPlus/TeleportEverything/";
         private const string ModGUID = "com."+ Author + "." + ModName;
@@ -77,9 +77,11 @@ namespace TeleportEverything
         //Trasport carts
         public static ConfigEntry<string>? TransportCartsMode;
         public static ConfigEntry<bool>? ShouldTaxCarts;
-        public static Vagon? currentAttachedCart = null;
+        public static ZDOID? currentAttachedCartId = null;
         internal static bool currrentCartBeingTaxed = false;
-        private const float CART_SIZE = 3f;
+        private const float CART_SIZE = 2.5f;
+        private const float CART_FORWARD_OFFSET = 0.8f;
+        private const float CART_Y_OFFSET = 0.3f;
 
         // Include vars
         public static bool TransportAllies;

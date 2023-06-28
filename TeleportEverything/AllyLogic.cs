@@ -1,4 +1,5 @@
 
+using System;
 using System.Collections.Generic;
 
 namespace TeleportEverything
@@ -26,9 +27,9 @@ namespace TeleportEverything
 
         public static bool IsAllowedAlly(Character c)
         {
-            if (GetPrefabName(c).Equals(WOLF) && TransportWolves?.Value == false) return false;
-            if (GetPrefabName(c).Equals(BOAR) && TransportBoar?.Value == false) return false;
-            if (GetPrefabName(c).Equals(LOX) && TransportLox?.Value == false) return false;
+            if (GetPrefabName(c).Equals(WOLF, StringComparison.OrdinalIgnoreCase) && TransportWolves?.Value == false) return false;
+            if (GetPrefabName(c).Equals(BOAR, StringComparison.OrdinalIgnoreCase) && TransportBoar?.Value == false) return false;
+            if (GetPrefabName(c).Equals(LOX, StringComparison.OrdinalIgnoreCase) && TransportLox?.Value == false) return false;
             
             if (ServerEnableMask != null &&
                 PlayerTransportMask != null &&

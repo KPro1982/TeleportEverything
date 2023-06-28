@@ -166,19 +166,15 @@ namespace TeleportEverything
                     ApplyTax(__instance);
                 }
 
-                currentAttachedCart = GetAttachedCart();
-                if (currentAttachedCart != null)
+                var attachedCart = GetAttachedCart();
+                if (attachedCart != null)
                 {
                     if (CanTransportCarts())
                     {
-                        TransportCart(currentAttachedCart, pos, rot);
+                        attachedCart.Detach();
+                        TransportCart(attachedCart, pos, rot);
 
-                        __instance.m_teleportTargetPos += SetForwardOffset(rot, (CART_SIZE + 0.5f));
-                        __instance.m_teleportTargetRot = rot;
-                    }
-                    else
-                    {
-                        currentAttachedCart.Detach();
+                        __instance.m_teleportTargetPos += SetForwardOffset(rot, (CART_SIZE + CART_FORWARD_OFFSET));
                     }
                 }
 
@@ -199,14 +195,11 @@ namespace TeleportEverything
         [HarmonyPatch(typeof(Tameable), nameof(Tameable.RPC_Command))]
         public class TameableRPCCommandPatch
         {
-            private static void Postfix(Tameable __instance, ZDOID characterID)
+            private static void Postfix(Tameable __instance)
             {
                 if (!IsModEnabled()) return;
 
-                if (__instance.m_character.GetComponent<ZNetView>() is { } netView)
-                {
-                    TakeOwnership(__instance.m_character, characterID.m_userID);                   
-                }
+                __instance.m_character.m_nview.ClaimOwnership();
             }
         }
 
@@ -231,7 +224,15 @@ namespace TeleportEverything
                     //TeleportEverythingLogger.LogInfo("Teleport ended");
                     if (CanTransportCarts())
                     {
-                        if (currentAttachedCart != null) currentAttachedCart.AttachTo(Player.m_localPlayer.gameObject);
+                        if (currentAttachedCartId != null) 
+                        {
+                            var attachedCart = GetNearbyCarts(__instance.transform.position, SearchRadius.Value).Where(cart => cart.m_nview.GetZDO().m_uid == currentAttachedCartId).FirstOrDefault();
+                            if (attachedCart?.CanAttach(__instance.gameObject) == true)
+                            {
+                                attachedCart.AttachTo(__instance.gameObject);
+                            }
+                            currentAttachedCartId = null;
+                        }
                     }
                     if (totalContrabandCount > 0)
                     {
