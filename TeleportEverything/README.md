@@ -129,14 +129,14 @@ ___
 * If toggled on, players can transport **ores, ingots, and eggs**. 
 
 #### Transport fee (advanced)
-* In order to offset the advantage of transporting ores, players may set a **"transport fee"** that deducts a percentage of the contraband ores, ingots. For example, a 10% fee would take 3 out of 30 ores. Default: 0%.
+* In order to offset the advantage of transporting ores, players may set a **"transport fee"** that deducts a percentage of the transported ores, ingots. For example, a 10% fee would take 3 out of 30 ores. Default: 0%.
 * Dragon eggs are not taxed by default, but you can change it in the Remove Fee field.
 
 #### Remove Transport Fee From Items (advanced)
 * You can use the field to Remove the transport fee from specific items using their [prefab names](https://valheim-modding.github.io/Jotunn/data/prefabs/prefab-list.html). 
 By default, the fee from `DragonEgg` is removed, but you can change it if needed.
 
-* Advanced: [Regex expressions](regexr.com/70okv) are allowed, for example `boss_crystal_\w+` will remove the fee from any `boss_crystal_1`,`boss_crystal_2`,`boss_crystal_999`... (we automatically add a regex `\b` in the beggining and end to delimit the strings separated by comma)
+* Advanced: [Regex expressions](https://regexr.com/70okv) are allowed, for example `boss_crystal_\w+` will remove the fee from any `boss_crystal_1`,`boss_crystal_2`,`boss_crystal_999`... (we automatically add a regex `\b` in the beggining and end to delimit the strings separated by comma)
 
 <h2>Translations
   <img width="32" src="https://raw.githubusercontent.com/catamphetamine/country-flag-icons/master/3x2/US.svg" alt="English"/>
@@ -146,6 +146,7 @@ By default, the fee from `DragonEgg` is removed, but you can change it if needed
   <img width="32" src="https://raw.githubusercontent.com/catamphetamine/country-flag-icons/master/3x2/RU.svg" alt="Russian"/>
   <img width="32" src="https://raw.githubusercontent.com/catamphetamine/country-flag-icons/master/3x2/ES.svg" alt="Spanish"/>
 </h2>
+
 If you want to add your own translation locally, you can create a file based on the [English.yml template](https://cdn.discordapp.com/attachments/957320383424503949/1040075435674968094/English.yml) anywhere inside the Bepinex folder. The file should be named `TeleportEverything.Language.yml`. For example, the file for Spanish translation would be `TeleportEverything.Spanish.yml`.
 
 You can find Valheim's Languages list [here](https://valheim-modding.github.io/Jotunn/data/localization/language-list.html).
@@ -179,10 +180,8 @@ The mod requires two dependencies to work properly:
 
 The mod is compatible with several other mods and we are always improving it.
 
-- ![YES]: AllTameableHandH
-  - (If your vertical tolerance is low, you may not be able to transport a flying drake)
+- ![YES]: [QuickTeleport](https://valheim.thunderstore.io/package/OdinPlus/QuickTeleport/)
 - ![YES]: Basement or BasementJVLedition
-- ![YES]: QuickTeleport
 - ![YES]: Jewelcrafting
   - If you don't want to tax boss crystals, you can add to the Remove Transport fee field the  following boss crystal regex: `Boss_Crystal_\w+`
   - Separate by comma if you want to remove from other items, e.g.: `Boss_Crystal_\w+,DragonEgg`
@@ -191,6 +190,8 @@ The mod is compatible with several other mods and we are always improving it.
 - ![YES]: Skyheim
 - ![YES]: TargetPortal
 - ![YES]: Wayshrine
+- ![YES]: AllTameableHandH
+  - (If your vertical tolerance is low, you may not be able to transport a flying drake)
 - ![PARTIAL]: UnrestrictedPortals
   - You can use the ore configs from UnrestrictedPortals if you disable Teleport Ore or Dragon Eggs checkboxes from TeleportEverything config.
   - Item Fees don't work if you are using UnrestrictedPortals configs.
@@ -202,6 +203,8 @@ The mod is compatible with several other mods and we are always improving it.
 </p>
 
 ## Changelog
+- Version 2.4.0
+  - Valheim update fix
 - Version 2.3.1
   - Performance improvement (Thanks to @CW-Jesse)
   - Increased default ally spawn forward value to 1.5 meters
@@ -246,7 +249,7 @@ The mod is compatible with several other mods and we are always improving it.
   - Added advanced settings (if you need more options, enable config manager advanced mode)
 - Version 1.4
   - Added transport of ores, ingots, and eggs.
-  - Added optional "transport fee" that reduces ore, ingots, and eggs as a fee for transport these "contraband" items
+  - Added optional "transport fee" that reduces ore, ingots, and eggs as a fee for transport these items
   - Added configurable settings for fee feature
 - Version 1.3
   - Added display messages top left, center, or none

@@ -9,7 +9,7 @@ namespace TeleportEverything
 {
     internal partial class Plugin
     {
-        public static string GetPrefabName(Character c) => c.name.Replace("(Clone)", "").ToLower();
+        public static string GetPrefabName(Character c) => c.name.Replace("(Clone)", "");
         public static List<Regex> CommaSeparatedStringToList(string mask) => 
             mask.Split(',').Select(p => new Regex("\\b"+p.Trim().ToLower()+"\\b", RegexOptions.IgnoreCase)).ToList();
 
@@ -112,7 +112,7 @@ namespace TeleportEverything
             placedEnemies = 0;
             foreach (Character c in creatures)
             {
-                TakeOwnership(c, ZDOMan.instance.GetMyID());
+                c.m_nview.ClaimOwnership();
                 SetPositionAttempt(c, player.m_teleportTargetPos, player.m_teleportTargetRot, hasEnemies);
             }
 
@@ -121,17 +121,6 @@ namespace TeleportEverything
                 var placedEnemiesMessage = Localization.instance.Localize("$te_transported_enemies_message", placedEnemies.ToString());
                 TeleportEverythingLogger.LogInfo(placedEnemiesMessage);
                 DisplayMessage(placedEnemiesMessage);
-            }
-        }
-
-        public static void TakeOwnership(Character c, long userId)
-        {
-            if (c.GetComponent<ZNetView>() is { } netView)
-            {
-                if (c.GetOwner() != userId)
-                {
-                    netView.GetZDO()?.SetOwner(userId);
-                }
             }
         }
 
@@ -186,7 +175,7 @@ namespace TeleportEverything
             var alliesOffset = SpawnForwardOffset.Value;
             if (!hasEnemies)
             {
-                if (GetPrefabName(c).Equals("Lox".ToLower()))
+                if (GetPrefabName(c).Equals(LOX, StringComparison.OrdinalIgnoreCase))
                 {
                     alliesOffset = alliesOffset < 4 ? 4 : alliesOffset;
                 }
