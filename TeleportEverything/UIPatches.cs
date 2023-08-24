@@ -48,7 +48,7 @@ namespace TeleportEverything
             }
         }
          
-        [HarmonyPatch(typeof(ItemData), nameof(ItemData.GetTooltip), typeof(ItemData), typeof(int), typeof(bool))]
+        [HarmonyPatch(typeof(ItemData), nameof(ItemData.GetTooltip), typeof(ItemData), typeof(int), typeof(bool), typeof(float))]
         public class GetTooltip_Patch
         {
             private static void Postfix(ItemData item, ref string __result)

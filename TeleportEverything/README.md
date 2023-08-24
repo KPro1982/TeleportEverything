@@ -19,14 +19,6 @@ It's recommended to Install a [BepInEx Configuration Manager](https://valheim.th
 ## Want to teleport faster?
 Try using also the [QuickTeleport mod](https://valheim.thunderstore.io/package/OdinPlus/QuickTeleport/). It works perfectly with teleport everything and several other mods.
 
-## Did you like the mod?
-Check out what's being developed or buy me a coffee to support the development:
-<p align="center">
-  <a href="https://www.buymeacoffee.com/elgthedev">
-    <img width="300" alt="bmc-button" src="https://user-images.githubusercontent.com/101152506/215227016-c5a9ea72-fe35-42bf-be89-06c643b46993.png">
-  </a>
-</p>
-
 ## Features
 
 ### Teleport Modes:
@@ -203,6 +195,8 @@ The mod is compatible with several other mods and we are always improving it.
 </p>
 
 ## Changelog
+- Version 2.5.0
+  - Valheim Hildir's Request Update
 - Version 2.4.0
   - Valheim update fix
 - Version 2.3.1
