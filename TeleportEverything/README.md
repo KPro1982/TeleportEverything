@@ -195,6 +195,8 @@ The mod is compatible with several other mods and we are always improving it.
 </p>
 
 ## Changelog
+- Version 2.5.1
+  - Valheim update - server sync fix
 - Version 2.5.0
   - Valheim Hildir's Request Update
 - Version 2.4.0
