@@ -182,6 +182,7 @@ The mod is compatible with several other mods and we are always improving it.
 - ![YES]: Skyheim
 - ![YES]: TargetPortal
 - ![YES]: Wayshrine
+- ![YES]: XPortal
 - ![YES]: AllTameableHandH
   - (If your vertical tolerance is low, you may not be able to transport a flying drake)
 - ![PARTIAL]: UnrestrictedPortals
@@ -195,6 +196,9 @@ The mod is compatible with several other mods and we are always improving it.
 </p>
 
 ## Changelog
+- Version 2.5.2
+  - Update ServerSync
+  - Add compatibility with Xportal to the docs
 - Version 2.5.1
   - Valheim update - server sync fix
 - Version 2.5.0

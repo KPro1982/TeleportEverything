@@ -16,7 +16,7 @@ namespace TeleportEverything
     internal partial class Plugin : BaseUnityPlugin
     {
         internal const string ModName = "TeleportEverything";
-        internal const string ModVersion = "2.5.1";
+        internal const string ModVersion = "2.5.2";
         internal const string Author = "kpro";
         internal const string ModURL = "https://valheim.thunderstore.io/package/OdinPlus/TeleportEverything/";
         private const string ModGUID = "com."+ Author + "." + ModName;
@@ -29,7 +29,7 @@ namespace TeleportEverything
         public static readonly ManualLogSource TeleportEverythingLogger =
             BepInEx.Logging.Logger.CreateLogSource(ModName);
 
-        private static readonly ConfigSync ConfigSync = new(ModGUID) { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = ModVersion };
+        private static readonly ConfigSync ConfigSync = new(ModGUID) { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.5.1" };
         // Mod
         private static ConfigEntry<bool>? _serverConfigLocked;
         public static ConfigEntry<bool>? EnableMod;
