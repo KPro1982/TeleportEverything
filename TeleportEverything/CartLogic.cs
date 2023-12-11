@@ -40,9 +40,9 @@ namespace TeleportEverything
                 newPosition.y = ZoneSystem.instance.GetSolidHeight(newPosition) + 0.5f;
             }
 
+            attachedTeleportingCartId = cart.m_nview.GetZDO().m_uid;
             SetPosition(cart, newPosition, rot);
             cart.m_body.velocity = Vector3.zero;
-            attachedTeleportingCartId = cart.m_nview.GetZDO().m_uid;
         }
 
         internal static bool IsTeleportingCart() => attachedTeleportingCartId != null;
@@ -61,19 +61,8 @@ namespace TeleportEverything
 
         internal static bool CartIsTeleportable(Vagon cart)
         {
-            if (DragonEggsEnabled() && OresEnabled())
-            {
-                return true;
-            }
-
             var inventory = GetCartInventory(cart);
-            if (inventory == null) return true;
-            foreach (var item in inventory.GetAllItems())
-            {
-                if (!ItemPermitted(item)) return false;
-            }
-
-            return true;
+            return inventory?.IsTeleportable() == true;
         }
 
         internal static bool CanTransportCarts()

@@ -180,23 +180,27 @@ The mod requires two dependencies to work properly:
 
 The mod is compatible with several other mods and we are always improving it.
 
-- ![YES]: [QuickTeleport](https://valheim.thunderstore.io/package/OdinPlus/QuickTeleport/)
+- ![YES]: [QuickTeleport](https://valheim.thunderstore.io/package/OdinPlus/QuickTeleport/) (Recommended to reduce Teleport time)
 - ![YES]: Basement or BasementJVLedition
+- ![YES]: OdinsUndercroft
+- ![YES]: Wayshrine
 - ![YES]: Jewelcrafting
   - If you don't want to tax boss crystals, you can add to the Remove Transport fee field the  following boss crystal regex: `Boss_Crystal_\w+`
   - Separate by comma if you want to remove from other items, e.g.: `Boss_Crystal_\w+,DragonEgg`
-- ![YES]: MapTeleport
-- ![YES]: OdinsUndercroft
-- ![YES]: Skyheim
 - ![YES]: TargetPortal
-- ![YES]: Wayshrine
+- ![PARTIAL]: CreatureLevelAndLootControl (CLLC)
+    - You can use the ItemConfig.yml from CLLC if you disable Teleport Ore & Dragon Eggs checkboxes from the TeleportEverything config.
+    - Taxing system won't work if disabled, but you can use the CLLC's amazing world level feature.
+- ![YES]: Skyheim
+- ![YES]: QuickCart (Recommended for a better cart attachment experience)
 - ![YES]: XPortal
+- ![YES]: MapTeleport
 - ![YES]: MagicPlugin
 - ![YES]: Fall_Damage_For_Creatures
   - The creatures will spawn in the ground in front of the player to avoid them falling on teleport.
 - ![PARTIAL]: UnrestrictedPortals
   - You can use the ore configs from UnrestrictedPortals if you disable Teleport Ore or Dragon Eggs checkboxes from TeleportEverything config.
-  - Item Fees don't work if you are using UnrestrictedPortals configs.
+  - Taxing system won't work if you are using UnrestrictedPortals configs.
 
 <p>
   <p align="center"><h2>For Questions or Comments find Elg in the Odin Plus Team on Discord:</h2></p>
@@ -206,17 +210,16 @@ The mod is compatible with several other mods and we are always improving it.
 
 ## Changelog
 - Version 2.6.0
-  - Add compatibility with Fall_Damage_For_Creatures
-  - Add compatibility with MagicPlugin
+  - Added compatibility with MagicPlugin, Fall_Damage_For_Creatures, CLLC and QuickCart
   - Summons can also be teleported
-  - Fix "take them with you" mode
-  - Improve transport carts
-  - Improve message mode
+  - Fixed "take them with you" mode
+  - Improved transporting carts
+  - Improved message modes
 - Version 2.5.2
-  - Update ServerSync
-  - Add compatibility with Xportal to the docs
+  - Updated ServerSync
+  - Added compatibility with Xportal to the docs
 - Version 2.5.1
-  - Valheim update - server sync fix
+  - Valheim update - ServerSync fix
 - Version 2.5.0
   - Valheim Hildir's Request Update
 - Version 2.4.0
