@@ -35,16 +35,17 @@ namespace TeleportEverything
             cart.m_nview.ClaimOwnership();
 
             var newPosition = pos + SetForwardOffset(rot, CART_FORWARD_OFFSET);
-            if (!ZoneSystem.instance.FindFloor(newPosition, out var height))
+            if (!ZoneSystem.instance.FindFloor(newPosition, out _))
             {
-                newPosition.y += CART_Y_OFFSET;
+                newPosition.y = ZoneSystem.instance.GetSolidHeight(newPosition) + 0.5f;
             }
 
-            cart.transform.SetPositionAndRotation(newPosition, rot);
+            SetPosition(cart, newPosition, rot);
             cart.m_body.velocity = Vector3.zero;
-            cart.m_body.useGravity = false;
-            currentAttachedCartId = cart.m_nview.GetZDO().m_uid;
+            attachedTeleportingCartId = cart.m_nview.GetZDO().m_uid;
         }
+
+        internal static bool IsTeleportingCart() => attachedTeleportingCartId != null;
 
         internal static void RemoveEmptyItems(Vagon cart)
         {

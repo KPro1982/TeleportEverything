@@ -16,7 +16,7 @@ namespace TeleportEverything
     internal partial class Plugin : BaseUnityPlugin
     {
         internal const string ModName = "TeleportEverything";
-        internal const string ModVersion = "2.5.2";
+        internal const string ModVersion = "2.6.0";
         internal const string Author = "kpro";
         internal const string ModURL = "https://valheim.thunderstore.io/package/OdinPlus/TeleportEverything/";
         private const string ModGUID = "com."+ Author + "." + ModName;
@@ -29,7 +29,7 @@ namespace TeleportEverything
         public static readonly ManualLogSource TeleportEverythingLogger =
             BepInEx.Logging.Logger.CreateLogSource(ModName);
 
-        private static readonly ConfigSync ConfigSync = new(ModGUID) { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = "2.5.1" };
+        private static readonly ConfigSync ConfigSync = new(ModGUID) { DisplayName = ModName, CurrentVersion = ModVersion, MinimumRequiredVersion = ModVersion };
         // Mod
         private static ConfigEntry<bool>? _serverConfigLocked;
         public static ConfigEntry<bool>? EnableMod;
@@ -48,7 +48,7 @@ namespace TeleportEverything
         // Transport Enemies
         public static ConfigEntry<int>? SpawnEnemiesForwardOffset;
         public static ConfigEntry<int>? EnemySpawnRadius;
-        private const float UP_OFFSET = .5f;
+        private const float UP_OFFSET = .2f;
         public static ConfigEntry<string>? EnemiesMaskMode;
         public static ConfigEntry<string>? EnemiesTransportMask;
 
@@ -77,7 +77,7 @@ namespace TeleportEverything
         //Trasport carts
         public static ConfigEntry<string>? TransportCartsMode;
         public static ConfigEntry<bool>? ShouldTaxCarts;
-        public static ZDOID? currentAttachedCartId = null;
+        public static ZDOID? attachedTeleportingCartId = null;
         internal static bool currrentCartBeingTaxed = false;
         private const float CART_SIZE = 2.5f;
         private const float CART_FORWARD_OFFSET = 0.8f;
@@ -198,10 +198,10 @@ namespace TeleportEverything
             TransportWolves = config("--- Transport ---", "Transport Wolves", true, "", false);
 
             //Transport Carts
-            TransportCartsMode = config("--- Transport Carts ---", "Transport Carts Mode", "Disabled",
+            TransportCartsMode = config("--- Transport Carts ---", "Transport Carts Mode", "Enabled",
                 new ConfigDescription("Allows transporting carts. (beta)",
                     new AcceptableValueList<string>("Disabled", "Enabled", "Only Dungeons"),
-                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }));
+                    new ConfigurationManagerAttributes { Order = 2 }));
 
             ShouldTaxCarts = config("--- Transport Carts ---", "Transport Carts Tax Items", true,
                 new ConfigDescription("Take fee from cart prohibited items.", null,
@@ -236,7 +236,7 @@ namespace TeleportEverything
             TransportFee = config("--- Transport Items ---", "Transport fee", 0,
                 new ConfigDescription("Transport Fee in (%) ore",
                     new AcceptableValueRange<int>(0, 100),
-                    new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }));
+                    new ConfigurationManagerAttributes { Order = 2 }));
             RemoveTransportFeeFrom = config("--- Transport Items ---", "Remove Transport fee from", "DragonEgg",
                 new ConfigDescription("Add the prefab names to remove fee from items on the server", null,
                     new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));

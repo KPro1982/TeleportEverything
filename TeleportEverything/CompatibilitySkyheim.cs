@@ -74,7 +74,7 @@ namespace TeleportEverything
 
                 if (totalContrabandCount > 0)
                 {
-                    DisplayMessage(Localization.instance.Localize("$te_deducted_items_message", deductedContraband.ToString(), totalContrabandCount.ToString()));
+                    DisplayLongMessage(Localization.instance.Localize("$te_deducted_items_message", deductedContraband.ToString(), totalContrabandCount.ToString()));
                     deductedContraband = 0;
                     totalContrabandCount = 0;
                 }

@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using System;
 using static ItemDrop;
 
 namespace TeleportEverything
@@ -7,15 +8,37 @@ namespace TeleportEverything
     {
         public static void DisplayMessage(string msg)
         {
-            switch (MessageMode?.Value)
+            if (!MessagesEnabled()) return;
+
+            var modMessageType = GetMessageType(MessageMode.Value);
+            MessageHud.instance.ShowMessage(modMessageType, msg);
+        }
+
+        public static void DisplayLongMessage(string msg)
+        {
+            if (!MessagesEnabled()) return;
+
+            var modMessageType = GetMessageType(MessageMode.Value);
+            if (modMessageType == MessageHud.MessageType.Center)
             {
-                case "top left":
-                    MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft, msg);
-                    break;
-                case "centered":
-                    MessageHud.instance.ShowMessage(MessageHud.MessageType.Center, msg);
-                    break;
+                MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft, msg);
             }
+            else
+            {
+                MessageHud.instance.ShowMessage(MessageHud.MessageType.Center, msg);
+            }
+        }
+
+        public static bool MessagesEnabled() => !string.IsNullOrWhiteSpace(MessageMode?.Value) && !MessageMode.Value.Equals("No messages", StringComparison.OrdinalIgnoreCase);
+
+        private static MessageHud.MessageType GetMessageType(string messageMode)
+        {
+            if(messageMode.Equals("centered", StringComparison.OrdinalIgnoreCase))
+            {
+                return MessageHud.MessageType.Center;
+            }
+
+            return MessageHud.MessageType.TopLeft;
         }
 
         [HarmonyPatch(typeof(InventoryGrid), nameof(InventoryGrid.UpdateGui))]

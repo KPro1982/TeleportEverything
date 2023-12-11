@@ -113,7 +113,7 @@ namespace TeleportEverything
                     DisplayEnemiesMessage();
                 }
 
-                if (!IsTransportCartsDisabled())
+                if (!IsTransportCartsDisabled() && !IsTeleportingCart())
                 {
                     var cart = GetAttachedCart();
                     if (cart != null)
@@ -224,19 +224,19 @@ namespace TeleportEverything
                     //TeleportEverythingLogger.LogInfo("Teleport ended");
                     if (CanTransportCarts())
                     {
-                        if (currentAttachedCartId != null) 
+                        if (attachedTeleportingCartId != null) 
                         {
-                            var attachedCart = GetNearbyCarts(__instance.transform.position, SearchRadius.Value).Where(cart => cart.m_nview.GetZDO().m_uid == currentAttachedCartId).FirstOrDefault();
+                            var attachedCart = GetNearbyCarts(__instance.transform.position, SearchRadius.Value).Where(cart => cart.m_nview.GetZDO().m_uid == attachedTeleportingCartId).FirstOrDefault();
                             if (attachedCart?.CanAttach(__instance.gameObject) == true)
                             {
                                 attachedCart.AttachTo(__instance.gameObject);
                             }
-                            currentAttachedCartId = null;
+                            attachedTeleportingCartId = null;
                         }
                     }
                     if (totalContrabandCount > 0)
                     {
-                        DisplayMessage(Localization.instance.Localize("$te_deducted_items_message", deductedContraband.ToString(), totalContrabandCount.ToString()));
+                        DisplayLongMessage(Localization.instance.Localize("$te_deducted_items_message", deductedContraband.ToString(), totalContrabandCount.ToString()));
                         deductedContraband = 0;
                         totalContrabandCount = 0;
                     }
