@@ -190,7 +190,7 @@ The mod is compatible with several other mods and we are always improving it.
 - ![YES]: TargetPortal
 - ![PARTIAL]: CreatureLevelAndLootControl (CLLC)
     - You can use the ItemConfig.yml from CLLC if you disable Teleport Ore & Dragon Eggs checkboxes from the TeleportEverything config.
-    - Taxing system won't work if disabled, but you can use the CLLC's amazing world level feature.
+    - Tax system won't work if disabled, but you can use the CLLC's amazing world level feature.
 - ![YES]: Skyheim
 - ![YES]: QuickCart
 - ![YES]: XPortal
@@ -200,7 +200,7 @@ The mod is compatible with several other mods and we are always improving it.
   - The creatures will spawn in the ground in front of the player to avoid them falling on teleport.
 - ![PARTIAL]: UnrestrictedPortals
   - You can use the ore configs from UnrestrictedPortals if you disable Teleport Ore or Dragon Eggs checkboxes from TeleportEverything config.
-  - Taxing system won't work if you are using UnrestrictedPortals configs.
+  - Tax system won't work if you are using UnrestrictedPortals configs.
 
 <p>
   <p align="center"><h2>For Questions or Comments find Elg in the Odin Plus Team on Discord:</h2></p>
@@ -215,6 +215,7 @@ The mod is compatible with several other mods and we are always improving it.
   - Fixed "take them with you" mode
   - Improved transporting carts
   - Improved message modes
+  - Fixed DragonEgg transport when Ores were disabled
 - Version 2.5.2
   - Updated ServerSync
   - Added compatibility with Xportal to the docs
