@@ -31,7 +31,7 @@ namespace TeleportEverything
             ReduceStacks(player);
         }
 
-        internal static string GetItemPrefabName(ItemDrop.ItemData item) => item.m_dropPrefab.name; //item name, no use of tolower here
+        internal static string GetItemPrefabName(ItemDrop.ItemData item) => item?.m_dropPrefab?.name; //item name, no use of tolower here
         internal static string GetItemTranslatedName(ItemDrop.ItemData item) => Localization.instance.Localize(item.m_shared.m_name);
 
         internal static bool IsDragonEgg(ItemDrop.ItemData item)
@@ -40,7 +40,7 @@ namespace TeleportEverything
             {
                 return false;
             }
-            return GetItemPrefabName(item).Equals(DRAGON_EGG);
+            return GetItemPrefabName(item)?.Equals(DRAGON_EGG) == true;
         }
 
         internal static bool HasFeeRemoved(ItemDrop.ItemData item)

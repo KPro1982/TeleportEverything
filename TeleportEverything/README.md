@@ -192,7 +192,7 @@ The mod is compatible with several other mods and we are always improving it.
     - You can use the ItemConfig.yml from CLLC if you disable Teleport Ore & Dragon Eggs checkboxes from the TeleportEverything config.
     - Taxing system won't work if disabled, but you can use the CLLC's amazing world level feature.
 - ![YES]: Skyheim
-- ![YES]: QuickCart (Recommended for a better cart attachment experience)
+- ![YES]: QuickCart
 - ![YES]: XPortal
 - ![YES]: MapTeleport
 - ![YES]: MagicPlugin
