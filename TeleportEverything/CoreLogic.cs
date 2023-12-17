@@ -231,7 +231,7 @@ namespace TeleportEverything
             {
                 if(!ZoneSystem.instance.GetGroundHeight(new Vector3(position.x, position.y, position.z), out floorHeight))
                 {
-                    return false;
+                    floorHeight = ZoneSystem.instance.GetSolidHeight(position) + 0.5f;
                 }
             }
 

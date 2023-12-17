@@ -16,7 +16,7 @@ namespace TeleportEverything
     internal partial class Plugin : BaseUnityPlugin
     {
         internal const string ModName = "TeleportEverything";
-        internal const string ModVersion = "2.6.0";
+        internal const string ModVersion = "2.6.1";
         internal const string Author = "kpro";
         internal const string ModURL = "https://valheim.thunderstore.io/package/OdinPlus/TeleportEverything/";
         private const string ModGUID = "com."+ Author + "." + ModName;
@@ -130,7 +130,7 @@ namespace TeleportEverything
             EnableMod = config("--- Mod ---", "Enable Mod", true, "Enable/Disable mod");
             _serverConfigLocked = config("--- Mod ---", "Force Server Config", true, "Force Server Config");
             _ = ConfigSync.AddLockingConfigEntry(_serverConfigLocked);
-            MessageMode = config("--- Mod ---", "Message Mode", "top left",
+            MessageMode = config("--- Mod ---", "Message Mode", "centered",
                 new ConfigDescription("Message Mode",
                     new AcceptableValueList<string>("No messages", "top left", "centered")), false);
 

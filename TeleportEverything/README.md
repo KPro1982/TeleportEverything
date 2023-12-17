@@ -209,6 +209,10 @@ The mod is compatible with several other mods and we are always improving it.
 </p>
 
 ## Changelog
+- Version 2.6.1
+  - Fixed find floor when transporting allies
+  - Fixed inventory weight calculation after tax
+  - Set message mode centered as default
 - Version 2.6.0
   - Added compatibility with MagicPlugin, Fall_Damage_For_Creatures, CLLC and QuickCart
   - Summons can also be teleported

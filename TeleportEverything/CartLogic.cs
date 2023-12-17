@@ -47,12 +47,6 @@ namespace TeleportEverything
 
         internal static bool IsTeleportingCart() => attachedTeleportingCartId != null;
 
-        internal static void RemoveEmptyItems(Vagon cart)
-        {
-            TeleportEverythingLogger.LogInfo("Taking fee from cart");
-            RemoveEmptyItemsFromInventory(GetCartInventory(cart));
-        }
-
         internal static Inventory? GetCartInventory(Vagon cart)
         {
             var container = cart.gameObject.GetComponentInChildren<Container>();
