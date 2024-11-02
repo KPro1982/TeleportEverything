@@ -10,7 +10,7 @@ using TeleportEverything;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany(Plugin.Author)]
 [assembly: AssemblyProduct(Plugin.ModName)]
-[assembly: AssemblyCopyright("Copyright © 2022")]
+[assembly: AssemblyCopyright("Copyright © 2024")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
