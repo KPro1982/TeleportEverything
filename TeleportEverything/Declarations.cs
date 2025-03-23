@@ -16,7 +16,7 @@ namespace TeleportEverything
     internal partial class Plugin : BaseUnityPlugin
     {
         internal const string ModName = "TeleportEverything";
-        internal const string ModVersion = "2.7.0";
+        internal const string ModVersion = "2.9.0";
         internal const string Author = "kpro";
         internal const string ModURL = "https://thunderstore.io/c/valheim/p/OdinPlus/TeleportEverything/";
         private const string ModGUID = "com."+ Author + "." + ModName;
