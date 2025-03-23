@@ -11,8 +11,9 @@ namespace TeleportEverything
         private static bool ItemPermitted(ItemDrop.ItemData item)
         {
             if (item.m_shared.m_teleportable) return true;
-            if (IsDragonEgg(item) && !DragonEggsEnabled()) return false;
-            if (!OresEnabled()) return false;
+            var isDragonEgg = IsDragonEgg(item);
+            if (isDragonEgg && !DragonEggsEnabled()) return false;
+            if (!isDragonEgg && !OresEnabled()) return false;
 
             return true;
         }
@@ -36,11 +37,11 @@ namespace TeleportEverything
 
         internal static bool IsDragonEgg(ItemDrop.ItemData item)
         {
-            if (item?.m_dropPrefab == null)
+            if (item.m_dropPrefab == null)
             {
                 return false;
             }
-            return GetItemPrefabName(item).Equals(DRAGON_EGG);
+            return GetItemPrefabName(item).Equals(DRAGON_EGG, StringComparison.OrdinalIgnoreCase);
         }
 
         internal static bool HasFeeRemoved(ItemDrop.ItemData item)
@@ -52,54 +53,66 @@ namespace TeleportEverything
             return RemoveTransportFeeFrom?.Value != null && IsInMask(item.m_dropPrefab.name, RemoveTransportFeeFrom.Value);
         }
 
+        private static int CalculateDeductionValue(int oreQuantity)
+        {
+            decimal deductionPercentage = (decimal)TransportFee.Value / 100;
+            decimal valueToDeduct = oreQuantity * deductionPercentage;
+
+            // Ensure a minimum deduction of 1 and convert to integer
+            return Math.Max((int)Math.Ceiling(valueToDeduct), 1);
+        }
+
         internal static void ReduceStacks(Player player)
         {
-            var ores = new Dictionary<string, int>();
-            ores = RegisterOreQuantities(player.GetInventory(), ores);
+            var ores = RegisterOreQuantities(player.GetInventory());
 
             var cart = GetAttachedCart();
 
             if (CanTransportCarts() && ShouldTaxCarts?.Value == true && cart != null)
             {
                 var cartInventory = GetCartInventory(cart);
-                ores = RegisterOreQuantities(cartInventory, ores, true);
+                ores = RegisterOreQuantities(cartInventory, true, ores);
             }
 
             //deduct from inventory
             foreach (var ore in ores)
             {
                 if (TransportFee == null) continue;
-                var valueToDeduct = Convert.ToInt32(ore.Value * (float)TransportFee.Value / 100);
-                valueToDeduct = valueToDeduct > 0 ? valueToDeduct : 1;
-                
+                var valueToDeduct = CalculateDeductionValue(ore.Value);
                 var deducted = 0;
-                if (ShouldTaxCarts?.Value == true && currrentCartBeingTaxed && cart != null)
+
+                if (ShouldTaxCarts?.Value == true && currrentCartBeingTaxed && cart != null && valueToDeduct > 0)
                 {
                     var container = cart.gameObject.GetComponentInChildren<Container>();
                     if (container != null)
-                        ReduceFromInventory(container.m_inventory, ore.Key, ref valueToDeduct, ref deducted);
+                        ReduceFromInventory(container.GetInventory(), ore.Key, ref valueToDeduct, ref deducted);
                 }
                 if (valueToDeduct > 0)
                 {
                     ReduceFromInventory(player.GetInventory(), ore.Key, ref valueToDeduct, ref deducted);
                 }
+
                 deductedContraband += deducted;
-                TeleportEverythingLogger.LogInfo(
-                    Localization.instance.Localize("$te_deducted_items_detailed_message",
-                        deducted.ToString(), ore.Value.ToString(), ore.Key)
-                );
+
+                LogDeductionInfo(deducted, ore.Value, ore.Key);
             }
-            RemoveEmptyItems(player);
-            if (ShouldTaxCarts?.Value == true && currrentCartBeingTaxed && cart != null)
-            {
-                RemoveEmptyItems(cart);
-                currrentCartBeingTaxed = false;
-            }
+
+            currrentCartBeingTaxed = false;
         }
 
-        internal static Dictionary<string, int> RegisterOreQuantities(Inventory? inventory, Dictionary<string, int> ores, bool isFromCart=false)
+        private static void LogDeductionInfo(int deducted, int oreQuantity, string oreKey)
         {
-            if(inventory == null) return ores;
+            var message = Localization.instance.Localize("$te_deducted_items_detailed_message",
+                deducted.ToString(), oreQuantity.ToString(), oreKey);
+
+            TeleportEverythingLogger.LogInfo(message);
+        }
+
+        internal static Dictionary<string, int> RegisterOreQuantities(Inventory? inventory, bool isFromCart = false, Dictionary<string, int> ores = null)
+        {
+            ores ??= new Dictionary<string, int>();
+            if (inventory == null) return ores;
+
             //register ore quantities in a dictionary
             foreach (var item in inventory.GetAllItems().Where(item => !item.m_shared.m_teleportable && !HasFeeRemoved(item)))
             {
@@ -110,28 +123,49 @@ namespace TeleportEverything
                 AddOrCreateKey(ores, GetItemTranslatedName(item), item.m_stack);
                 totalContrabandCount += item.m_stack;
             }
+
             return ores;
         }
 
         internal static void ReduceFromInventory(Inventory? inventory, string oreKey, ref int valueToDeduct, ref int deducted)
         {
-            if (inventory == null) return;
-            foreach (var item in inventory.GetAllItems().Where(item => !item.m_shared.m_teleportable))
+            if (inventory == null)
             {
-                if (!GetItemTranslatedName(item).Equals(oreKey) || item.m_stack == 0 || valueToDeduct == 0) continue;
+                return;
+            }
 
-                if (item.m_stack > valueToDeduct)
+            List<ItemDrop.ItemData> itemsToDeduct = inventory
+                .GetAllItems()
+                .Where(item => !item.m_shared.m_teleportable && GetItemTranslatedName(item).Equals(oreKey) && item.m_stack > 0)
+                .ToList();
+
+            foreach (var item in itemsToDeduct)
+            {
+                DeductItemFromInventory(item, ref valueToDeduct, ref deducted);
+
+                // Only remove the item if m_stack is 0
+                if (item.m_stack == 0)
                 {
-                    deducted += valueToDeduct;
-                    item.m_stack -= valueToDeduct;
-                    valueToDeduct = 0;
+                    inventory.RemoveItem(item);
                 }
-                else
-                {
-                    deducted += item.m_stack;
-                    valueToDeduct -= item.m_stack;
-                    item.m_stack = 0;
-                }
+            }
+
+            inventory.Changed();
+        }
+
+        private static void DeductItemFromInventory(ItemDrop.ItemData item, ref int valueToDeduct, ref int deducted)
+        {
+            if (item.m_stack > valueToDeduct)
+            {
+                deducted += valueToDeduct;
+                item.m_stack -= valueToDeduct;
+                valueToDeduct = 0;
+            }
+            else
+            {
+                deducted += item.m_stack;
+                valueToDeduct -= item.m_stack;
+                item.m_stack = 0;
             }
         }
 
@@ -145,18 +179,6 @@ namespace TeleportEverything
             {
                 dict.Add(key, value);
             }
-        }
-
-        internal static void RemoveEmptyItems(Player player)
-        {
-            RemoveEmptyItemsFromInventory(player.GetInventory());
-        }
-
-        internal static void RemoveEmptyItemsFromInventory(Inventory? inventory)
-        {
-            if (inventory == null) return;
-            var items = inventory.GetAllItems();
-            items.RemoveAll(item => item.m_stack == 0);
         }
 
         public static bool DragonEggsEnabled() => TransportDragonEggs?.Value == true;

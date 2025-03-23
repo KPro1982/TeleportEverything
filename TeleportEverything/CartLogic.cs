@@ -35,22 +35,17 @@ namespace TeleportEverything
             cart.m_nview.ClaimOwnership();
 
             var newPosition = pos + SetForwardOffset(rot, CART_FORWARD_OFFSET);
-            if (!ZoneSystem.instance.FindFloor(newPosition, out var height))
+            if (!ZoneSystem.instance.FindFloor(newPosition, out _))
             {
-                newPosition.y += CART_Y_OFFSET;
+                newPosition.y = ZoneSystem.instance.GetSolidHeight(newPosition) + 0.5f;
             }
 
-            cart.transform.SetPositionAndRotation(newPosition, rot);
+            attachedTeleportingCartId = cart.m_nview.GetZDO().m_uid;
+            SetPosition(cart, newPosition, rot);
             cart.m_body.velocity = Vector3.zero;
-            cart.m_body.useGravity = false;
-            currentAttachedCartId = cart.m_nview.GetZDO().m_uid;
         }
 
-        internal static void RemoveEmptyItems(Vagon cart)
-        {
-            TeleportEverythingLogger.LogInfo("Taking fee from cart");
-            RemoveEmptyItemsFromInventory(GetCartInventory(cart));
-        }
+        internal static bool IsTeleportingCart() => attachedTeleportingCartId != null;
 
         internal static Inventory? GetCartInventory(Vagon cart)
         {
@@ -60,19 +55,8 @@ namespace TeleportEverything
 
         internal static bool CartIsTeleportable(Vagon cart)
         {
-            if (DragonEggsEnabled() && OresEnabled())
-            {
-                return true;
-            }
-
             var inventory = GetCartInventory(cart);
-            if (inventory == null) return true;
-            foreach (var item in inventory.GetAllItems())
-            {
-                if (!ItemPermitted(item)) return false;
-            }
-
-            return true;
+            return inventory?.IsTeleportable() == true;
         }
 
         internal static bool CanTransportCarts()

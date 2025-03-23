@@ -107,20 +107,24 @@ namespace TeleportEverything
         }
 
         private static int placedEnemies;
-        public static void TeleportCreatures(Player player, List<Character> creatures, bool hasEnemies=false)
+        public static void TeleportCreatures(Player player, List<Character> creatures, bool areEnemies=false)
         {
             placedEnemies = 0;
             foreach (Character c in creatures)
             {
                 c.m_nview.ClaimOwnership();
-                SetPositionAttempt(c, player.m_teleportTargetPos, player.m_teleportTargetRot, hasEnemies);
+                if(!areEnemies && c.TryGetComponent<Tameable>(out var tameable))
+                {
+                    tameable.m_unsummonDistance = 0f;
+                }
+                SetPositionAttempt(c, player.m_teleportTargetPos, player.m_teleportTargetRot, areEnemies);
             }
 
             if (placedEnemies > 0)
             {
                 var placedEnemiesMessage = Localization.instance.Localize("$te_transported_enemies_message", placedEnemies.ToString());
                 TeleportEverythingLogger.LogInfo(placedEnemiesMessage);
-                DisplayMessage(placedEnemiesMessage);
+                DisplayLongMessage(placedEnemiesMessage);
             }
         }
 
@@ -129,18 +133,18 @@ namespace TeleportEverything
             return EnableMod?.Value == true;
         }
 
-        private static void SetPositionAttempt(Character c, Vector3 destination, Quaternion playerRotation, bool hasEnemies)
+        private static void SetPositionAttempt(Character c, Vector3 destination, Quaternion playerRotation, bool isEnemy)
         {
             var radius = EnemySpawnRadius?.Value ?? 3;
             var tries = 1;
-            var offset = GetSpawnOffset(c, playerRotation, radius, hasEnemies);
+            var offset = GetSpawnOffset(c, playerRotation, radius, isEnemy);
 
             while (tries <= 5)
             {
                 var newPosition = destination;
                 newPosition += offset;
-                newPosition += GetRandomLocation(radius, hasEnemies);
-                if (!CharacterFits(newPosition, c, hasEnemies, out var placeAt))
+                newPosition += GetRandomLocation(radius, isEnemy);
+                if (!CharacterFits(newPosition, c, out var placeAt))
                 {
                     tries++;
                     continue;
@@ -148,8 +152,10 @@ namespace TeleportEverything
 
                 newPosition.y = placeAt + UP_OFFSET;
                 SetPosition(c, newPosition, playerRotation);
+                c.m_body.velocity = Vector3.zero;
+                c.m_maxAirAltitude = c.transform.position.y;
                 c.SetLookDir(c.transform.position);
-                if (hasEnemies)
+                if (isEnemy)
                 {
                     placedEnemies++;
                 }
@@ -158,9 +164,9 @@ namespace TeleportEverything
             }
         }
 
-        private static Vector3 GetRandomLocation(int radius, bool hasEnemies)
+        private static Vector3 GetRandomLocation(int radius, bool isEnemy)
         {
-            var random = (hasEnemies) ? Random.insideUnitCircle * radius : Random.insideUnitCircle * 0.5f;
+            var random = (isEnemy) ? Random.insideUnitCircle * radius : Random.insideUnitCircle * 0.5f;
             return new Vector3(random.x, 0, random.y);
         }
 
@@ -169,11 +175,11 @@ namespace TeleportEverything
             return rot * Vector3.forward * offsetValue;
         }
 
-        private static Vector3 GetSpawnOffset(Character c, Quaternion playerRotation, int radius, bool hasEnemies)
+        private static Vector3 GetSpawnOffset(Character c, Quaternion playerRotation, int radius, bool isEnemy)
         {
             if (SpawnForwardOffset == null) return SetForwardOffset(playerRotation, 0f);
             var alliesOffset = SpawnForwardOffset.Value;
-            if (!hasEnemies)
+            if (!isEnemy)
             {
                 if (GetPrefabName(c).Equals(LOX, StringComparison.OrdinalIgnoreCase))
                 {
@@ -182,7 +188,7 @@ namespace TeleportEverything
             }
 
             if (SpawnEnemiesForwardOffset == null) return SetForwardOffset(playerRotation, 0f);
-            var spawnForward = (hasEnemies) ? SpawnEnemiesForwardOffset.Value + radius / 2 : alliesOffset;
+            var spawnForward = (isEnemy) ? SpawnEnemiesForwardOffset.Value + radius / 2 : alliesOffset;
             return SetForwardOffset(playerRotation, spawnForward);
         }
 
@@ -217,7 +223,7 @@ namespace TeleportEverything
             return false;
         }
 
-        private static bool CharacterFits(Vector3 position, Character c, bool hasEnemies, out float placeAt)
+        private static bool CharacterFits(Vector3 position, Character c, out float placeAt)
         {
             placeAt = 0f;
 
@@ -225,12 +231,7 @@ namespace TeleportEverything
             {
                 if(!ZoneSystem.instance.GetGroundHeight(new Vector3(position.x, position.y, position.z), out floorHeight))
                 {
-                    if (hasEnemies)
-                    {
-                        return false;
-                    }
-
-                    floorHeight = position.y;
+                    floorHeight = ZoneSystem.instance.GetSolidHeight(position) + 0.5f;
                 }
             }
 
